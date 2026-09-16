@@ -1,0 +1,10 @@
+# ── Secrets — ne JAMAIS commiter ────────────────────────────
+.env
+plugins/*/.env
+
+# ── Python ──────────────────────────────────────────────────
+__pycache__/
+*.pyc
+
+# ── Config / données locales ────────────────────────────────
+.secondbrain/

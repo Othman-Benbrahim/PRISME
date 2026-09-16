@@ -1,0 +1,14 @@
+{
+  "name": "OSINT Cross-Reference",
+  "version": "1.7.0",
+  "description": "Recherche OSINT multi-source en mode audit défensif : score de corrélation, GitHub public, Wikidata, API Entreprises, Reddit public, Maigret/Sherlock local, BrixHub optionnel et X API.",
+  "author": "HackerAI / adaptation Second Brain",
+  "buttons": [
+    {
+      "panel": "toolbar",
+      "label": "🔍 OSINT",
+      "title": "OSINT Cross-Reference — Recherche multi-source",
+      "onclick": "openOsintCx()"
+    }
+  ]
+}
