@@ -1,10 +1,16 @@
-# ── Secrets — ne JAMAIS commiter ────────────────────────────
+# ── Secrets : ne JAMAIS commiter ────────────────────────────
 .env
 plugins/*/.env
 
 # ── Python ──────────────────────────────────────────────────
 __pycache__/
 *.pyc
+*.bak
 
-# ── Config / données locales ────────────────────────────────
+# ── Construction de l'exe ───────────────────────────────────
+build/
+dist/
+
+# ── Profils et données locales ──────────────────────────────
+.prisme/
 .secondbrain/
