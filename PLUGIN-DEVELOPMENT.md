@@ -1,3 +1,17 @@
+> **PRISME, étape E8 — guide provisoire.** Ce guide décrit l'API des plugins héritée de
+> Second Brain V1. Elle fonctionne encore grâce à une passerelle temporaire : l'import
+> `from second_brain import _ai_call, extract_link_refs, resolve_ref` reste valide.
+> Changements déjà en place :
+> - le lancement se fait avec `python prisme.py` (le fichier `second_brain.py` n'existe plus) ;
+> - `ui.css` et `ui.js` de chaque plugin sont chargés comme **fichiers séparés** et non plus
+>   concaténés dans la page : une erreur de syntaxe n'affecte que votre plugin. Les
+>   déclarations globales (`var`, `let`, `const`, `function`) partagent toujours l'espace
+>   global avec le cœur ; évitez les noms génériques ;
+> - le profil utilisateur du cœur est `~/.prisme/` (les chemins `~/.secondbrain/` cités
+>   plus bas concernent encore les plugins hérités).
+>
+> Ce guide sera réécrit à l'étape E1, qui remplace cette API par `prisme_core.api`.
+
 # 🔌 Créer un plugin Second Brain
 
 > Guide complet pour développer un plugin Second Brain. Si vous savez écrire du Python et un peu de JavaScript, vous écrirez votre premier plugin en 20 minutes.
