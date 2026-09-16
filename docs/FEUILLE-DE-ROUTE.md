@@ -5,7 +5,7 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | Étape | Branche | Objet | État |
 |---|---|---|---|
 | Base | `main` (étiquette `base-v1`) | Import du code de Second Brain V1, sans modification | Fait |
-| E8 | `e8-decoupage-coeur` | Découpage du cœur et de l'interface, renommage PRISME, aucune nouvelle fonctionnalité | À faire |
+| E8 | `e8-decoupage-coeur` | Découpage du cœur et de l'interface, renommage PRISME, aucune nouvelle fonctionnalité | En revue |
 | E1 | `e1-api-plugins` | `prisme_core.api`, hooks synchrones, gestionnaire de plugins, migration des plugins | À faire |
 | E2 | `e2-index-sqlite` | Index SQLite FTS5 dans le profil, double granularité fichier + segment | À faire |
 | E3 | `e3-provenance` | Frontmatter `prisme_*`, identifiants posés au besoin | À faire |

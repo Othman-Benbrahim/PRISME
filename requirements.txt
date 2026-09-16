@@ -1,10 +1,13 @@
-# Second Brain — dépendances Python
+# PRISME — dépendances Python
 #
 # Installation :  pip install -r requirements.txt
 #
 # Aucune autre dépendance n'est requise : tout le reste utilise la
 # bibliothèque standard Python (re, time, json, html, datetime, pathlib,
 # urllib, threading, concurrent.futures, xml.etree.ElementTree, etc.).
+
+# Construction de l'exe (facultatif) : pip install pyinstaller
+#   puis : pyinstaller packaging/PRISME.spec
 
 # ── Cœur (obligatoire) ─────────────────────────────────────────────
 flask>=3.0.0

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PRISME</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="/static/css/core.css">
+<link rel="stylesheet" href="/static/css/ai-stream.css">
+<!-- PLUGIN_STYLES -->
+</head>
+<body>
+<header>
+  <div class="logo"><div class="dot"></div>PRISME</div>
+  <button class="hbtn" onclick="openSearch()">🔍 Recherche <kbd style="opacity:.5;font-size:10px">Ctrl+Shift+F</kbd></button>
+  <button class="hbtn" onclick="newFilePrompt()">＋ Nouveau</button>
+  <button class="hbtn" onclick="saveFile()">💾 Sauvegarder</button>
+  <button class="hbtn" id="btn-mm" onclick="toggleMM()">◀ Carte</button>
+  <button class="hbtn" onclick="openCfg()">⚙ Paramètres</button>
+</header>
+<div id="main">
+
+  <!-- ── Sidebar ── -->
+  <div id="sb">
+    <div class="sb-hd">📁 Explorateur
+      <div class="sb-act">
+        <button onclick="openGraph()" title="Vue graphe du dossier">🕸</button>
+        <button onclick="folderSynthesis()" title="Synthèse IA du dossier">✨</button>
+        <button onclick="newFilePrompt()" title="Nouveau fichier">＋</button>
+      </div>
+    </div>
+    <div id="fp">
+      <span id="fp-txt">…</span>
+      <button class="fp-ws" onclick="setWorkspace()" title="Définir comme espace de travail">⚑</button>
+    </div>
+    <div id="tag-filter-bar"><span id="tf-label"></span><button onclick="clearTagFilter()">×</button></div>
+    <div id="fl"></div>
+    <div id="tag-sect">
+      <div id="tag-hd" onclick="toggleTagSect()">🏷 Tags <span class="arr">▼</span></div>
+      <div id="tagcloud"></div>
+    </div>
+  </div>
+
+  <!-- ── Éditeur ── -->
+  <div id="ed-col">
+    <div id="tab-bar"><button id="tab-new" onclick="newFilePrompt()" title="Nouveau fichier">＋</button></div>
+    <div id="ed-bar">
+      <span id="ed-fname">Aucun fichier</span>
+      <div class="mode-grp">
+        <button class="mbtn on" id="btn-mode-edit"    onclick="setMode('edit')"   >✏️ Éditer</button>
+        <button class="mbtn"    id="btn-mode-preview"  onclick="setMode('preview')">👁 Aperçu</button>
+        <button class="mbtn"    id="btn-mode-split"    onclick="setMode('split')"  >⧉ Scindé</button>
+      </div>
+      <button class="hbtn" onclick="saveFile()">💾</button>
+      <button class="hbtn" onclick="suggestLinks()" title="Suggérer des [[liens]]">🔗 Liens IA</button>
+      <!-- PLUGIN_TOOLBAR_BUTTONS -->
+    </div>
+    <div id="ed-area">
+      <div class="es" id="no-file"><div class="ei">📝</div><div>Ouvrez ou créez un fichier <strong>.md</strong></div></div>
+      <textarea id="md-editor" style="display:none" oninput="onEditorInput()"></textarea>
+      <div id="split-div" style="display:none"></div>
+      <div id="md-preview" style="display:none"></div>
+    </div>
+    <div id="fai-toggle" onclick="toggleFileAI()">
+      <span>🤖 IA — Modifier ce fichier</span><span class="arr">▲</span>
+    </div>
+    <div id="file-ai"><div id="fai-inner">
+      <div id="faag">
+        <button class="btn bs faab" onclick="fileAI('improve')">✨ Améliorer</button>
+        <button class="btn bs faab" onclick="fileAI('structure')">📐 Restructurer</button>
+        <button class="btn bs faab" onclick="fileAI('summarize')">📝 Résumer</button>
+        <button class="btn bs faab" onclick="fileAI('expand')">🌿 Développer</button>
+      </div>
+      <textarea id="fap" rows="2" placeholder="Instruction libre…"></textarea>
+      <button class="btn bp" onclick="fileAICustom()">🚀 Envoyer</button>
+      <div id="fald"><span class="sp"></span>Génération…</div>
+      <div id="farw"></div>
+      <div id="faar" class="row">
+        <button class="btn bs" onclick="applyFileAI('r')" style="font-size:11px">✓ Remplacer</button>
+        <button class="btn bs" onclick="applyFileAI('a')" style="font-size:11px">+ Ajouter à la fin</button>
+      </div>
+    </div></div>
+  </div>
+
+  <div id="divbar"></div>
+
+  <!-- ── Panneau droit ── -->
+  <div id="mm-col">
+    <div id="mm-tabs">
+      <button class="mm-tab on" id="mmt0" onclick="switchMMTab(0)">🗺 Structure</button>
+      <button class="mm-tab"    id="mmt1" onclick="switchMMTab(1)">🔗 Backlinks</button>
+    </div>
+    <div id="pane-struct">
+      <div id="mm-bar">
+        <span id="mm-title">Structure</span>
+        <button onclick="fitView()" title="Recentrer">⊡</button>
+        <button onclick="svgZoom(1.3)">＋</button>
+        <button onclick="svgZoom(.77)">－</button>
+      </div>
+      <div id="mm-wrap"><svg id="mm"></svg></div>
+    </div>
+    <div id="pane-bl">
+      <div id="bl-hd">🔗 Backlinks <span id="bl-count" style="color:var(--acc);margin-left:4px"></span></div>
+      <div id="bl-list"><div class="bl-empty">Ouvrez un fichier</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sélection toolbar ── -->
+<div id="sel-bar" style="display:none;position:fixed;z-index:150;gap:3px;">
+  <button onclick="aiOnSel('improve')">✨ Améliorer</button>
+  <button onclick="aiOnSel('shorten')">✂️ Raccourcir</button>
+  <button onclick="aiOnSel('explain')">💡 Expliquer</button>
+  <button onclick="aiOnSel('translate')">🌐 Traduire</button>
+  <button onclick="hideSelBar()" style="color:var(--tx2)">×</button>
+</div>
+
+<!-- ── Context menu ── -->
+<div id="ctx">
+  <div class="ci" id="ctx-open">📄 Ouvrir</div>
+  <div class="ci" id="ctx-ws">⚑ Définir comme espace de travail</div>
+  <div class="ci" id="ctx-graph">🕸 Vue graphe du dossier</div>
+  <div class="csep"></div>
+  <div class="ci dng" id="ctx-del">🗑 Supprimer</div>
+</div>
+
+<!-- ── Modal Paramètres ── -->
+<div id="mcfg" class="ov"><div class="mb">
+  <div class="mt">⚙ Paramètres</div>
+  <!-- SB_SETTINGS_PATCH -->
+  <div><label>Fournisseur</label>
+  <select id="cprov" onchange="cfgProv()"></select>
+  <div id="cprov-help" style="font-size:11px;color:var(--tx2);margin-top:4px"></div></div>
+  <div><label>Clé API <span style="color:var(--tx2);font-weight:400">(inutile en local)</span></label>
+  <input id="ckey" type="password" placeholder="">
+  <div id="kinfo" style="font-size:11px;margin-top:5px"></div></div>
+  <div><label>Modèle IA</label>
+  <input id="cmod" type="text" list="cfg-models" placeholder="nom exact du modèle">
+  <datalist id="cfg-models"></datalist></div>
+  <button class="btn bs" id="lmobtn" onclick="loadMods()" style="width:auto;padding:5px 12px;font-size:11px">↺ Charger les modèles</button>
+  <div><label>Dossier de notes</label><input id="cws" type="text"></div>
+  <div><label>URL API</label><input id="curl" type="text"></div>
+  <div class="mf">
+    <button class="btn bs" onclick="closeCfg()" style="width:auto;padding:7px 16px">Annuler</button>
+    <button class="btn bp" onclick="saveCfg()" style="width:auto;padding:7px 16px">💾 Sauvegarder</button>
+  </div>
+</div></div>
+
+<!-- ── Modal Recherche ── -->
+<div id="msearch" class="ov"><div class="mb mb-wide">
+  <input id="sq" type="text" placeholder="Rechercher dans tous les fichiers .md…" oninput="debouncedSearch()" autocomplete="off">
+  <div id="sresults"><div class="s-empty">Tapez pour rechercher…</div></div>
+</div></div>
+
+<!-- ── Modal Graphe dossier ── -->
+<div id="mgraph" class="ov"><div class="mb mb-wide" style="height:88vh;padding:0">
+  <div id="graph-hd">
+    <span id="graph-title">Graphe du dossier</span>
+    <div class="grp-btns">
+      <button class="gbtn on" id="gbt-force" onclick="switchGraph('force')">🕸 Réseau</button>
+      <button class="gbtn"    id="gbt-tree"  onclick="switchGraph('tree')">🌳 Arbre</button>
+    </div>
+    <button class="hbtn" style="margin-left:8px" onclick="closeGraph()">✕ Fermer</button>
+  </div>
+  <div id="graph-wrap">
+    <svg id="graph-svg"></svg>
+    <div id="graph-tooltip"></div>
+  </div>
+</div></div>
+
+<!-- PLUGIN_HTML -->
+
+<!-- ── Modal Synthèse ── -->
+<div id="msyn" class="ov"><div class="mb">
+  <div class="mt" id="syn-title">Synthèse IA du dossier</div>
+  <div id="syn-ld" style="text-align:center;padding:24px"><span class="sp"></span>Analyse en cours…</div>
+  <div id="syn-content" style="display:none"></div>
+  <div class="mf" id="syn-footer" style="display:none">
+    <button class="btn bs" onclick="closeSyn()" style="width:auto;padding:7px 16px">Fermer</button>
+    <button class="btn bp" onclick="saveSynAsFile()" style="width:auto;padding:7px 16px">💾 Sauver comme .md</button>
+  </div>
+</div></div>
+
+<div id="toast"></div>
+
+
+<!-- Premier lancement -->
+<div id="monb" class="ov"><div class="mb" style="width:520px;max-width:94vw">
+  <div class="mt">🧠 Bienvenue dans PRISME</div>
+  <div class="minfo">Deux réglages et c'est parti. Tout est modifiable plus tard dans ⚙ Paramètres.</div>
+
+  <div><label>1. Où ranger vos notes</label>
+    <input id="onb-ws" type="text">
+    <div style="font-size:11px;color:var(--tx2);margin-top:4px">
+      Le dossier sera créé s'il n'existe pas, avec une note d'accueil.
+    </div>
+  </div>
+
+  <div><label>2. Quelle IA</label>
+    <select id="onb-prov" onchange="onbProv()"></select>
+    <div id="onb-help" style="font-size:11px;color:var(--tx2);margin-top:4px"></div>
+  </div>
+
+  <div id="onb-key-block"><label>Clé API</label>
+    <input id="onb-key" type="password" placeholder="">
+  </div>
+
+  <div><label>URL du service</label><input id="onb-url" type="text"></div>
+  <div><label>Modèle</label><input id="onb-model" type="text" list="onb-models">
+    <datalist id="onb-models"></datalist>
+  </div>
+
+  <div id="onb-status" style="font-size:11px;margin-top:8px;min-height:14px"></div>
+
+  <div class="mf">
+    <button class="btn bs" style="width:auto;padding:7px 16px" onclick="onbTest()">🔌 Tester</button>
+    <button class="btn bp" style="width:auto;padding:7px 16px" onclick="onbSave()">Commencer →</button>
+  </div>
+</div></div>
+
+<!-- Reponse IA au fil de l'eau -->
+<div id="aistream">
+  <div id="aistream-hd">
+    <span id="aistream-ttl">✨ L'IA rédige…</span>
+    <button class="hbtn" onclick="aiStreamAbort()" title="Interrompre">⏹</button>
+  </div>
+  <div id="aistream-body"></div>
+  <div id="aistream-meta"><span id="aistream-count">0 caractère</span><span id="aistream-time">0 s</span></div>
+</div>
+
+
+<!-- Coeur : l'ordre des scripts compte (meme ordre qu'en V1, jeton en premier) -->
+<script src="/static/js/token.js"></script>
+<script src="/static/js/helpers.js"></script>
+<script src="/static/js/tabs.js"></script>
+<script src="/static/js/editor.js"></script>
+<script src="/static/js/explorer.js"></script>
+<script src="/static/js/tags.js"></script>
+<script src="/static/js/backlinks.js"></script>
+<script src="/static/js/search.js"></script>
+<script src="/static/js/graph.js"></script>
+<script src="/static/js/synthesis.js"></script>
+<script src="/static/js/ai-selection.js"></script>
+<script src="/static/js/link-suggest.js"></script>
+<script src="/static/js/ai-file.js"></script>
+<!-- Plugins : un fichier chacun, une erreur n'affecte que son plugin -->
+<!-- PLUGIN_SCRIPTS -->
+<script src="/static/js/mindmap.js"></script>
+<script src="/static/js/layout.js"></script>
+<script src="/static/js/settings.js"></script>
+<script src="/static/js/init.js"></script>
+<script src="/static/js/onboarding.js"></script>
+<script src="/static/js/ai-stream.js"></script>
+</body>
+</html>

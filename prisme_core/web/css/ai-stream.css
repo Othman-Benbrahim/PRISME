@@ -1,0 +1,10 @@
+#aistream{position:fixed;right:18px;bottom:18px;width:360px;max-width:46vw;z-index:400;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;
+  box-shadow:0 8px 28px rgba(0,0,0,.45);display:none;font-size:12px}
+#aistream.on{display:block}
+#aistream-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+#aistream-ttl{flex:1;font-weight:600;font-size:11px;color:var(--acc)}
+#aistream-body{max-height:190px;overflow:auto;white-space:pre-wrap;line-height:1.5;
+  color:var(--tx2);font-size:11px}
+#aistream-meta{font-size:10px;color:var(--tx2);margin-top:6px;display:flex;
+  justify-content:space-between;gap:8px}

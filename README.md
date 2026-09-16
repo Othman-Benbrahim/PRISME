@@ -13,10 +13,22 @@ La feuille de route est dans [`docs/FEUILLE-DE-ROUTE.md`](docs/FEUILLE-DE-ROUTE.
 Chaque étape vit sur sa propre branche, documentée dans [`docs/branches/`](docs/branches/),
 et n'entre dans `main` que par une pull request validée.
 
+## Lancer PRISME
+
+```powershell
+pip install -r requirements.txt
+python prisme.py
+```
+
+Le navigateur s'ouvre sur `http://localhost:5000`. Les tests se lancent avec
+`python -m unittest discover -s tests -v`.
+
 ## Documents de référence
 
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) : les choix d'architecture et leurs raisons.
 - [`docs/RUPTURES.md`](docs/RUPTURES.md) : tout ce qui change par rapport à la base V1.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) : où se trouve quoi dans le code.
+- [`PLUGIN-DEVELOPMENT.md`](PLUGIN-DEVELOPMENT.md) : créer un plugin (guide provisoire).
 
 ## Principes
 
