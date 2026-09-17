@@ -97,6 +97,7 @@ def call_ai_stream():
             yield _sse({"error": "HTTP %d %s" % (r.status_code, detail)})
             return
         got_any = False
+        r.encoding = "utf-8"      # text/event-stream sans charset : requests supposerait ISO-8859-1
         try:
             for line in r.iter_lines(decode_unicode=True):
                 if not line:

@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="/static/css/core.css">
 <link rel="stylesheet" href="/static/css/ai-stream.css">
 <link rel="stylesheet" href="/static/css/plugin-manager.css">
+<link rel="stylesheet" href="/static/css/link-suggest.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
@@ -92,6 +93,7 @@
     <div id="mm-tabs">
       <button class="mm-tab on" id="mmt0" onclick="switchMMTab(0)">🗺 Structure</button>
       <button class="mm-tab"    id="mmt1" onclick="switchMMTab(1)">🔗 Backlinks</button>
+      <button class="mm-tab"    id="mmt2" onclick="switchMMTab(2)">✨ Liens</button>
     </div>
     <div id="pane-struct">
       <div id="mm-bar">
@@ -105,6 +107,14 @@
     <div id="pane-bl">
       <div id="bl-hd">🔗 Backlinks <span id="bl-count" style="color:var(--acc);margin-left:4px"></span></div>
       <div id="bl-list"><div class="bl-empty">Ouvrez un fichier</div></div>
+    </div>
+    <div id="pane-links">
+      <div id="lk-hd">
+        <span id="lk-title">Liens suggérés</span>
+        <button class="hbtn" id="lk-run" onclick="suggestLinks()">Analyser</button>
+      </div>
+      <div id="lk-status" class="lk-status"></div>
+      <div id="lk-list"><div class="bl-empty">Ouvrez une note puis cliquez sur « Analyser ».</div></div>
     </div>
   </div>
 </div>

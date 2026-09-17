@@ -58,7 +58,11 @@ def _chat_post(url, headers=None, json=None, timeout=120, **kw):
     body = json or {}
     if headers and "anthropic-version" in headers:
         body = _to_anthropic_body(body)
-    return http.post(url, headers=headers, json=body, timeout=timeout, **kw)
+    r = http.post(url, headers=headers, json=body, timeout=timeout, **kw)
+    # Les API de chat repondent en UTF-8. Sans charset annonce, requests suppose
+    # ISO-8859-1 pour text/* : les accents devenaient "Ã©".
+    r.encoding = "utf-8"
+    return r
 
 def needs_key(cfg):
     """True si une cle est indispensable : service distant sans cle configuree."""

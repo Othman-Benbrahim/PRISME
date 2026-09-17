@@ -2,9 +2,10 @@
 //  BACKLINKS
 // ══════════════════════════════════════════════════
 function switchMMTab(i){
-  [0,1].forEach(function(j){ $('mmt'+j).classList.toggle('on',j===i); });
+  [0,1,2].forEach(function(j){ $('mmt'+j).classList.toggle('on',j===i); });
   $('pane-struct').style.display=i===0?'flex':'none';
   $('pane-bl').style.display=i===1?'flex':'none';
+  $('pane-links').style.display=i===2?'flex':'none';
   ACTIVE_MM_TAB=i;
   if(i===1&&ACTIVE) loadBacklinks(ACTIVE);
 }

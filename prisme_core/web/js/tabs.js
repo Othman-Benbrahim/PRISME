@@ -21,6 +21,7 @@ function switchTab(path){
   if(EDITOR_MODE!=='edit') updatePreview();
   updateMindmap(t.content,path.split(/[/\\]/).pop());
   if(ACTIVE_MM_TAB===1) loadBacklinks(path);
+  if(typeof linksOnSwitch==='function') linksOnSwitch(path);
   highlightFile(path);
 }
 function closeTab(path){
