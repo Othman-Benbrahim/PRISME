@@ -72,7 +72,7 @@ function hasBrixPayload(payload){
 }
 
 async function fetchBrixHubPayload(payload){
-  var resp = await fetch('/api/osintcx/brixhub', {
+  var resp = await fetch('/api/plugins/osint-cx/brixhub', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload)
@@ -127,7 +127,7 @@ async function runOsintCxSearch(){
         if(liUrl) extras += '&linkedin_url=' + encodeURIComponent(liUrl);
       }
       if($('oscx-socialcli') && $('oscx-socialcli').checked) extras += '&socialcli=1';
-      var url = '/api/osintcx/crossref?q=' + encodeURIComponent(q) + '&type=' + encodeURIComponent(OSCX.type) + extras;
+      var url = '/api/plugins/osint-cx/crossref?q=' + encodeURIComponent(q) + '&type=' + encodeURIComponent(OSCX.type) + extras;
       r = await fetch(url).then(function(resp){ return resp.json(); });
       if(r.error || r.ok === false){ $('oscx-progress').style.display = 'none'; showOsintCxError(r.error || 'Recherche impossible'); return; }
     }else{

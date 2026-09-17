@@ -4,7 +4,7 @@ Inspiré de WeakSignalFinder (https://github.com/LittleViewer/WeakSignalFinder) 
 allégé pour rester dans la philosophie "zéro dépendance lourde" du projet :
 - Pas de spaCy, pas de NLTK, pas de scikit-learn
 - Regex + Counter + stopwords français/anglais embarqués
-- Historique sur disque (~/.secondbrain/rss_signals_history.json)
+- Historique sur disque (~/.prisme/plugins/rss/rss_signals_history.json)
 
 Pipeline :
   1. Tokenisation (mots de 4+ caractères, lettres + accents FR)
@@ -191,8 +191,13 @@ def _empty_result(article_count=0):
 #  PERSISTANCE — pour la détection d'émergence inter-runs
 # ══════════════════════════════════════════════════════════════
 
+HISTORY_FILE = None   # fixe par le plugin : ~/.prisme/plugins/rss/rss_signals_history.json
+
+
 def _history_file():
-    return Path.home() / ".secondbrain" / "rss_signals_history.json"
+    if HISTORY_FILE is None:
+        raise RuntimeError("signal_engine.HISTORY_FILE non initialise")
+    return HISTORY_FILE
 
 
 def save_run(signals, feed_urls):

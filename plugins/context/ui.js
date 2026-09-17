@@ -6,7 +6,7 @@ var CTX = {files:[], selected:new Set(), answer:'', question:'', sysPrompt:'', f
 async function openContextBuilder(){
   // Charger la liste de tous les .md du workspace
   try {
-    var r = await fetch('/api/context/list?dir='+eu(CUR_DIR)).then(function(r){return r.json();});
+    var r = await fetch('/api/plugins/context/list?dir='+eu(CUR_DIR)).then(function(r){return r.json();});
     if(r.error){ toast('⚠ '+r.error); return; }
     CTX.files = r.files || [];
   } catch(e){ toast('⚠ Erreur chargement fichiers: '+e); return; }
@@ -116,7 +116,7 @@ async function ctxPreview(){
   var depth = mode === 'auto' ? parseInt($('ctx-depth').value) : 0;
 
   toast('Assemblage du corpus…', 2000);
-  var r = await post('/api/context/build', {paths: Array.from(CTX.selected), depth: depth, dir: CUR_DIR});
+  var r = await post('/api/plugins/context/build', {paths: Array.from(CTX.selected), depth: depth, dir: CUR_DIR});
   if(r.error){ toast('⚠ '+r.error); return; }
 
   // Aperçu dans nouvel onglet
@@ -146,7 +146,7 @@ async function ctxAsk(){
   $('ctx-ask-btn').textContent = '⏳ IA en cours (peut prendre 1-3 min)…';
   $('ctx-response').style.display = 'none';
 
-  var r = await post('/api/context/ask', {
+  var r = await post('/api/plugins/context/ask', {
     paths:         Array.from(CTX.selected),
     depth:         depth,
     question:      question,

@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="/static/css/core.css">
 <link rel="stylesheet" href="/static/css/ai-stream.css">
+<link rel="stylesheet" href="/static/css/plugin-manager.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
@@ -17,6 +18,7 @@
   <button class="hbtn" onclick="newFilePrompt()">＋ Nouveau</button>
   <button class="hbtn" onclick="saveFile()">💾 Sauvegarder</button>
   <button class="hbtn" id="btn-mm" onclick="toggleMM()">◀ Carte</button>
+  <button class="hbtn" onclick="openPlugins()" title="Installer, activer, configurer les plugins">🧩 Plugins</button>
   <button class="hbtn" onclick="openCfg()">⚙ Paramètres</button>
 </header>
 <div id="main">
@@ -169,6 +171,32 @@
   </div>
 </div></div>
 
+<!-- ── Modal Gestionnaire de plugins ── -->
+<div id="mplugins" class="ov"><div class="mb">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="mt" style="flex:1">🧩 Plugins</div>
+    <button class="hbtn" onclick="closePlugins()">✕</button>
+  </div>
+  <div id="pm-list-view">
+    <div class="pm-install">
+      <label class="btn bs" style="width:auto;margin:0;text-transform:none;letter-spacing:0;font-size:12px;padding:6px 12px;color:var(--tx3)">
+        📦 Installer un ZIP…<input type="file" accept=".zip" style="display:none" onchange="pmInspectFile(this)">
+      </label>
+      <input id="pm-url" type="text" placeholder="ou adresse https:// d'une archive ZIP">
+      <button class="btn bs" id="pm-url-btn" onclick="pmInspectUrl()">Vérifier</button>
+    </div>
+    <div class="pm-muted" id="pm-encryption" style="margin-top:6px"></div>
+    <div id="pm-list"></div>
+  </div>
+  <div id="pm-confirm-view" style="display:none">
+    <div id="pm-confirm-body"></div>
+    <div class="mf">
+      <button class="btn bs" onclick="pmShowList()">Annuler</button>
+      <button class="btn bp" onclick="pmInstall()">Installer</button>
+    </div>
+  </div>
+</div></div>
+
 <!-- PLUGIN_HTML -->
 
 <!-- ── Modal Synthèse ── -->
@@ -230,7 +258,7 @@
 </div>
 
 
-<!-- Coeur : l'ordre des scripts compte (meme ordre qu'en V1, jeton en premier) -->
+<!-- Coeur : l'ordre des scripts compte (jeton en premier) -->
 <script src="/static/js/token.js"></script>
 <script src="/static/js/helpers.js"></script>
 <script src="/static/js/tabs.js"></script>
@@ -244,6 +272,7 @@
 <script src="/static/js/ai-selection.js"></script>
 <script src="/static/js/link-suggest.js"></script>
 <script src="/static/js/ai-file.js"></script>
+<script src="/static/js/plugin-manager.js"></script>
 <!-- Plugins : un fichier chacun, une erreur n'affecte que son plugin -->
 <!-- PLUGIN_SCRIPTS -->
 <script src="/static/js/mindmap.js"></script>

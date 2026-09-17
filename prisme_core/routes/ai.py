@@ -6,6 +6,7 @@ from flask import Blueprint, Response, jsonify, request
 import requests as http
 
 from ..config import rd_cfg
+from ..vault import _path_err, scoped_dir
 from ..providers import (_chat_post, _chat_url, _headers, _to_anthropic_body,
                          needs_key, parse_chat_response)
 
@@ -132,9 +133,13 @@ def call_ai_stream():
 
 @bp.route("/api/ai/folder", methods=["POST"])
 def ai_folder():
-    cfg = rd_cfg(); key = cfg.get("api_key")
-    if not key: return jsonify({"error": "Clé API manquante"}), 400
-    d = request.json; dir_p = d.get("dir", "")
+    cfg = rd_cfg()
+    if needs_key(cfg): return jsonify({"error": "Clé API manquante"}), 400
+    d = request.json or {}
+    try:
+        dir_p = scoped_dir(d.get("dir"))
+    except (PermissionError, FileNotFoundError) as e:
+        return _path_err(e)
     parts, chars = [], 0
     for f in sorted(Path(dir_p).glob("*.md")):
         try:

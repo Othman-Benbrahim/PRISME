@@ -1,7 +1,7 @@
-"""Page principale et liste des plugins charges."""
+"""Page principale et liste des plugins actifs."""
 from flask import Blueprint, Response, jsonify
 
-from ..plugins import LOADED_PLUGINS, assemble_page
+from ..plugins import active_plugins, assemble_page
 
 bp = Blueprint("pages", __name__)
 
@@ -14,14 +14,15 @@ def index():
 
 @bp.route("/api/plugins", methods=["GET"])
 def list_plugins():
-    """Liste les plugins charges (debug et future UI de gestion)."""
+    """Plugins actifs (le detail complet est dans /api/plugin-manager/list)."""
+    active = active_plugins()
     return jsonify({
-        "count": len(LOADED_PLUGINS),
+        "count": len(active),
         "plugins": [{
-            "name": p["name"],
-            "dir": p["dir"],
-            "description": p["manifest"].get("description", ""),
-            "version": p["manifest"].get("version", "?"),
-            "buttons": p["manifest"].get("buttons", []),
-        } for p in LOADED_PLUGINS]
+            "id": p.id,
+            "name": p.name,
+            "description": p.manifest.get("description", ""),
+            "version": p.manifest.get("version", "?"),
+            "buttons": p.manifest.get("buttons", []),
+        } for p in active]
     })

@@ -1,20 +1,20 @@
 """
-Plugin OSINT Cross-Reference — compatible Second Brain.
+Plugin OSINT Cross-Reference — compatible PRISME.
 
 Structure alignée sur le plugin DuckDuckGo :
   - manifest.json déclare le bouton toolbar
   - ui.html / ui.css / ui.js sont injectés par le loader
-  - ce fichier expose register(app, rd_cfg) et déclare toutes les routes Flask
+  - ce fichier expose register(ctx) et déclare toutes les routes Flask
 
 Routes :
-  GET /api/osintcx/ping
-  GET /api/osintcx/username?q=<username>
-  GET /api/osintcx/email?q=<email>
-  GET /api/osintcx/phone?q=<phone>
-  GET /api/osintcx/ip?q=<ip>
-  GET /api/osintcx/domain?q=<domain>
-  GET /api/osintcx/crossref?q=<term>&type=<auto|username|email|phone|ip|domain>
-  GET /api/osintcx/brixhub?q=<term>&type=<auto|username|email|phone|ip|domain>
+  GET /api/plugins/osint-cx/ping
+  GET /api/plugins/osint-cx/username?q=<username>
+  GET /api/plugins/osint-cx/email?q=<email>
+  GET /api/plugins/osint-cx/phone?q=<phone>
+  GET /api/plugins/osint-cx/ip?q=<ip>
+  GET /api/plugins/osint-cx/domain?q=<domain>
+  GET /api/plugins/osint-cx/crossref?q=<term>&type=<auto|username|email|phone|ip|domain>
+  GET /api/plugins/osint-cx/brixhub?q=<term>&type=<auto|username|email|phone|ip|domain>
 
 BrixHub est optionnel et se configure côté serveur avec des variables d'environnement :
   BRIXHUB_API_KEY       clé API BrixHub, obligatoire pour interroger le service
@@ -60,11 +60,26 @@ BRIXHUB_BASE_URL = os.getenv("BRIXHUB_BASE_URL", "https://brixhub.net").rstrip("
 BRIXHUB_FALLBACK_BASE_URL = os.getenv("BRIXHUB_FALLBACK_BASE_URL", "https://brixhub.site").rstrip("/")
 BRIXHUB_SEARCH_PATH = os.getenv("BRIXHUB_SEARCH_PATH", "/api/v1/search")
 BRIXHUB_DOCS_PATH = os.getenv("BRIXHUB_DOCS_PATH", "/api/v1/docs")
-BRIXHUB_API_KEY = os.getenv("BRIXHUB_API_KEY", "").strip()
+# Secrets : lus a chaque appel. register() branche la lecture sur ctx.secret
+# (coffre chiffre de PRISME, puis variables d'environnement / .env).
+_read_secret = lambda name: os.getenv(name, "").strip()
+
+
+def _brixhub_key():
+    return _read_secret("BRIXHUB_API_KEY")
+
+
+def _x_token():
+    return _read_secret("X_BEARER_TOKEN")
+
+
+def _rapidapi_key():
+    return _read_secret("RAPIDAPI_KEY")
+
+
 BRIXHUB_AUTH_HEADER = os.getenv("BRIXHUB_AUTH_HEADER", "X-API-Key").strip() or "X-API-Key"
 BRIXHUB_AUTH_SCHEME = os.getenv("BRIXHUB_AUTH_SCHEME", "").strip()
 BRIXHUB_USER_AGENT = os.getenv("BRIXHUB_USER_AGENT", UA).strip() or UA
-BRIXHUB_ENABLED = bool(BRIXHUB_API_KEY)
 
 # X API v2 — lecture de profil public par username.
 # Configurez uniquement côté serveur dans .env :
@@ -72,8 +87,6 @@ BRIXHUB_ENABLED = bool(BRIXHUB_API_KEY)
 # Optionnel :
 #   X_BASE_URL=https://api.x.com
 X_BASE_URL = os.getenv("X_BASE_URL", "https://api.x.com").rstrip("/")
-X_BEARER_TOKEN = os.getenv("X_BEARER_TOKEN", "").strip()
-X_ENABLED = bool(X_BEARER_TOKEN)
 
 # LinkedIn via RapidAPI — optionnel, désactivé si RAPIDAPI_KEY ou le host n'est pas configuré.
 # Le plugin reste générique car chaque API RapidAPI a ses propres chemins/paramètres.
@@ -85,13 +98,17 @@ X_ENABLED = bool(X_BEARER_TOKEN)
 #   LINKEDIN_RAPIDAPI_METHOD=GET ou POST
 #   LINKEDIN_RAPIDAPI_PARAM=url
 #   LINKEDIN_RAPIDAPI_BASE_URL=https://<host>
-RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "").strip()
 LINKEDIN_RAPIDAPI_HOST = os.getenv("LINKEDIN_RAPIDAPI_HOST", "").strip()
 LINKEDIN_RAPIDAPI_ENDPOINT = os.getenv("LINKEDIN_RAPIDAPI_ENDPOINT", "").strip()
 LINKEDIN_RAPIDAPI_METHOD = os.getenv("LINKEDIN_RAPIDAPI_METHOD", "GET").strip().upper()
 LINKEDIN_RAPIDAPI_PARAM = os.getenv("LINKEDIN_RAPIDAPI_PARAM", "url").strip() or "url"
 LINKEDIN_RAPIDAPI_BASE_URL = os.getenv("LINKEDIN_RAPIDAPI_BASE_URL", "").strip().rstrip("/")
-LINKEDIN_ENABLED = bool(RAPIDAPI_KEY and LINKEDIN_RAPIDAPI_HOST and LINKEDIN_RAPIDAPI_ENDPOINT)
+
+
+def _linkedin_enabled():
+    return bool(_rapidapi_key() and LINKEDIN_RAPIDAPI_HOST and LINKEDIN_RAPIDAPI_ENDPOINT)
+
+
 X_USER_FIELDS = os.getenv(
     "X_USER_FIELDS",
     "created_at,description,location,public_metrics,verified,verified_type,profile_image_url,url"
@@ -445,9 +462,9 @@ def search_linkedin_rapidapi(q, profile_url=None):
     profile_url = (profile_url or "").strip() or _linkedin_url_from_query(q)
     if not q and not profile_url:
         return {"ok": False, "type": "linkedin", "error": "Pseudo ou URL LinkedIn manquant."}
-    if not LINKEDIN_ENABLED:
+    if not _linkedin_enabled():
         missing = []
-        if not RAPIDAPI_KEY: missing.append("RAPIDAPI_KEY")
+        if not _rapidapi_key(): missing.append("RAPIDAPI_KEY")
         if not LINKEDIN_RAPIDAPI_HOST: missing.append("LINKEDIN_RAPIDAPI_HOST")
         if not LINKEDIN_RAPIDAPI_ENDPOINT: missing.append("LINKEDIN_RAPIDAPI_ENDPOINT")
         return {"ok": False, "type": "linkedin", "query": q, "profile_url": profile_url, "error": "Configuration LinkedIn/RapidAPI incomplète : " + ", ".join(missing)}
@@ -456,7 +473,7 @@ def search_linkedin_rapidapi(q, profile_url=None):
     endpoint = LINKEDIN_RAPIDAPI_ENDPOINT if LINKEDIN_RAPIDAPI_ENDPOINT.startswith("/") else "/" + LINKEDIN_RAPIDAPI_ENDPOINT
     url = base.rstrip("/") + endpoint
     headers = {
-        "X-RapidAPI-Key": RAPIDAPI_KEY,
+        "X-RapidAPI-Key": _rapidapi_key(),
         "X-RapidAPI-Host": LINKEDIN_RAPIDAPI_HOST,
         "User-Agent": UA,
         "Accept": "application/json",
@@ -1240,8 +1257,8 @@ def _x_headers():
         "User-Agent": UA,
         "Accept": "application/json",
     }
-    if X_BEARER_TOKEN:
-        headers["Authorization"] = f"Bearer {X_BEARER_TOKEN}"
+    if _x_token():
+        headers["Authorization"] = f"Bearer {_x_token()}"
     return headers
 
 
@@ -1254,13 +1271,13 @@ def search_x_profile(username):
     username = (username or "").strip().lstrip("@")
     if not _USERNAME_RE.match(username):
         return {"ok": False, "type": "x", "error": "Nom d'utilisateur X invalide."}
-    if not X_BEARER_TOKEN:
+    if not _x_token():
         return {
             "ok": False,
             "type": "x",
             "enabled": False,
             "query": username,
-            "error": "X non configuré : définissez X_BEARER_TOKEN côté serveur dans le fichier .env.",
+            "error": "X non configuré : définissez X_BEARER_TOKEN dans PRISME : Plugins > OSINT > secrets.",
         }
 
     cache_key = ("x_profile", username.lower(), X_USER_FIELDS)
@@ -1376,8 +1393,8 @@ def _brixhub_headers(content_type=False):
     }
     if content_type:
         headers["Content-Type"] = "application/json"
-    if BRIXHUB_API_KEY:
-        value = f"{BRIXHUB_AUTH_SCHEME} {BRIXHUB_API_KEY}".strip() if BRIXHUB_AUTH_SCHEME else BRIXHUB_API_KEY
+    if _brixhub_key():
+        value = f"{BRIXHUB_AUTH_SCHEME} {_brixhub_key()}".strip() if BRIXHUB_AUTH_SCHEME else _brixhub_key()
         headers[BRIXHUB_AUTH_HEADER] = value
     return headers
 
@@ -1392,7 +1409,7 @@ def brixhub_openapi_spec():
     cached = _cached(cache_key)
     if cached is not None:
         return cached
-    if not BRIXHUB_API_KEY:
+    if not _brixhub_key():
         return {"ok": False, "enabled": False, "error": "BRIXHUB_API_KEY manquante."}
 
     url = _brixhub_url(BRIXHUB_BASE_URL, BRIXHUB_DOCS_PATH)
@@ -1499,12 +1516,12 @@ def search_brixhub_payload(criteria):
     criteria = _clean_brixhub_criteria(criteria)
     if not criteria:
         return {"ok": False, "type": "brixhub", "error": "Aucun critère BrixHub documenté n'a été fourni."}
-    if not BRIXHUB_API_KEY:
+    if not _brixhub_key():
         return {
             "ok": False,
             "type": "brixhub",
             "enabled": False,
-            "error": "BrixHub non configuré : définissez BRIXHUB_API_KEY côté serveur.",
+            "error": "BrixHub non configuré : renseignez BRIXHUB_API_KEY dans PRISME : Plugins > OSINT > secrets.",
             "config_help": {
                 "BRIXHUB_API_KEY": "clé API fournie par BrixHub",
                 "BRIXHUB_BASE_URL": BRIXHUB_BASE_URL,
@@ -1634,70 +1651,72 @@ def crossref(q, typ="auto"):
     return data
 
 
-def register(app, rd_cfg):
-    """Point d'entrée appelé automatiquement par le plugin loader Second Brain."""
+def register(ctx):
+    """Point d'entrée appelé par le chargeur de plugins PRISME."""
+    global _read_secret
+    _read_secret = lambda name: ctx.secret(name)
 
-    @app.route("/api/osintcx/ping", methods=["GET"])
+    @ctx.route("/ping", methods=["GET"])
     def osintcx_ping():
         return jsonify({"ok": True, "plugin": "osint-cx", "version": "1.8", "routes_registered": True})
 
-    @app.route("/api/osintcx/username", methods=["GET"])
+    @ctx.route("/username", methods=["GET"])
     def osintcx_username():
         return jsonify(search_username(request.args.get("q", "")))
 
-    @app.route("/api/osintcx/email", methods=["GET"])
+    @ctx.route("/email", methods=["GET"])
     def osintcx_email():
         return jsonify(search_email(request.args.get("q", "")))
 
-    @app.route("/api/osintcx/phone", methods=["GET"])
+    @ctx.route("/phone", methods=["GET"])
     def osintcx_phone():
         return jsonify(search_phone(request.args.get("q", "")))
 
-    @app.route("/api/osintcx/ip", methods=["GET"])
+    @ctx.route("/ip", methods=["GET"])
     def osintcx_ip():
         return jsonify(search_ip(request.args.get("q", "")))
 
-    @app.route("/api/osintcx/domain", methods=["GET"])
+    @ctx.route("/domain", methods=["GET"])
     def osintcx_domain():
         return jsonify(search_domain(request.args.get("q", "")))
 
-    @app.route("/api/osintcx/entreprise", methods=["GET"])
+    @ctx.route("/entreprise", methods=["GET"])
     def osintcx_entreprise():
         data = search_entreprise(request.args.get("q", ""))
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/github", methods=["GET"])
+    @ctx.route("/github", methods=["GET"])
     def osintcx_github():
         data = search_github_profile(request.args.get("q", ""))
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/wikidata", methods=["GET"])
+    @ctx.route("/wikidata", methods=["GET"])
     def osintcx_wikidata():
         data = search_wikidata(request.args.get("q", ""))
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/score", methods=["POST"])
+    @ctx.route("/score", methods=["POST"])
     def osintcx_score():
         payload = request.get_json(silent=True) or {}
         data = compute_correlation_score(payload)
         return jsonify(data), 200
 
-    @app.route("/api/osintcx/reddit", methods=["GET"])
+    @ctx.route("/reddit", methods=["GET"])
     def osintcx_reddit():
         data = reddit_user_info(request.args.get("q", ""))
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/x", methods=["GET"])
+    @ctx.route("/x", methods=["GET"])
     def osintcx_x():
         data = search_x_profile(request.args.get("q", ""))
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/linkedin", methods=["GET", "POST"])
+    @ctx.route("/linkedin", methods=["GET", "POST"])
     def osintcx_linkedin():
         if request.method == "POST":
             payload = request.get_json(silent=True) or {}
@@ -1707,13 +1726,13 @@ def register(app, rd_cfg):
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/social-cli", methods=["GET"])
+    @ctx.route("/social-cli", methods=["GET"])
     def osintcx_social_cli():
         data = search_social_cli(request.args.get("q", ""), request.args.get("tool", "auto"))
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/brixhub", methods=["GET", "POST"])
+    @ctx.route("/brixhub", methods=["GET", "POST"])
     def osintcx_brixhub():
         if request.method == "POST":
             payload = request.get_json(silent=True) or {}
@@ -1723,13 +1742,13 @@ def register(app, rd_cfg):
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/brixhub/spec", methods=["GET"])
+    @ctx.route("/brixhub/spec", methods=["GET"])
     def osintcx_brixhub_spec():
         data = brixhub_openapi_spec()
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 
-    @app.route("/api/osintcx/crossref", methods=["GET"])
+    @ctx.route("/crossref", methods=["GET"])
     def osintcx_crossref():
         data = crossref(request.args.get("q", ""), request.args.get("type", "auto"))
         status = 200 if data.get("ok", True) else 400

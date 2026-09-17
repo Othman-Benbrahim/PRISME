@@ -51,7 +51,7 @@ async function runArxiv(){
     }
   },1500);
 
-  var r=await post('/api/arxiv/agentic',{content:content,name:name,hint:hint,n:n});
+  var r=await post('/api/plugins/arxiv/agentic',{content:content,name:name,hint:hint,n:n});
   if(r.error){
     $('arx-error-msg').textContent=r.error;
     $('arx-error').style.display='block';
@@ -95,7 +95,7 @@ async function retryArxivSearch(){
   $('arx-progress').style.display='block';
   setStep(1,'done'); setStep(2,'active'); setStep(3,'pending');
 
-  var r=await fetch('/api/arxiv/search?q='+encodeURIComponent(q)+'&n='+n).then(function(r){return r.json();});
+  var r=await fetch('/api/plugins/arxiv/search?q='+encodeURIComponent(q)+'&n='+n).then(function(r){return r.json();});
   if(r.error){
     setStep(2,'fail');
     $('arx-error-msg').textContent=r.error;
@@ -146,7 +146,7 @@ async function synthesizeArxiv(){
   $('arx-syn-btn').disabled=true; $('arx-syn-btn').textContent='⏳ Synthèse en cours…';
   $('arx-error').style.display='none';
 
-  var r=await post('/api/arxiv/synthesize',{
+  var r=await post('/api/plugins/arxiv/synthesize',{
     papers:ARX.papers, content:$('md-editor').value, name:ACTIVE.split(/[/\\]/).pop(), query:ARX.query
   });
   if(r.error){

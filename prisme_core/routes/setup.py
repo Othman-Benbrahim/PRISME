@@ -4,6 +4,7 @@ import json
 from flask import Blueprint, jsonify, request
 import requests as http
 
+from .. import secrets
 from ..config import DEFAULT_VAULT, rd_cfg, wr_cfg
 from ..providers import _chat_post, _chat_url, _headers, needs_key
 from ..vault import ensure_vault
@@ -39,18 +40,24 @@ def setup_save():
 @bp.route("/api/config", methods=["GET"])
 def get_cfg():
     c = rd_cfg()
-    return jsonify({**c, "api_key": "●●●" if c.get("api_key") else "", "has_key": bool(c.get("api_key"))})
+    return jsonify({**c, "api_key": "●●●" if c.get("api_key") else "", "has_key": bool(c.get("api_key")),
+                    "key_protected": secrets.available()})
 
 @bp.route("/api/config", methods=["POST"])
-def set_cfg(): wr_cfg(request.json); return jsonify({"ok": True})
+def set_cfg():
+    d = dict(request.get_json(silent=True) or {})
+    if d.get("api_key") in ("●●●", None):
+        d.pop("api_key", None)                  # masque renvoye par erreur : on garde la cle
+    wr_cfg(d)
+    return jsonify({"ok": True})
 
 @bp.route("/api/test", methods=["GET"])
 def test_api():
     """Diagnostic — appelle l'API avec un prompt minimal et renvoie tout."""
-    cfg = rd_cfg(); key = cfg.get("api_key")
+    cfg = rd_cfg()
     if needs_key(cfg): return jsonify({"ok": False, "step": "config", "error": "Pas de clé API"})
     url = _chat_url(cfg)
-    info = {"url": url, "model": cfg.get("model"), "key_prefix": key[:8]+"…"}
+    info = {"url": url, "model": cfg.get("model"), "key_state": cfg.get("key_state")}
     try:
         r = _chat_post(url,
             headers=_headers(cfg),

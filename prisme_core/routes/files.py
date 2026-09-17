@@ -4,26 +4,36 @@ from pathlib import Path
 
 from flask import Blueprint, jsonify, request
 
+from .. import hooks
 from ..config import rd_cfg
 from ..markdown import extract_link_refs, resolve_ref
-from ..vault import _path_err, in_trash, iter_md, safe_path, snapshot, to_trash, vault_root
+from ..vault import _path_err, in_trash, iter_md, safe_path, scoped_dir, snapshot, to_trash, vault_root
 
 bp = Blueprint("files", __name__)
 
 @bp.route("/api/files", methods=["GET"])
 def list_files():
-    raw = request.args.get("path", "").strip() or rd_cfg().get("workspace", str(Path.home()))
-    p = Path(raw)
+    """Contenu d'un dossier. Dans le vault : dossiers et fichiers. Hors du vault :
+    dossiers seulement, pour pouvoir choisir un autre espace de travail sans
+    exposer les noms de fichiers du reste du disque."""
+    root = vault_root()
+    raw = request.args.get("path", "").strip()
+    p = Path(raw).expanduser() if raw else root
     try:
+        p = p.resolve()
+        inside = p == root or root in p.parents
         items = sorted(
             [{"name": i.name, "path": str(i), "is_dir": i.is_dir(),
               "is_md": i.suffix.lower() in (".md", ".txt", ".markdown")}
-             for i in p.iterdir() if not i.name.startswith(".")],
+             for i in p.iterdir()
+             if not i.name.startswith(".") and (inside or i.is_dir())],
             key=lambda x: (not x["is_dir"], x["name"].lower())
         )
-        return jsonify({"path": str(p), "parent": str(p.parent), "items": items})
+        return jsonify({"path": str(p), "parent": str(p.parent), "items": items,
+                        "outside_vault": not inside})
     except PermissionError: return jsonify({"error": "Accès refusé"}), 403
-    except FileNotFoundError: return jsonify({"error": "Dossier introuvable"}), 404
+    except (FileNotFoundError, NotADirectoryError): return jsonify({"error": "Dossier introuvable"}), 404
+    except OSError as e: return jsonify({"error": str(e)}), 400
 
 @bp.route("/api/files/read", methods=["GET"])
 def read_file():
@@ -40,9 +50,11 @@ def save_file():
     try:
         p = safe_path(d.get("path", ""))
         p.parent.mkdir(parents=True, exist_ok=True)
+        created = not p.exists()
         snap = snapshot(p)                      # version precedente -> .trash/versions/
         p.write_text(d.get("content", ""), encoding="utf-8")
-        return jsonify({"ok": True, "snapshot": str(snap) if snap else None})
+        incidents = hooks.emit("note_created" if created else "note_saved", path=str(p), origin="editeur")
+        return jsonify({"ok": True, "snapshot": str(snap) if snap else None, "hooks": incidents})
     except (PermissionError, FileNotFoundError) as e: return _path_err(e)
     except Exception as e: return jsonify({"error": str(e)}), 500
 
@@ -61,7 +73,8 @@ def new_file():
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(f"# {name.replace('.md','')}\n\n", encoding="utf-8")
-        return jsonify({"ok": True, "path": str(path)})
+        incidents = hooks.emit("note_created", path=str(path), origin="editeur")
+        return jsonify({"ok": True, "path": str(path), "hooks": incidents})
     except Exception as e: return jsonify({"error": str(e)}), 500
 
 @bp.route("/api/files/rename", methods=["POST"])
@@ -72,11 +85,18 @@ def rename_file():
     except (PermissionError, FileNotFoundError) as e: return _path_err(e)
     new_name = (d.get("new_name") or "").strip()
     if not old.exists() or not new_name: return jsonify({"error": "Paramètres invalides"}), 400
-    if any(c in new_name for c in '\\/:*?"<>|'):
+    if any(c in new_name for c in '\\/:*?"<>|') or new_name in (".", ".."):
         return jsonify({"error": "Nom de fichier invalide"}), 400
+    if old == vault_root():
+        return jsonify({"error": "Impossible de renommer la racine de l'espace de travail"}), 400
     new_path = old.parent / new_name
-    try: old.rename(new_path); return jsonify({"ok": True, "new_path": str(new_path)})
+    if new_path.exists():
+        return jsonify({"error": "Un élément porte déjà ce nom"}), 409
+    try:
+        old.rename(new_path)
     except Exception as e: return jsonify({"error": str(e)}), 500
+    incidents = hooks.emit("note_renamed", path=str(new_path), old_path=str(old), origin="editeur")
+    return jsonify({"ok": True, "new_path": str(new_path), "hooks": incidents})
 
 @bp.route("/api/files/delete", methods=["POST"])
 def delete_file():
@@ -95,12 +115,13 @@ def delete_file():
             else: p.unlink()
             return jsonify({"ok": True, "trashed": False})
         dest = to_trash(p)
-        return jsonify({"ok": True, "trashed": True, "trash_path": str(dest)})
+        incidents = hooks.emit("note_deleted", path=str(p), origin="editeur")
+        return jsonify({"ok": True, "trashed": True, "trash_path": str(dest), "hooks": incidents})
     except Exception as e: return jsonify({"error": str(e)}), 500
 
 @bp.route("/api/files/graph", methods=["GET"])
 def files_graph():
-    dir_p = request.args.get("dir", "").strip() or rd_cfg().get("workspace", str(Path.home()))
+    dir_p = scoped_dir(request.args.get("dir"))
     files = sorted(iter_md(dir_p))
     vault_paths = {str(f) for f in files}
     degree = {str(f): 0 for f in files}
@@ -126,7 +147,7 @@ def files_graph():
 @bp.route("/api/files/backlinks", methods=["GET"])
 def backlinks():
     file_path = request.args.get("path", "")
-    dir_p     = request.args.get("dir", "").strip() or rd_cfg().get("workspace", str(Path.home()))
+    dir_p     = scoped_dir(request.args.get("dir"))
     if not file_path: return jsonify({"backlinks": []})
     try:
         target_resolved = str(Path(file_path).resolve())
@@ -164,8 +185,9 @@ def find_file():
     """Trouve un .md à partir d'une référence brute, avec résolution intelligente."""
     ref      = request.args.get("name", "").strip()
     src      = request.args.get("from", "").strip()
-    dir_p    = request.args.get("dir", "").strip() or rd_cfg().get("workspace", str(Path.home()))
+    dir_p    = scoped_dir(request.args.get("dir"))
     if not ref: return jsonify({"error": "Référence vide"}), 400
+    if src: src = str(safe_path(src))
     try:
         vault_paths = {str(f) for f in iter_md(dir_p)}
         # 1. Si source connue, résoudre depuis là

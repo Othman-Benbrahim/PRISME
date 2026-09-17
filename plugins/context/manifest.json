@@ -1,8 +1,11 @@
 {
+  "id": "context",
   "name": "Context Builder",
-  "version": "1.0",
+  "version": "2.0.0",
+  "api_version": 1,
   "description": "Sélection multi-fichiers avec résolution récursive des [[liens]], pour interroger l'IA sur un corpus assemblé.",
-  "author": "Second Brain core",
+  "author": "PRISME",
+  "permissions": [],
   "buttons": [
     {
       "panel": "toolbar",

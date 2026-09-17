@@ -43,8 +43,8 @@
       </div>
       <div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn bp" id="ddg-retry-search" onclick="retryDDGSearch()" style="display:none;width:auto;padding:5px 12px;font-size:11px">🔄 Relancer avec cette requête</button>
-        <button class="btn bs" onclick="window.open('/api/ddg/ping','_blank')" style="width:auto;padding:5px 10px;font-size:11px">🩺 Test DDG</button>
-        <button class="btn bs" onclick="window.open('/api/test','_blank')" style="width:auto;padding:5px 10px;font-size:11px">🔍 Test API IA</button>
+        <button class="btn bs" onclick="openJson('/api/plugins/duckduckgo/ping')" style="width:auto;padding:5px 10px;font-size:11px">🩺 Test DDG</button>
+        <button class="btn bs" onclick="openJson('/api/test')" style="width:auto;padding:5px 10px;font-size:11px">🔍 Test API IA</button>
         <button class="btn bs" onclick="$('ddg-error').style.display='none';$('ddg-form').style.display='block';$('ddg-progress').style.display='none'" style="width:auto;padding:5px 10px;font-size:11px">↺ Tout reprendre</button>
       </div>
     </div>

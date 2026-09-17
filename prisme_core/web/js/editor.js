@@ -43,7 +43,7 @@ async function saveFile(){
   var c=$('md-editor').value;
   var r=await post('/api/files/save',{path:ACTIVE,content:c});
   if(r.error){toast('⚠ '+r.error);return;}
-  TABS[ACTIVE].saved=c; TABS[ACTIVE].modified=false; renderTabBar(); toast('✓ Sauvegardé');
+  TABS[ACTIVE].saved=c; TABS[ACTIVE].modified=false; renderTabBar(); toast('✓ Sauvegardé'); reportHooks(r);
 }
 async function newFilePrompt(){
   var name=prompt('Nom du fichier (sans extension) :'); if(!name) return;

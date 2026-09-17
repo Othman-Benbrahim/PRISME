@@ -1,19 +1,18 @@
 """
 Plugin Prompts Manager — presets de prompts système persistants.
 
-Stockage : ~/.secondbrain/system_prompts.json
+Stockage : ~/.prisme/plugins/prompts/system_prompts.json
 
 Routes exposées :
-  GET  /api/prompts/list   — liste tous les presets
-  POST /api/prompts/save   — crée ou met à jour un preset
-  POST /api/prompts/delete — supprime un preset par id
-  POST /api/prompts/reset  — restaure les presets d'usine
+  GET  /api/plugins/prompts/list   — liste tous les presets
+  POST /api/plugins/prompts/save   — crée ou met à jour un preset
+  POST /api/plugins/prompts/delete — supprime un preset par id
+  POST /api/plugins/prompts/reset  — restaure les presets d'usine
 """
 import json, re, uuid
-from pathlib import Path
 from flask import request, jsonify
 
-PROMPTS_FILE = Path.home() / ".secondbrain" / "system_prompts.json"
+PROMPTS_FILE = None   # fixe par register() : ~/.prisme/plugins/prompts/system_prompts.json
 
 # Presets d'usine — adaptés au profil IRIS∞ + usages courants
 DEFAULT_PROMPTS = [
@@ -94,13 +93,15 @@ def _make_id(name, existing_ids):
     return pid
 
 
-def register(app, rd_cfg):
+def register(ctx):
+    global PROMPTS_FILE
+    PROMPTS_FILE = ctx.adopt_legacy_file("system_prompts.json")
 
-    @app.route("/api/prompts/list", methods=["GET"])
+    @ctx.route("/list", methods=["GET"])
     def prompts_list():
         return jsonify({"prompts": _load_prompts()})
 
-    @app.route("/api/prompts/save", methods=["POST"])
+    @ctx.route("/save", methods=["POST"])
     def prompts_save():
         d       = request.json or {}
         name    = (d.get("name", "") or "").strip()
@@ -123,7 +124,7 @@ def register(app, rd_cfg):
         _save_prompts(prompts)
         return jsonify({"ok": True, "id": new_id, "created": True})
 
-    @app.route("/api/prompts/delete", methods=["POST"])
+    @ctx.route("/delete", methods=["POST"])
     def prompts_delete():
         pid = ((request.json or {}).get("id", "") or "").strip()
         if not pid: return jsonify({"error": "ID requis"}), 400
@@ -135,7 +136,7 @@ def register(app, rd_cfg):
         _save_prompts(prompts)
         return jsonify({"ok": True})
 
-    @app.route("/api/prompts/reset", methods=["POST"])
+    @ctx.route("/reset", methods=["POST"])
     def prompts_reset():
         _save_prompts(list(DEFAULT_PROMPTS))
         return jsonify({"ok": True, "prompts": _load_prompts()})

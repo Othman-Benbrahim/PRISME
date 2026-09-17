@@ -11,6 +11,7 @@ ROOT = os.path.abspath(os.path.join(SPECPATH, ".."))
 STDLIB_FOR_PLUGINS = [
     "xml", "concurrent", "urllib", "http", "email", "json", "ipaddress",
     "sysconfig", "subprocess", "socket", "tempfile", "hashlib", "importlib",
+    "ctypes",       # chiffrement DPAPI (Windows)
 ]
 hidden = collect_submodules("prisme_core") + ["requests"]
 for mod in STDLIB_FOR_PLUGINS:

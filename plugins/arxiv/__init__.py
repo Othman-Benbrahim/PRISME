@@ -7,10 +7,10 @@ Workflow :
 3. IA synthétise les papiers trouvés en français avec citations
 
 Routes exposées :
-  GET  /api/arxiv/ping
-  GET  /api/arxiv/search
-  POST /api/arxiv/agentic
-  POST /api/arxiv/synthesize
+  GET  /api/plugins/arxiv/ping
+  GET  /api/plugins/arxiv/search
+  POST /api/plugins/arxiv/agentic
+  POST /api/plugins/arxiv/synthesize
 """
 import time
 import xml.etree.ElementTree as ET
@@ -19,7 +19,6 @@ from flask import request, jsonify
 import requests as http
 
 # Helpers récupérés du core
-from second_brain import _ai_call
 
 ARXIV_API = "https://export.arxiv.org/api/query"
 ARXIV_NS  = {"a": "http://www.w3.org/2005/Atom", "arxiv": "http://arxiv.org/schemas/atom"}
@@ -105,10 +104,10 @@ def _arxiv_query(query, n=8):
     return []
 
 
-def register(app, rd_cfg):
+def register(ctx):
     """Point d'entrée appelé par le core au chargement."""
 
-    @app.route("/api/arxiv/ping", methods=["GET"])
+    @ctx.route("/ping", methods=["GET"])
     def arxiv_ping():
         """Test minimal de connexion ArXiv (1 papier, sans IA)."""
         t0 = time.time()
@@ -131,7 +130,7 @@ def register(app, rd_cfg):
                 "elapsed_ms": int((time.time() - t0) * 1000),
             })
 
-    @app.route("/api/arxiv/search", methods=["GET"])
+    @ctx.route("/search", methods=["GET"])
     def arxiv_search():
         """Recherche ArXiv directe (mode manuel)."""
         q = request.args.get("q", "").strip()
@@ -142,11 +141,11 @@ def register(app, rd_cfg):
         except Exception as e:
             return jsonify({"error": f"ArXiv : {str(e)[:300]}"}), 500
 
-    @app.route("/api/arxiv/agentic", methods=["POST"])
+    @ctx.route("/agentic", methods=["POST"])
     def arxiv_agentic():
         """Étape 1+2 : IA génère la requête, puis interroge ArXiv."""
-        cfg = rd_cfg()
-        if not cfg.get("api_key"): return jsonify({"error": "Clé API manquante"}), 400
+        problem = ctx.ai_unavailable()
+        if problem: return jsonify({"error": problem}), 400
         d = request.json
         content = (d.get("content","") or "")[:4000]
         fname   = d.get("name", "note")
@@ -162,7 +161,7 @@ def register(app, rd_cfg):
         )
         if hint: prompt += f"\n\nIndication de l'utilisateur (à prioriser) : {hint}"
 
-        query, err = _ai_call(cfg, [
+        query, err = ctx.ai_call([
             {"role": "system", "content": "Tu génères des requêtes ArXiv optimales en anglais. Pas de fioritures."},
             {"role": "user",   "content": prompt}
         ], max_tokens=200, temp=0.3)
@@ -177,11 +176,11 @@ def register(app, rd_cfg):
 
         return jsonify({"query": query, "papers": papers, "count": len(papers)})
 
-    @app.route("/api/arxiv/synthesize", methods=["POST"])
+    @ctx.route("/synthesize", methods=["POST"])
     def arxiv_synthesize():
         """Étape 3 : synthèse française des papiers, avec citations."""
-        cfg = rd_cfg()
-        if not cfg.get("api_key"): return jsonify({"error": "Clé API manquante"}), 400
+        problem = ctx.ai_unavailable()
+        if problem: return jsonify({"error": problem}), 400
         d = request.json
         papers  = d.get("papers", [])
         content = (d.get("content","") or "")[:3000]
@@ -209,7 +208,7 @@ def register(app, rd_cfg):
             f"=== MON FICHIER \"{fname}\" ===\n{content}\n=== FIN ===\n\n"
             f"=== PAPIERS ARXIV ===\n{papers_md}\n=== FIN ==="
         )
-        synthesis, err = _ai_call(cfg, [
+        synthesis, err = ctx.ai_call([
             {"role": "system", "content": "Tu es expert en synthèse de littérature scientifique. Tu écris en français en Markdown structuré, avec rigueur et concision."},
             {"role": "user",   "content": user_prompt}
         ], max_tokens=2500, temp=0.5, timeout=240)

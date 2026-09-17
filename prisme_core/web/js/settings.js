@@ -6,8 +6,12 @@ async function openCfg(){
   $('ckey').value='';
   $('ckey').placeholder=c.has_key?'(clé définie — laisser vide pour garder)':'votre clé API';
   cfgFillProviders(c);
-  $('kinfo').textContent=c.has_key?'✓ Clé API configurée':'⚠ Aucune clé — IA désactivée';
-  $('kinfo').style.color=c.has_key?'var(--grn)':'var(--yel)';
+  var ks={chiffree:'✓ Clé API configurée — chiffrée sur cette machine',
+          clair:'✓ Clé API configurée — stockée en clair (chiffrement indisponible)',
+          illisible:'⚠ Clé illisible sur cette machine — ressaisissez-la',
+          vide:'⚠ Aucune clé — IA désactivée pour les services distants'};
+  $('kinfo').textContent=ks[c.key_state]||(c.has_key?'✓ Clé API configurée':ks.vide);
+  $('kinfo').style.color=(c.key_state==='chiffree')?'var(--grn)':(c.has_key?'var(--yel)':'var(--yel)');
   $('cmod').value=c.model||'';$('cws').value=c.workspace||'';$('curl').value=c.base_url||'';
   $('mcfg').classList.add('on');
 }
