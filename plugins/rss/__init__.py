@@ -18,9 +18,8 @@ import xml.etree.ElementTree as ET
 from flask import request, jsonify
 import requests as http
 
-from second_brain import _ai_call
 
-# Chargement dynamique de signal_engine (le loader principal ne gère pas les imports relatifs)
+# Chargement dynamique de signal_engine (module frere, charge par chemin)
 import importlib.util as _ilu
 _se_spec = _ilu.spec_from_file_location("rss_signal_engine", Path(__file__).parent / "signal_engine.py")
 signal_engine = _ilu.module_from_spec(_se_spec)
@@ -518,18 +517,20 @@ def _fetch_articles_parallel(items):
 #  REGISTER — routes Flask
 # ═══════════════════════════════════════════════════════════════
 
-def register(app, rd_cfg):
+def register(ctx):
+
+    signal_engine.HISTORY_FILE = ctx.adopt_legacy_file("rss_signals_history.json")
 
     def _vault_root():
-        return rd_cfg().get('workspace') or str(Path.home())
+        return str(ctx.vault_root())
 
-    @app.route("/api/rss/list", methods=["GET"])
+    @ctx.route("/list", methods=["GET"])
     def rss_list():
         feeds = _load_feeds_from_vault(_vault_root())
         return jsonify({"feeds": feeds, "count": len(feeds),
                         "vault_file": str(Path(_vault_root()) / VAULT_RSS_FILE)})
 
-    @app.route("/api/rss/discover", methods=["POST"])
+    @ctx.route("/discover", methods=["POST"])
     def rss_discover():
         d = request.json or {}
         url = (d.get('url') or '').strip()
@@ -540,7 +541,7 @@ def register(app, rd_cfg):
             return jsonify({"error": name, "original_url": url}), 404
         return jsonify({"feed_url": feed_url, "name": name, "original_url": url})
 
-    @app.route("/api/rss/add", methods=["POST"])
+    @ctx.route("/add", methods=["POST"])
     def rss_add():
         d = request.json or {}
         url = (d.get('url') or '').strip()
@@ -572,7 +573,7 @@ def register(app, rd_cfg):
             "original_url": url if url != feed_url else None
         }})
 
-    @app.route("/api/rss/remove", methods=["POST"])
+    @ctx.route("/remove", methods=["POST"])
     def rss_remove():
         d = request.json or {}
         url = (d.get('url') or '').strip()
@@ -586,7 +587,7 @@ def register(app, rd_cfg):
         _save_feeds_to_vault(vault, new_feeds)
         return jsonify({"ok": True})
 
-    @app.route("/api/rss/fetch", methods=["POST"])
+    @ctx.route("/fetch", methods=["POST"])
     def rss_fetch():
         d = request.json or {}
         feed_urls   = d.get('feed_urls') or []
@@ -647,11 +648,11 @@ def register(app, rd_cfg):
             "fetch_full": fetch_full,
         })
 
-    @app.route("/api/rss/analyze", methods=["POST"])
+    @ctx.route("/analyze", methods=["POST"])
     def rss_analyze():
-        cfg = rd_cfg()
-        if not cfg.get("api_key"):
-            return jsonify({"error": "Clé API manquante"}), 400
+        problem = ctx.ai_unavailable()
+        if problem:
+            return jsonify({"error": problem}), 400
 
         d = request.json or {}
         feeds_data        = d.get('feeds') or []
@@ -770,7 +771,7 @@ def register(app, rd_cfg):
                 )
 
             t_ai = time.time()
-            synthesis, err = _ai_call(cfg, [
+            synthesis, err = ctx.ai_call([
                 {"role": "system", "content": system},
                 {"role": "user", "content": user_prompt}
             ], max_tokens=2200, temp=0.5, timeout=180)
@@ -853,7 +854,7 @@ def register(app, rd_cfg):
 
             t_ai = time.time()
             print(f"[RSS] Per-feed analyse '{f.get('name')}' : {len(items)} articles, ~{len(articles_md)} chars")
-            synth, err = _ai_call(cfg, [
+            synth, err = ctx.ai_call([
                 {"role": "system", "content": system},
                 {"role": "user", "content": up}
             ], max_tokens=1500, temp=0.5, timeout=150)

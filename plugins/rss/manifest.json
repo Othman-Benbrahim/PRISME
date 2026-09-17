@@ -1,8 +1,14 @@
 {
+  "id": "rss",
   "name": "RSS Feeds",
-  "version": "1.0",
+  "version": "2.0.0",
+  "api_version": 1,
   "description": "Gestion + analyse IA de flux RSS/Atom. Stockage dans flux-rss.md du vault. Auto-découverte (lemonde.fr → /rss/une.xml). Modes : tous flux ensemble OU flux par flux. Fetch parallèle des articles complets.",
-  "author": "Second Brain core",
+  "author": "PRISME",
+  "permissions": [
+    "network",
+    "vault_write"
+  ],
   "buttons": [
     {
       "panel": "toolbar",

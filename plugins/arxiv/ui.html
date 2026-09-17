@@ -36,8 +36,8 @@
       </div>
       <div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn bp" id="arx-retry-search" onclick="retryArxivSearch()" style="display:none;width:auto;padding:5px 12px;font-size:11px">🔄 Relancer ArXiv avec cette requête</button>
-        <button class="btn bs" onclick="window.open('/api/arxiv/ping','_blank')" style="width:auto;padding:5px 10px;font-size:11px">🩺 Test ArXiv</button>
-        <button class="btn bs" onclick="window.open('/api/test','_blank')" style="width:auto;padding:5px 10px;font-size:11px">🔍 Test API IA</button>
+        <button class="btn bs" onclick="openJson('/api/plugins/arxiv/ping')" style="width:auto;padding:5px 10px;font-size:11px">🩺 Test ArXiv</button>
+        <button class="btn bs" onclick="openJson('/api/test')" style="width:auto;padding:5px 10px;font-size:11px">🔍 Test API IA</button>
         <button class="btn bs" onclick="closeArxiv();openCfg()" style="width:auto;padding:5px 10px;font-size:11px">⚙ Paramètres</button>
         <button class="btn bs" onclick="$('arx-error').style.display='none';$('arx-form').style.display='block';$('arx-progress').style.display='none'" style="width:auto;padding:5px 10px;font-size:11px">↺ Tout reprendre</button>
       </div>

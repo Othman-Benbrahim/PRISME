@@ -123,3 +123,10 @@ def iter_md(root):
         if n > MAX_SCAN:
             return
         yield p
+
+
+def scoped_dir(raw=None):
+    """Dossier demande par le client, ramene dans le vault (racine par defaut).
+    Leve PermissionError s'il sort du vault."""
+    raw = (raw or "").strip()
+    return str(safe_path(raw) if raw else vault_root())

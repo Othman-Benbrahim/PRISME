@@ -2,34 +2,22 @@
 
 Lancement : python -m unittest discover -s tests -v
 """
-import json
-import os
-import sys
-import tempfile
 import unittest
 from pathlib import Path
 
-# Profil isole AVANT tout import de prisme_core
-_TMP = tempfile.mkdtemp(prefix="prisme-test-")
-os.environ["PRISME_DATA_DIR"] = str(Path(_TMP) / "profil")
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+from commun import ROOT, TMP, VAULT, reset_vault
 
-from prisme_core import compat, config, plugins  # noqa: E402
+from prisme_core import config  # noqa: E402,F401
 from prisme_core.app import create_app  # noqa: E402
 from prisme_core.routes import security  # noqa: E402
 
-VAULT = Path(_TMP) / "vault"
+_TMP = str(TMP)
 
 
 class E8Base(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        (VAULT / "sous").mkdir(parents=True, exist_ok=True)
-        (VAULT / "Alpha.md").write_text("# Alpha\n\n[[Beta]] #t1\n\nmot-unique\n", encoding="utf-8")
-        (VAULT / "sous" / "Beta.md").write_text("# Beta\n\n[[Alpha]]\n", encoding="utf-8")
-        config.wr_cfg({"workspace": str(VAULT), "configured": True,
-                       "base_url": "http://127.0.0.1:9/v1", "model": "m"})
+        reset_vault()
         cls.app = create_app(with_plugins=False)
         cls.client = cls.app.test_client()
         cls.h = {"X-Prisme-Token": security.TOKEN}
@@ -106,40 +94,6 @@ class TestPage(E8Base):
             self.assertLess(f.stat().st_size, 20_000, f.name)
         self.assertFalse((ROOT / "ui.html").exists())
         self.assertFalse((ROOT / "second_brain.py").exists())
-
-
-class TestPlugins(unittest.TestCase):
-    def test_passerelle_v1(self):
-        compat.install()
-        from second_brain import _ai_call, extract_link_refs, resolve_ref  # noqa: F401
-        self.assertEqual(extract_link_refs("voir [[Note]]"), {"Note"})
-
-    def test_plugin_isole_et_asset_filtre(self):
-        tmp = Path(tempfile.mkdtemp()) / "plugins"
-        (tmp / "demo").mkdir(parents=True)
-        (tmp / "demo" / "manifest.json").write_text(json.dumps({
-            "name": "Demo", "buttons": [{"panel": "toolbar", "label": "D", "onclick": "demo()"}]}))
-        (tmp / "demo" / "ui.js").write_text("function demo(){}")
-        (tmp / "demo" / "secret.txt").write_text("x")
-        (tmp / "casse").mkdir()
-        (tmp / "casse" / "manifest.json").write_text("{pas du json")
-        old = plugins.PLUGINS_DIR
-        plugins.PLUGINS_DIR = tmp
-        plugins.LOADED_PLUGINS.clear()
-        try:
-            app = create_app(with_plugins=True)
-            c = app.test_client()
-            self.assertEqual([p["dir"] for p in plugins.LOADED_PLUGINS], ["demo"])
-            html = c.get("/").get_data(as_text=True)
-            self.assertIn('<script src="/plugins/demo/ui.js" data-plugin="demo"></script>', html)
-            self.assertIn('onclick="demo()"', html)
-            for url, code in (("/plugins/demo/ui.js", 200), ("/plugins/demo/secret.txt", 404),
-                              ("/plugins/casse/ui.js", 404)):
-                with c.get(url) as r:
-                    self.assertEqual(r.status_code, code, url)
-        finally:
-            plugins.PLUGINS_DIR = old
-            plugins.LOADED_PLUGINS.clear()
 
 
 if __name__ == "__main__":

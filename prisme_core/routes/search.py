@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flask import Blueprint, jsonify, request
 
-from ..config import rd_cfg
+from ..vault import scoped_dir
 from ..search_index import index_refresh
 
 bp = Blueprint("search", __name__)
@@ -11,7 +11,7 @@ bp = Blueprint("search", __name__)
 @bp.route("/api/search", methods=["GET"])
 def search_files():
     query = request.args.get("q", "").strip()
-    dir_p = request.args.get("dir", "").strip() or rd_cfg().get("workspace", str(Path.home()))
+    dir_p = scoped_dir(request.args.get("dir"))
     if len(query) < 2: return jsonify({"results": []})
     results, total = [], 0
     ql = query.lower()
@@ -34,7 +34,7 @@ def search_files():
 
 @bp.route("/api/tags", methods=["GET"])
 def get_tags():
-    dir_p = request.args.get("dir", "").strip() or rd_cfg().get("workspace", str(Path.home()))
+    dir_p = scoped_dir(request.args.get("dir"))
     tags = {}
     idx = index_refresh(dir_p)
     for sp in sorted(idx):

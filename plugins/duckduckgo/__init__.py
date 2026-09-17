@@ -13,7 +13,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import request, jsonify
 import requests as http
 
-from second_brain import _ai_call
 
 # Stratégie 1 : bibliothèque (essayer les 2 noms, le projet a été renommé)
 HAS_DDGS_LIB = False
@@ -407,9 +406,9 @@ def _fetch_pages_parallel(results, n_fetch):
     return results
 
 
-def register(app, rd_cfg):
+def register(ctx):
 
-    @app.route("/api/ddg/ping", methods=["GET"])
+    @ctx.route("/ping", methods=["GET"])
     def ddg_ping():
         """Diagnostic détaillé : teste chaque backend de la lib + scraping lite."""
         t0 = time.time()
@@ -456,7 +455,7 @@ def register(app, rd_cfg):
         out["ok"] = any(s.get("ok") and s.get("results", 0) > 0 for s in out["strategies_tried"])
         return jsonify(out)
 
-    @app.route("/api/ddg/search", methods=["GET"])
+    @ctx.route("/search", methods=["GET"])
     def ddg_search():
         q = request.args.get("q", "").strip()
         n = int(request.args.get("n", 10))
@@ -466,10 +465,10 @@ def register(app, rd_cfg):
         except Exception as e:
             return jsonify({"error": f"DDG : {str(e)[:400]}"}), 500
 
-    @app.route("/api/ddg/agentic", methods=["POST"])
+    @ctx.route("/agentic", methods=["POST"])
     def ddg_agentic():
-        cfg = rd_cfg()
-        if not cfg.get("api_key"): return jsonify({"error": "Clé API manquante"}), 400
+        problem = ctx.ai_unavailable()
+        if problem: return jsonify({"error": problem}), 400
         d = request.json
         content    = (d.get("content", "") or "")[:4000]
         fname      = d.get("name", "note")
@@ -487,7 +486,7 @@ def register(app, rd_cfg):
         )
         if hint: prompt += f"\n\nIndication de l'utilisateur (à prioriser) : {hint}"
 
-        query, err = _ai_call(cfg, [
+        query, err = ctx.ai_call([
             {"role": "system", "content": "Tu génères des requêtes de moteur de recherche optimales. Pas d'explications."},
             {"role": "user",   "content": prompt}
         ], max_tokens=150, temp=0.3)
@@ -514,10 +513,10 @@ def register(app, rd_cfg):
             "fetch_full": fetch_full,
         })
 
-    @app.route("/api/ddg/synthesize", methods=["POST"])
+    @ctx.route("/synthesize", methods=["POST"])
     def ddg_synthesize():
-        cfg = rd_cfg()
-        if not cfg.get("api_key"): return jsonify({"error": "Clé API manquante"}), 400
+        problem = ctx.ai_unavailable()
+        if problem: return jsonify({"error": problem}), 400
         d = request.json
         results        = d.get("results", [])
         content        = (d.get("content", "") or "")[:3000]
@@ -579,7 +578,7 @@ def register(app, rd_cfg):
                        "Tu ne paraphrases pas en généralités quand la matière manque — tu le dis.")
         system = user_sys or default_sys
 
-        synthesis, err = _ai_call(cfg, [
+        synthesis, err = ctx.ai_call([
             {"role": "system", "content": system},
             {"role": "user",   "content": user_prompt}
         ], max_tokens=2500, temp=0.5, timeout=240)

@@ -98,6 +98,10 @@ function aiStreamWrapPost(){
   var _origPost = post;
   var wrapped = async function(url, data){
     if(url !== '/api/ai') return _origPost(url, data);
+    if(data && data.nostream){                 // sortie structuree : pas d'affichage au fil de l'eau
+      var copy = Object.assign({}, data); delete copy.nostream;
+      return _origPost(url, copy);
+    }
     var r = await aiStreamCall(data);
     if(r) return r;
     return _origPost(url, data);       // repli silencieux

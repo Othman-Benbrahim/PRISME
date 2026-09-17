@@ -3,15 +3,15 @@ Plugin Context Builder — sélection multi-fichiers, résolution optionnelle de
 envoi du corpus assemblé à l'IA avec une question libre.
 
 Routes exposées :
-  GET  /api/context/list   — liste tous les .md du workspace
-  POST /api/context/build  — assemble le markdown du corpus (avec liens si depth>0)
-  POST /api/context/ask    — pose une question à l'IA sur le corpus
+  GET  /api/plugins/context/list   — liste tous les .md du workspace
+  POST /api/plugins/context/build  — assemble le markdown du corpus (avec liens si depth>0)
+  POST /api/plugins/context/ask    — pose une question à l'IA sur le corpus
 """
 from pathlib import Path
+
+from prisme_core.api import extract_link_refs, resolve_ref
 from flask import request, jsonify
 
-# Helpers du core
-from second_brain import _ai_call, extract_link_refs, resolve_ref
 
 
 def _gather_files(selected_paths, depth, vault_paths):
@@ -56,14 +56,14 @@ def _assemble_context(paths, vault_dir):
     return "".join(parts), files_info
 
 
-def register(app, rd_cfg):
+def register(ctx):
 
-    @app.route("/api/context/list", methods=["GET"])
+    @ctx.route("/list", methods=["GET"])
     def context_list():
         """Liste tous les .md du workspace avec taille."""
-        dir_p = request.args.get("dir", "").strip() or rd_cfg().get("workspace", str(Path.home()))
+        dir_p = str(ctx.safe_path(request.args.get("dir", "").strip() or ctx.vault_root()))
         files = []
-        for f in sorted(Path(dir_p).rglob("*.md")):
+        for f in sorted(ctx.iter_notes(dir_p)):
             try:    size = f.stat().st_size
             except: size = 0
             try:    rel  = str(f.relative_to(dir_p))
@@ -71,16 +71,17 @@ def register(app, rd_cfg):
             files.append({"path": str(f), "name": f.name, "rel": rel, "size": size})
         return jsonify({"files": files, "count": len(files)})
 
-    @app.route("/api/context/build", methods=["POST"])
+    @ctx.route("/build", methods=["POST"])
     def context_build():
         """Assemble le contexte markdown (avec résolution des liens si depth>0)."""
         d     = request.json
         paths = d.get("paths", [])
         depth = int(d.get("depth", 0))
-        dir_p = d.get("dir") or rd_cfg().get("workspace", str(Path.home()))
+        dir_p = str(ctx.safe_path(d.get("dir") or ctx.vault_root()))
         if not paths: return jsonify({"error": "Aucun fichier sélectionné"}), 400
+        paths = [str(ctx.safe_path(p)) for p in paths]
 
-        vault_paths = {str(f) for f in Path(dir_p).rglob("*.md")}
+        vault_paths = {str(f) for f in ctx.iter_notes(dir_p)}
         all_paths = _gather_files(paths, depth, vault_paths)
         markdown, files = _assemble_context(all_paths, dir_p)
         return jsonify({
@@ -91,23 +92,24 @@ def register(app, rd_cfg):
             "auto_added":   len(files) - len(paths),
         })
 
-    @app.route("/api/context/ask", methods=["POST"])
+    @ctx.route("/ask", methods=["POST"])
     def context_ask():
         """Pose une question à l'IA en utilisant le corpus assemblé comme contexte."""
-        cfg = rd_cfg()
-        if not cfg.get("api_key"): return jsonify({"error": "Clé API manquante"}), 400
+        problem = ctx.ai_unavailable()
+        if problem: return jsonify({"error": problem}), 400
 
         d           = request.json
         paths       = d.get("paths", [])
         depth       = int(d.get("depth", 0))
         question    = (d.get("question", "") or "").strip()
         sys_prompt  = (d.get("system_prompt", "") or "").strip()
-        dir_p       = d.get("dir") or rd_cfg().get("workspace", str(Path.home()))
+        dir_p       = str(ctx.safe_path(d.get("dir") or ctx.vault_root()))
 
         if not paths:    return jsonify({"error": "Aucun fichier sélectionné"}), 400
         if not question: return jsonify({"error": "Question vide"}), 400
+        paths = [str(ctx.safe_path(p)) for p in paths]
 
-        vault_paths = {str(f) for f in Path(dir_p).rglob("*.md")}
+        vault_paths = {str(f) for f in ctx.iter_notes(dir_p)}
         all_paths   = _gather_files(paths, depth, vault_paths)
         markdown, files = _assemble_context(all_paths, dir_p)
 
@@ -129,7 +131,7 @@ def register(app, rd_cfg):
             f"=== QUESTION ===\n\n{question}"
         )
 
-        answer, err = _ai_call(cfg, [
+        answer, err = ctx.ai_call([
             {"role": "system", "content": system},
             {"role": "user",   "content": user_prompt}
         ], max_tokens=2500, temp=0.5, timeout=240)

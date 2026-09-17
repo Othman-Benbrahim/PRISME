@@ -1,8 +1,13 @@
 {
+  "id": "arxiv",
   "name": "ArXiv",
-  "version": "1.0",
+  "version": "2.0.0",
+  "api_version": 1,
   "description": "Recherche ArXiv agentique : IA génère une requête depuis le fichier ouvert, interroge ArXiv, et synthétise les résultats en français avec citations.",
-  "author": "Second Brain core",
+  "author": "PRISME",
+  "permissions": [
+    "network"
+  ],
   "buttons": [
     {
       "panel": "toolbar",

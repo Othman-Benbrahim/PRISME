@@ -1,8 +1,32 @@
 {
+  "id": "osint-cx",
   "name": "OSINT Cross-Reference",
-  "version": "1.7.0",
+  "version": "2.0.0",
+  "api_version": 1,
   "description": "Recherche OSINT multi-source en mode audit défensif : score de corrélation, GitHub public, Wikidata, API Entreprises, Reddit public, Maigret/Sherlock local, BrixHub optionnel et X API.",
-  "author": "HackerAI / adaptation Second Brain",
+  "author": "HackerAI / adaptation PRISME",
+  "permissions": [
+    "network",
+    "processes",
+    "secrets"
+  ],
+  "secrets": [
+    {
+      "name": "BRIXHUB_API_KEY",
+      "label": "Clé API BrixHub",
+      "optional": true
+    },
+    {
+      "name": "X_BEARER_TOKEN",
+      "label": "Jeton X API (Bearer)",
+      "optional": true
+    },
+    {
+      "name": "RAPIDAPI_KEY",
+      "label": "Clé RapidAPI (LinkedIn)",
+      "optional": true
+    }
+  ],
   "buttons": [
     {
       "panel": "toolbar",

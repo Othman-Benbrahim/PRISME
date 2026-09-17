@@ -61,7 +61,7 @@ async function runDDG(){
     }, 1500);
   }
 
-  var r = await post('/api/ddg/agentic', {content:content, name:name, hint:hint, n:n,
+  var r = await post('/api/plugins/duckduckgo/agentic', {content:content, name:name, hint:hint, n:n,
     fetch_full: fetchFull, n_fetch: 5});
 
   if(r.error){
@@ -112,7 +112,7 @@ async function retryDDGSearch(){
   $('ddg-progress').style.display = 'block';
   setDDGStep(1,'done'); setDDGStep(2,'active'); setDDGStep(3,'pending');
 
-  var r = await fetch('/api/ddg/search?q='+encodeURIComponent(q)+'&n='+n).then(function(r){return r.json();});
+  var r = await fetch('/api/plugins/duckduckgo/search?q='+encodeURIComponent(q)+'&n='+n).then(function(r){return r.json();});
   if(r.error){
     setDDGStep(2,'fail');
     $('ddg-error-msg').textContent = r.error;
@@ -170,7 +170,7 @@ async function synthesizeDDG(){
   $('ddg-syn-btn').textContent = '⏳ Synthèse en cours…';
   $('ddg-error').style.display = 'none';
 
-  var r = await post('/api/ddg/synthesize', {
+  var r = await post('/api/plugins/duckduckgo/synthesize', {
     results: DDG.results, content: $('md-editor').value,
     name: ACTIVE.split(/[/\\]/).pop(), query: DDG.query,
     question: question, system_prompt: sysPrompt

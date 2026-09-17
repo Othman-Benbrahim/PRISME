@@ -4,8 +4,8 @@
 
 var RSS = {
   feeds: [],            // [{name, url, tags, section}]
-  fetchedFeeds: null,   // résultat du /api/rss/fetch
-  syntheses: null,      // résultat du /api/rss/analyze
+  fetchedFeeds: null,   // résultat du /api/plugins/rss/fetch
+  syntheses: null,      // résultat du /api/plugins/rss/analyze
   mode: 'together',
   question: '',
   sysPrompt: '',
@@ -60,7 +60,7 @@ function rssSwitchTab(t){
 
 async function rssReloadList(){
   $('rss-feeds-list').innerHTML = '<div style="padding:20px;text-align:center;color:var(--tx2);font-size:12px">Chargement…</div>';
-  var r = await fetch('/api/rss/list').then(function(r){return r.json();});
+  var r = await fetch('/api/plugins/rss/list').then(function(r){return r.json();});
   RSS.feeds = r.feeds || [];
   $('rss-feeds-count').textContent = RSS.feeds.length;
   $('rss-vault-file').textContent = r.vault_file || 'flux-rss.md';
@@ -111,7 +111,7 @@ async function rssAddFeed(){
   st.style.display = 'block';
   st.textContent = '🔍 Recherche du flux RSS (auto-discovery + chemins courants)…';
 
-  var r = await post('/api/rss/add', {url: url, tags: tags});
+  var r = await post('/api/plugins/rss/add', {url: url, tags: tags});
 
   $('rss-add-btn').disabled = false;
   $('rss-add-btn').textContent = '➕ Ajouter';
@@ -135,7 +135,7 @@ async function rssAddFeed(){
 
 async function rssRemoveFeed(url){
   if(!confirm('Retirer ce flux de la liste ?')) return;
-  var r = await post('/api/rss/remove', {url: url});
+  var r = await post('/api/plugins/rss/remove', {url: url});
   if(r.error){ toast('⚠ '+r.error); return; }
   rssReloadList();
   toast('✓ Flux retiré');
@@ -214,7 +214,7 @@ async function rssRunAnalysis(){
 
   // ── ÉTAPE 1 : FETCH ──
   try {
-    var fr = await rssFetchWithAbort('/api/rss/fetch', {
+    var fr = await rssFetchWithAbort('/api/plugins/rss/fetch', {
       feed_urls:  feedUrls,
       hours_back: hours,
       fetch_full: fetchFull,
@@ -240,7 +240,7 @@ async function rssRunAnalysis(){
     currentStep = 'analyze';
     RSS.startTime = Date.now();  // reset chrono pour l'étape 2
 
-    var ar = await rssFetchWithAbort('/api/rss/analyze', {
+    var ar = await rssFetchWithAbort('/api/plugins/rss/analyze', {
       feeds: fr.feeds,
       question: question,
       system_prompt: sysPrompt,

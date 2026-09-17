@@ -74,6 +74,9 @@ python second_brain.py
 
 ## Variables d’environnement
 
+> **PRISME** : les clés `BRIXHUB_API_KEY`, `X_BEARER_TOKEN` et `RAPIDAPI_KEY` se saisissent de préférence dans PRISME (bouton 🧩 Plugins > OSINT Cross-Reference > Secrets), où elles sont chiffrées sous Windows. Le fichier `.env` reste lu en secours ; les autres réglages (URL, hôte RapidAPI…) restent dans `.env`.
+
+
 Le plugin fonctionne en grande partie sans clé API.
 
 Certaines fonctionnalités avancées nécessitent cependant des variables dans le fichier `.env` situé à la racine de Second Brain.
@@ -235,7 +238,7 @@ Permet de rechercher des entreprises, établissements, dirigeants ou information
 Route plugin :
 
 ```txt
-GET /api/osintcx/entreprise?q=<terme>
+GET /api/plugins/osint-cx/entreprise?q=<terme>
 ```
 
 ### Reddit public
@@ -245,7 +248,7 @@ Permet de récupérer des informations publiques basiques sur un utilisateur Red
 Route plugin :
 
 ```txt
-GET /api/osintcx/reddit?q=<username>
+GET /api/plugins/osint-cx/reddit?q=<username>
 ```
 
 ### GitHub public
@@ -263,7 +266,7 @@ Permet de récupérer les informations publiques d’un profil GitHub :
 Route plugin :
 
 ```txt
-GET /api/osintcx/github?q=<username>
+GET /api/plugins/osint-cx/github?q=<username>
 ```
 
 ### Wikidata
@@ -273,7 +276,7 @@ Permet de rechercher des entités publiques : personnes publiques, organisations
 Route plugin :
 
 ```txt
-GET /api/osintcx/wikidata?q=<terme>
+GET /api/plugins/osint-cx/wikidata?q=<terme>
 ```
 
 ---
@@ -281,23 +284,23 @@ GET /api/osintcx/wikidata?q=<terme>
 ## Routes principales
 
 ```txt
-GET  /api/osintcx/username?q=<pseudo>
-GET  /api/osintcx/email?q=<email>
-GET  /api/osintcx/phone?q=<telephone>
-GET  /api/osintcx/ip?q=<ip>
-GET  /api/osintcx/domain?q=<domaine>
+GET  /api/plugins/osint-cx/username?q=<pseudo>
+GET  /api/plugins/osint-cx/email?q=<email>
+GET  /api/plugins/osint-cx/phone?q=<telephone>
+GET  /api/plugins/osint-cx/ip?q=<ip>
+GET  /api/plugins/osint-cx/domain?q=<domaine>
 
-GET  /api/osintcx/entreprise?q=<terme>
-GET  /api/osintcx/reddit?q=<username>
-GET  /api/osintcx/github?q=<username>
-GET  /api/osintcx/wikidata?q=<terme>
-GET  /api/osintcx/social-cli?q=<username>&tool=auto
+GET  /api/plugins/osint-cx/entreprise?q=<terme>
+GET  /api/plugins/osint-cx/reddit?q=<username>
+GET  /api/plugins/osint-cx/github?q=<username>
+GET  /api/plugins/osint-cx/wikidata?q=<terme>
+GET  /api/plugins/osint-cx/social-cli?q=<username>&tool=auto
 
-GET  /api/osintcx/linkedin?q=<username>&url=<url_linkedin>
-POST /api/osintcx/linkedin
+GET  /api/plugins/osint-cx/linkedin?q=<username>&url=<url_linkedin>
+POST /api/plugins/osint-cx/linkedin
 
-POST /api/osintcx/brixhub
-POST /api/osintcx/score
+POST /api/plugins/osint-cx/brixhub
+POST /api/plugins/osint-cx/score
 ```
 
 ---
