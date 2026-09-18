@@ -187,11 +187,12 @@ def note_provenance():
     """Provenance de la note demandee, avec ses sources resolues."""
     p = safe_path(request.args.get("path", ""))
     idx = fresh_index()
-    meta = query.note_meta(idx, str(p))
-    if not meta:
-        meta = {k.replace(provenance.PREFIX, "", 1): v
-                for k, v in provenance.lire(p).items() if k.startswith(provenance.PREFIX)}
-        meta["sources"] = meta.get("sources") or []
+    meta = {k: v for k, v in query.note_meta(idx, str(p)).items() if v not in (None, "", "[]")}
+    # L'en-tete du fichier fait foi : l'index ne stocke qu'une partie des champs
+    entete = {k.replace(provenance.PREFIX, "", 1): v
+              for k, v in provenance.lire(p).items() if k.startswith(provenance.PREFIX)}
+    meta.update(entete)
+    meta.setdefault("sources", [])
     sources = meta.get("sources") or []
     if isinstance(sources, str):
         try:
@@ -206,16 +207,38 @@ def note_provenance():
     parent = query.by_prisme_id(idx, meta.get("parent"))
     return jsonify({
         "path": str(p),
-        "genere": bool(meta.get("outil") or meta.get("genere_par")),
+        # « generee » = un modele est intervenu ; un outil seul peut etre une saisie manuelle
+        "genere": bool(meta.get("genere_par")),
         "meta": {k: v for k, v in meta.items() if k != "file_id"},
         "sources": resolues,
         "parent": parent,
         "champs_connus": provenance.CHAMPS,
+        "modifiables": list(provenance.MODIFIABLES),
+        "types": list(provenance.TYPES),
+        "etats": list(provenance.ETATS),
     })
+
+
+@bp.route("/api/provenance", methods=["POST"])
+def set_note_provenance():
+    """Ecrit ou corrige la provenance d'une note existante (fiche modifiable)."""
+    d = request.get_json(silent=True) or {}
+    p = safe_path(d.get("path", ""))
+    try:
+        contenu = provenance.appliquer(p, d.get("champs") or {},
+                                       d.get("sources") if "sources" in d else None)
+    except provenance.ChampInvalide as e:
+        return jsonify({"error": str(e)}), 400
+    notify_changed(p)
+    hooks.emit("note_saved", path=str(p), origin="provenance")
+    return jsonify({"ok": True, "path": str(p), "content": contenu})
 
 
 @bp.route("/api/provenance/id", methods=["POST"])
 def ensure_note_id():
     """Pose un identifiant sur une note (utilise quand on veut la citer)."""
     p = safe_path((request.get_json(silent=True) or {}).get("path", ""))
-    return jsonify({"path": str(p), "prisme_id": provenance.assurer_id(p)})
+    ident = provenance.assurer_id(p)
+    notify_changed(p)
+    return jsonify({"path": str(p), "prisme_id": ident,
+                    "content": Path(p).read_text(encoding="utf-8", errors="replace")})

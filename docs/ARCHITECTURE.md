@@ -20,7 +20,7 @@
 | `vault.py` | Racine autorisée, garde de chemin, corbeille, instantanés, parcours des `.md` |
 | `markdown.py` | Extraction des liens et des tags, résolution des références |
 | `frontmatter.py` | Lecture et écriture de l'en-tête YAML, sans dépendance |
-| `provenance.py` | Identifiants, horloge d'enregistrement, estampillage des notes produites par une machine |
+| `provenance.py` | Identifiants, horloge d'enregistrement, estampillage des notes produites par une machine, validation des champs saisis à la main |
 | `index/` | **Index SQLite** : `store.py` (base et schéma), `segmenter.py` (découpage), `resolver.py` (résolution des liens), `indexer.py` (mise à jour), `search.py` (recherche, tags, graphe, backlinks) |
 | `providers.py` | Fournisseurs IA (OpenAI-compatibles, Anthropic), appel générique |
 | `api.py` | **API publique des plugins** (`PluginContext`, version 1) |
