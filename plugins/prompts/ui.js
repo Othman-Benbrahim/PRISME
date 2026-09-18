@@ -99,7 +99,8 @@ async function savePrompt(){
 
 async function deletePromptUI(){
   if(!PROMPTS.current) return;
-  if(!confirm('Supprimer le preset "'+PROMPTS.current.name+'" ?\n(action irréversible)')) return;
+  if(!await confirmer({titre:'Supprimer un preset', danger:true, ok:'Supprimer',
+      message:'Supprimer le preset « '+PROMPTS.current.name+' » ? Action irréversible.'})) return;
   var r = await post('/api/plugins/prompts/delete', {id: PROMPTS.current.id});
   if(r.error){ toast('⚠ '+r.error); return; }
   cancelEditPrompt();
@@ -109,7 +110,8 @@ async function deletePromptUI(){
 }
 
 async function resetPromptsToDefault(){
-  if(!confirm('Restaurer les presets d\'usine ?\nVos personnalisations seront écrasées.')) return;
+  if(!await confirmer({titre:'Restaurer les presets', danger:true, ok:'Restaurer',
+      message:'Restaurer les presets d\'usine ? Vos personnalisations seront écrasées.'})) return;
   var r = await post('/api/plugins/prompts/reset', {});
   if(r.error){ toast('⚠ '+r.error); return; }
   await loadPrompts();

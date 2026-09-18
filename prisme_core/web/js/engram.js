@@ -107,8 +107,9 @@ async function engReimporter(encoded, mode){
 }
 
 async function engOublier(cle){
-  if(!confirm('Retirer cette source du registre ? Les notes déjà créées restent dans le vault, '
-    + 'mais un réimport ne saura plus les mettre à jour.')) return;
+  if(!await confirmer({titre:'Oublier une source', ok:'Oublier',
+      message:'Retirer cette source du registre ? Les notes déjà créées restent dans le vault, '
+        + 'mais un réimport ne saura plus les mettre à jour.'})) return;
   var d = await post('/api/engram/oublier', {cle: cle});
   if(d.error){ toast('⚠ ' + d.error); return; }
   toast('Source oubliée');

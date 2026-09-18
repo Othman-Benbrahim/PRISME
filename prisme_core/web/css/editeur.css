@@ -62,3 +62,16 @@ mark.fh.cur{background:rgba(251,191,36,.55);color:#111}
 .pv-hit:hover{background:var(--bg4);color:var(--tx)}
 .pv-del{background:none;border:none;color:var(--tx2);cursor:pointer;float:right;font-size:12px;padding:0 2px}
 .pv-del:hover{color:var(--red)}
+
+/* ── Dialogues dans l'interface ── */
+#mdialog .mb{width:430px}
+.dlg-msg{font-size:12.5px;color:var(--tx3);line-height:1.6;margin-top:8px}
+.dlg-aide{font-size:11px;color:var(--tx2);line-height:1.5;margin-top:6px}
+.dlg-f{margin-top:10px}
+.dlg-f label{display:block;font-size:10.5px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.dlg-f input{width:100%;padding:7px 10px;font-size:13px;background:var(--bg3);border:1px solid var(--bdr);
+  border-radius:6px;color:var(--tx);font-family:var(--font);outline:none}
+.dlg-f input:focus{border-color:var(--acc)}
+.btn.bd{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.5);color:var(--red)}
+.btn.bd:hover{background:rgba(248,113,113,.25)}
+#fl-new-row{padding-right:8px}
