@@ -14,6 +14,7 @@ async function openCfg(){
   $('kinfo').style.color=(c.key_state==='chiffree')?'var(--grn)':(c.has_key?'var(--yel)':'var(--yel)');
   $('cmod').value=c.model||'';$('cws').value=c.workspace||'';$('curl').value=c.base_url||'';
   $('mcfg').classList.add('on');
+  loadIndexStatus();
 }
 function closeCfg(){$('mcfg').classList.remove('on');}
 // SB_SETTINGS_PATCH
@@ -63,3 +64,26 @@ async function loadMods(){
   }else toast('⚠ '+(d.error||'Aucun modèle — vérifiez la clé et l\'URL'));
 }
 
+
+// ── Index de recherche ──
+var IDX_TIMER=null;
+var IDX_STATE={vide:'vide',construction:'en construction',pret:'à jour',erreur:'en erreur'};
+async function loadIndexStatus(){
+  clearTimeout(IDX_TIMER);
+  var d=await fetch('/api/index/status').then(function(r){return r.json();});
+  if(d.error && !d.state){ $('cidx').textContent='⚠ '+d.error; return; }
+  var t=d.files+' note(s), '+d.segments+' segment(s), '+d.links_resolved+'/'+d.links+' lien(s) résolu(s) — '
+    +(IDX_STATE[d.state]||d.state);
+  if(d.state==='construction') t+=' ('+d.progress.done+' / '+d.progress.total+')';
+  if(d.error) t+=' — '+d.error;
+  t+=' · recherche '+(d.fulltext==='fts5'?'plein texte (FTS5)':'simple (FTS5 indisponible)');
+  if(d.last_duration_s!==null) t+=' · dernière mise à jour '+d.last_duration_s+' s';
+  $('cidx').textContent=t;
+  $('cidx').title=d.db;
+  if(d.state==='construction' && $('mcfg').classList.contains('on')) IDX_TIMER=setTimeout(loadIndexStatus,1000);
+}
+async function rebuildIndex(){
+  var d=await post('/api/index/rebuild',{});
+  toast(d.started?'↻ Reconstruction lancée — la recherche reste disponible':'Une mise à jour est déjà en cours');
+  setTimeout(loadIndexStatus,300);
+}

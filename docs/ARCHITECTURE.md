@@ -1,6 +1,6 @@
 # Architecture du code
 
-État après l'étape E1. Mis à jour à chaque étape qui déplace des responsabilités.
+État après l'étape E2. Mis à jour à chaque étape qui déplace des responsabilités.
 
 ## Lancement
 
@@ -19,7 +19,7 @@
 | `envfile.py` | Chargement des fichiers `.env` |
 | `vault.py` | Racine autorisée, garde de chemin, corbeille, instantanés, parcours des `.md` |
 | `markdown.py` | Extraction des liens et des tags, résolution des références |
-| `search_index.py` | Index de recherche en mémoire (remplacé en E2) |
+| `index/` | **Index SQLite** : `store.py` (base et schéma), `segmenter.py` (découpage), `resolver.py` (résolution des liens), `indexer.py` (mise à jour), `search.py` (recherche, tags, graphe, backlinks) |
 | `providers.py` | Fournisseurs IA (OpenAI-compatibles, Anthropic), appel générique |
 | `api.py` | **API publique des plugins** (`PluginContext`, version 1) |
 | `hooks.py` | Événements synchrones avec délai maximal |
@@ -31,7 +31,7 @@
 | `routes/setup.py` | Premier lancement, configuration, diagnostic, modèles |
 | `routes/ai.py` | Appels IA simples, flux SSE, synthèse de dossier |
 | `routes/files.py` | Fichiers du vault, graphe, backlinks |
-| `routes/search.py` | Recherche plein texte, tags |
+| `routes/search.py` | Recherche plein texte, tags, état et reconstruction de l'index |
 | `routes/plugin_manager.py` | Gestionnaire de plugins : liste, installation, activation, secrets |
 
 ## Interface `prisme_core/web/`
@@ -57,6 +57,7 @@ rafraîchir le navigateur suffit.
 | `secrets.json` | Secrets des plugins, chiffrés sous Windows |
 | `plugins.json` | État des plugins : activé, source, empreintes, date d'installation |
 | `plugins/<id>/` | Données privées de chaque plugin |
+| `index/<empreinte>.db` | Index d'un vault, avec `vaults.json` (empreinte → chemin) ; supprimable, il se reconstruit |
 | `staging/` | Archives vérifiées en attente de confirmation (effacées après une heure) |
 | `corbeille-plugins/` | Plugins désinstallés ou remplacés |
 
@@ -66,3 +67,21 @@ Un plugin est chargé seulement si son manifest déclare `api_version: 1` et un 
 identique au nom de son dossier. Ses routes ne sont pas enregistrées dans Flask : un
 aiguilleur unique (`/api/plugins/<id>/<chemin>`) les résout dans une table propre au
 plugin. C'est ce qui permet d'installer, d'activer et de désactiver sans redémarrer.
+
+## Index de recherche
+
+Les `.md` restent la source de vérité ; l'index n'est qu'un cache dérivé.
+
+- **Deux granularités** : une ligne par fichier (liens, tags, graphe) et une
+  ligne par segment (recherche). Un segment = un titre de niveau 1 à 3, ou un
+  groupe de paragraphes pour une note sans titre.
+- **Mise à jour incrémentale** : un fichier n'est relu que si sa date ou sa
+  taille a changé, et réindexé que si son contenu a changé ; dans un fichier
+  modifié, seuls les segments dont l'empreinte a changé sont réécrits.
+- **Écritures faites par PRISME** : prises en compte immédiatement
+  (`notify_changed`). **Écritures faites ailleurs** (Obsidian) : vues à la
+  vérification suivante, au plus deux secondes après.
+- **Gros vault** (plus de 5 000 notes) : la construction et les vérifications
+  passent en arrière-plan ; la recherche répond avec ce qui est déjà indexé.
+- **Reconstruction complète** : construite dans un fichier à part, qui remplace
+  l'ancien en une seule opération, une fois qu'aucune lecture n'est en cours.

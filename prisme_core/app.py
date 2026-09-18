@@ -48,6 +48,13 @@ def main():
     load_env_file(HOME / ".env")          # .env racine, avant tout plugin
     print("-> Chargement des plugins...")
     app = create_app()
-    print(f"-> {len(plugins.active_plugins())} plugin(s) actif(s)\n")
+    print(f"-> {len(plugins.active_plugins())} plugin(s) actif(s)")
+    try:
+        from .index import get_index
+        idx = get_index()
+        idx.start_background()
+        print(f"-> Index : {idx.db_path} ({'FTS5' if idx.fts else 'sans FTS5, recherche simple'})\n")
+    except Exception as e:                                   # noqa: BLE001
+        print(f"-> Index indisponible : {e}\n")
     threading.Timer(1.6, lambda: webbrowser.open(f"http://localhost:{PORT}")).start()
     app.run(host=HOST, port=PORT, debug=False, threaded=True)

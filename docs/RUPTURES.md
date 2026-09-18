@@ -5,6 +5,25 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E2 — Index SQLite
+
+| Avant | Après |
+|---|---|
+| Index en mémoire, reconstruit à chaque appel | Index SQLite dans `~/.prisme/index/<empreinte du vault>.db` |
+| Recherche par sous-chaîne, sans classement | FTS5 : classement BM25, insensible aux accents, recherche par préfixe (« predi » trouve « prédiction ») |
+| Plafond de 5 000 notes (`MAX_SCAN`) | Plus de plafond pour la recherche, les tags, le graphe et les backlinks |
+| Graphe et backlinks : relecture de tous les fichiers à chaque appel | Requêtes sur l'index |
+| Résultats : extraits bruts, surlignage côté navigateur | Extraits fournis par SQLite, avec titre de section ; le serveur encadre les termes trouvés par `\x01`/`\x02` |
+| `/api/search` utilisait le dossier affiché | Cherche dans tout le vault ; le paramètre `dir` reste possible pour limiter à un sous-dossier |
+| Tags `#méthode` tronqués à `#m` | Accents acceptés dans les tags ; un tag doit contenir au moins une lettre |
+| `[[note]]` pouvait se résoudre vers `manote.md` | Résolution : chemin relatif, puis fin de chemin exacte, puis nom sans extension ; à égalité, le chemin le plus court |
+| — | Nouvelles routes `/api/index/status` et `/api/index/rebuild`, état et bouton dans Paramètres |
+| — | Nouveau pour les plugins : `ctx.search(texte)` |
+| `prisme_core/search_index.py` | Supprimé, remplacé par `prisme_core/index/` |
+
+Toute évolution future des règles d'extraction doit incrémenter `SCHEMA_VERSION`
+(`prisme_core/index/store.py`) : l'index existant est alors reconstruit tout seul.
+
 ## E1 — API des plugins, gestionnaire, secrets
 
 **Plugins**

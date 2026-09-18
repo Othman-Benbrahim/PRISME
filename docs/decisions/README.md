@@ -17,8 +17,8 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0007 | [Gestionnaire de plugins](0007-gestionnaire-de-plugins.md) | appliquée en E1 |
 | 0008 | [Source des plugins](0008-source-des-plugins.md) | appliquée en E1 |
 | 0009 | [Hooks synchrones](0009-hooks-synchrones.md) | appliquée en E1 |
-| 0010 | [Index SQLite dans le profil](0010-index-sqlite-dans-le-profil.md) | acceptée, non encore appliquée |
-| 0011 | [Double granularité](0011-double-granularite.md) | acceptée, non encore appliquée |
+| 0010 | [Index SQLite dans le profil](0010-index-sqlite-dans-le-profil.md) | appliquée en E2 |
+| 0011 | [Double granularité](0011-double-granularite.md) | appliquée en E2 |
 | 0012 | [Identifiants posés au besoin](0012-identifiants-poses-au-besoin.md) | acceptée, non encore appliquée |
 | 0013 | [ENGRAM : toutes les sources, un seul contrat](0013-engram-toutes-les-sources-un-seul-contrat.md) | acceptée, non encore appliquée |
 | 0014 | [Forme des notes importées](0014-forme-des-notes-importees.md) | acceptée, non encore appliquée |

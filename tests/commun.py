@@ -31,6 +31,7 @@ def reset_vault():
     (VAULT / "sous").mkdir(parents=True)
     (VAULT / "Alpha.md").write_text("# Alpha\n\n[[Beta]] #t1\n\nmot-unique\n", encoding="utf-8")
     (VAULT / "sous" / "Beta.md").write_text("# Beta\n\n[[Alpha]]\n", encoding="utf-8")
-    from prisme_core import config
+    from prisme_core import config, index
+    index.forget_all()          # les fichiers ont change hors de PRISME : index relu
     config.wr_cfg({"workspace": str(VAULT), "configured": True,
                    "base_url": "http://127.0.0.1:9/v1", "model": "m"})

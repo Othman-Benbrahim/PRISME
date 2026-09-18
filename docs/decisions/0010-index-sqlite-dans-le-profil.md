@@ -1,6 +1,6 @@
 # 0010 · Index SQLite dans le profil
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : appliquée en E2
 - **Écrite** : 2026-09-16
 
 **Retenu.** `~/.prisme/index/<empreinte du chemin du vault>.db`, avec un fichier de

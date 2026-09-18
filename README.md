@@ -28,6 +28,7 @@ Le navigateur s'ouvre sur `http://localhost:5000`. Les tests se lancent avec
 - [`docs/decisions/`](docs/decisions/README.md) : les choix d'architecture et leurs raisons, une fiche par décision.
 - [`docs/RUPTURES.md`](docs/RUPTURES.md) : tout ce qui change par rapport à la base V1.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) : où se trouve quoi dans le code.
+- [`evaluation/`](evaluation/README.md) : questions de référence qui mesurent la qualité de la recherche.
 - [`PLUGIN-DEVELOPMENT.md`](PLUGIN-DEVELOPMENT.md) : créer ou migrer un plugin (API v1).
 
 ## Principes
