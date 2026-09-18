@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/static/css/link-suggest.css">
 <link rel="stylesheet" href="/static/css/editeur.css">
 <link rel="stylesheet" href="/static/css/engram.css">
+<link rel="stylesheet" href="/static/css/objets.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
@@ -22,6 +23,7 @@
   <button class="hbtn" onclick="saveFile()">💾 Sauvegarder</button>
   <button class="hbtn" id="btn-mm" onclick="toggleMM()">◀ Carte</button>
   <button class="hbtn" onclick="openEngram()" title="Importer une source dans le vault">📥 Sources</button>
+  <button class="hbtn" onclick="openObjets()" title="Recenser et valider les références citées dans vos notes">🔖 Sources citées</button>
   <button class="hbtn" onclick="openPlugins()" title="Installer, activer, configurer les plugins">🧩 Plugins</button>
   <button class="hbtn" onclick="openCfg()">⚙ Paramètres</button>
 </header>
@@ -54,6 +56,7 @@
     <div id="ed-bar">
       <span id="ed-fname">Aucun fichier</span>
       <button class="hbtn" id="ed-prov" style="display:none" onclick="openProvenance()">ⓘ</button>
+      <button class="hbtn" id="ed-objets" style="display:none" onclick="openObjets()">🔖</button>
       <div class="mode-grp">
         <button class="mbtn on" id="btn-mode-edit"    onclick="setMode('edit')"   >✏️ Éditer</button>
         <button class="mbtn"    id="btn-mode-preview"  onclick="setMode('preview')">👁 Aperçu</button>
@@ -237,6 +240,70 @@
   </div>
 </div></div>
 
+<!-- ── Modal Objets : sources citées, file de validation, rejets ── -->
+<div id="mobjets" class="ov"><div class="mb">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="mt" style="flex:1">🔖 Sources citées</div>
+    <button class="hbtn" onclick="closeObjets()">✕</button>
+  </div>
+  <div id="obj-tabs">
+    <button class="obj-tab on" id="obt0" onclick="objOnglet(0)">Objets Source</button>
+    <button class="obj-tab"    id="obt1" onclick="objOnglet(1)">File de validation</button>
+    <button class="obj-tab"    id="obt2" onclick="objOnglet(2)">Rejets mémorisés</button>
+  </div>
+
+  <div id="obp0">
+    <div class="eng-bloc">
+      <h4>Recenser les références</h4>
+      <div class="eng-ligne">
+        <input id="obj-dossier" type="text" placeholder="limiter à un dossier (facultatif)">
+        <button class="btn bp" onclick="objBalayer()" title="Repère URL, DOI, arXiv et ISBN — entrée directe">Balayer</button>
+        <button class="btn bs" onclick="objProposerIA()" title="L'IA cherche les sources citées en clair — elles vont en file">✨ Demander à l'IA</button>
+        <button class="btn bs" onclick="objStatuts()" title="Repasser les objets « citée » qu'ENGRAM a depuis importés">↻ Statuts</button>
+      </div>
+      <div class="eng-note">Le balayage ne retient que ce qui est vérifiable : URL, DOI, identifiant
+        arXiv ou ISBN. Ces objets entrent directement, marqués « non relu », sous un identifiant de
+        lot annulable. Ce que l'IA croit reconnaître sans forme vérifiable passe par la file.</div>
+      <div id="obj-rapport"></div>
+    </div>
+    <div class="eng-ligne" style="margin-top:10px">
+      <select id="obj-statut" onchange="objCharger()" style="flex:0 0 150px">
+        <option value="">Tous les statuts</option>
+        <option value="citee">Citées</option>
+        <option value="ingeree">Ingérées</option>
+      </select>
+      <select id="obj-relu" onchange="objCharger()" style="flex:0 0 150px">
+        <option value="">Relus et non relus</option>
+        <option value="false">Non relus</option>
+        <option value="true">Relus</option>
+      </select>
+    </div>
+    <div id="obj-compte"></div>
+    <div id="obj-lots"></div>
+    <div id="obj-fusion" style="display:none">
+      <div>Fusionner dans <span id="obj-fusion-garde"></span></div>
+      <select id="obj-fusion-sel"></select>
+      <input id="obj-fusion-raison" type="text" placeholder="raison (facultative, conservée avec la fusion)">
+      <div class="obj-a">
+        <button class="btn bp" onclick="objFusionner()">Fusionner</button>
+        <button class="btn bs" onclick="document.getElementById('obj-fusion').style.display='none'">Annuler</button>
+      </div>
+    </div>
+    <div id="obj-liste"></div>
+  </div>
+
+  <div id="obp1" style="display:none">
+    <div class="eng-note" style="margin:8px 0">L'IA propose, vous validez. Corrigez le titre, collez
+      l'URL ou le DOI si vous l'avez, donnez une raison : elle est conservée et relue avant les
+      propositions suivantes.</div>
+    <div id="obj-file"></div>
+  </div>
+
+  <div id="obp2" style="display:none">
+    <div id="obj-rejets" style="margin-top:8px"></div>
+  </div>
+</div></div>
+
 <!-- ── Modal Provenance ── -->
 <div id="mprov" class="ov"><div class="mb" style="width:520px">
   <div style="display:flex;align-items:center;gap:10px">
@@ -344,6 +411,7 @@
 <script src="/static/js/find-in-note.js"></script>
 <script src="/static/js/provenance.js"></script>
 <script src="/static/js/engram.js"></script>
+<script src="/static/js/objets.js"></script>
 <script src="/static/js/explorer.js"></script>
 <script src="/static/js/tags.js"></script>
 <script src="/static/js/backlinks.js"></script>

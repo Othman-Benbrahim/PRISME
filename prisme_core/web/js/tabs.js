@@ -31,6 +31,7 @@ function switchTab(path){
   if(ACTIVE_MM_TAB===1) loadBacklinks(path);
   if(typeof linksOnSwitch==='function') linksOnSwitch(path);
   if(typeof loadProvenance==='function') loadProvenance(path);
+  if(typeof loadObjetsDeLaNote==='function') loadObjetsDeLaNote(path);
   highlightFile(path);
 }
 async function closeTab(path){

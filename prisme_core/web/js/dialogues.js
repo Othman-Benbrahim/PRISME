@@ -3,7 +3,7 @@
 // ══════════════════════════════════════════════════
 // alert(), confirm() et prompt() bloquent la page, ne se stylent pas et
 // s'affichent hors de PRISME. Tout passe désormais par ces deux fonctions.
-var DLG = {resoudre: null};
+var DLG = {resoudre: null, libre: false};
 
 function _dlgFermer(valeur){
   $('mdialog').classList.remove('on');
@@ -42,15 +42,18 @@ function demanderTexte(options){
     + '<button class="btn bp" onclick="_dlgValider()">' + esc(o.ok || 'Valider') + '</button></div>',
     function(){
       var i = $('dlg-input'); i.focus(); i.select();
+      DLG.libre = !!o.libre;
       i.addEventListener('keydown', function(e){
         if(e.key === 'Enter'){ e.preventDefault(); _dlgValider(); }
         else if(e.key === 'Escape'){ e.preventDefault(); _dlgFermer(null); }
       });
     });
 }
+// libre:true accepte une réponse vide — pour un champ facultatif (une raison,
+// par exemple), où insister sur une saisie ferait perdre l'action à l'utilisateur.
 function _dlgValider(){
   var v = $('dlg-input').value.trim();
-  if(!v) { $('dlg-input').focus(); return; }
+  if(!v && !DLG.libre) { $('dlg-input').focus(); return; }
   _dlgFermer(v);
 }
 

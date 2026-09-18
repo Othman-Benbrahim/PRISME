@@ -1,0 +1,54 @@
+/* ── Objets : sources citées, file de validation, rejets ── */
+#mobjets .mb{width:760px;max-height:90vh;overflow-y:auto}
+
+#obj-tabs{display:flex;gap:0;border-bottom:1px solid var(--bdr);margin:8px 0 2px}
+.obj-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx2);
+  font-family:var(--font);font-size:12px;padding:7px 4px;cursor:pointer;transition:all .12s}
+.obj-tab:hover{color:var(--tx)}
+.obj-tab.on{color:var(--acc);border-bottom-color:var(--acc)}
+
+#obj-compte{font-size:11px;color:var(--tx2);line-height:1.5;margin:8px 0 6px}
+#obj-lots{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.obj-lot{font-size:11px;color:var(--tx2);background:var(--bg3);border:1px solid var(--bdr);
+  border-radius:6px;padding:4px 9px;display:flex;align-items:center;gap:8px}
+.obj-lot .btn{width:auto;padding:2px 8px;font-size:10.5px;margin-left:auto}
+
+/* Une carte d'objet. Le liseré ambre marque ce qui est entré tout seul et
+   n'a pas encore été relu (décision 0021). */
+.obj-c{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);
+  padding:9px 11px;margin-bottom:6px;display:flex;flex-direction:column;gap:3px}
+.obj-c.nonrelu{border-left:3px solid var(--yel)}
+.obj-c.s-ingeree{border-color:rgba(74,222,128,.35)}
+.obj-c.file{border-left:3px solid var(--acc)}
+.obj-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.obj-h strong{font-size:12.5px;font-weight:600}
+.obj-statut{margin-left:auto;font-size:10.5px;color:var(--tx2)}
+.obj-c.s-ingeree .obj-statut{color:var(--grn)}
+.obj-marq{font-size:10px;padding:1px 7px;border-radius:9px;background:rgba(251,191,36,.12);
+  border:1px solid rgba(251,191,36,.45);color:var(--yel)}
+.obj-ref{font-size:11px;color:var(--tx2);word-break:break-all}
+.obj-ref code{font-family:var(--mono);font-size:10.5px;color:var(--tx3)}
+.obj-indice{font-size:11.5px;color:var(--tx3);font-style:italic;line-height:1.5;
+  border-left:2px solid var(--bdr2);padding-left:8px;margin:3px 0}
+.obj-raison{font-size:11px;color:var(--yel);font-style:italic}
+.obj-cites{font-size:11px;color:var(--tx2);display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.obj-cite{color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.obj-cite:hover{color:var(--tx)}
+.obj-a{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.obj-a .btn{width:auto;padding:3px 9px;font-size:11px}
+
+.obj-f-form{display:flex;flex-direction:column;gap:4px;margin-top:5px}
+.obj-f-form input{padding:5px 8px;font-size:11.5px;background:var(--bg);border:1px solid var(--bdr);
+  border-radius:6px;color:var(--tx);font-family:var(--font);outline:none}
+.obj-f-form input:focus{border-color:var(--acc)}
+
+#obj-fusion{background:var(--bg4);border:1px solid var(--bdr2);border-radius:var(--r);
+  padding:9px 11px;margin-bottom:8px;display:flex;flex-direction:column;gap:5px}
+#obj-fusion select,#obj-fusion input{padding:5px 8px;font-size:11.5px;background:var(--bg);
+  border:1px solid var(--bdr);border-radius:6px;color:var(--tx);font-family:var(--font);outline:none}
+#obj-fusion .obj-a{margin-top:2px}
+#obj-fusion-garde{font-family:var(--mono);font-size:10.5px;color:var(--tx3);word-break:break-all}
+
+/* Marqueur dans l'en-tête de l'éditeur : ambre quand une source citée n'est pas relue. */
+#ed-objets{font-size:11px;padding:4px 8px}
+#ed-objets.nonrelu{color:var(--yel);border-color:rgba(251,191,36,.5)}
