@@ -221,6 +221,34 @@ async function objOublierRejet(encoded){
   objChargerFile();
 }
 
+// ── Analyser la note ouverte, et elle seule ─────────────────────────────
+// « Demander à l'IA » dans la fenêtre balaie un dossier entier — douze appels au
+// modèle quand on en voulait un. Ce bouton-ci n'analyse que la note sous les yeux.
+async function objSourcesDeLaNote(){
+  if(!ACTIVE){ toast('Ouvrez une note d\'abord'); return; }
+  var btn = $('ed-src-ia');
+  btn.disabled = true;
+  var avant = btn.textContent;
+  btn.textContent = '🔖 …';
+  try{
+    var d = await post('/api/objets/ia', {note: ACTIVE});
+    if(d.error){ toast('⚠ ' + d.error, 5000); return; }
+    var n = (d.deposees || []).length;
+    if(!n){
+      toast(d.ecartees
+        ? 'Aucune source retenue — ' + d.ecartees + ' proposition(s) écartée(s), extrait introuvable dans la note'
+        : 'Aucune source citée en clair trouvée dans cette note', 4500);
+      return;
+    }
+    toast(n + ' source(s) en attente de validation', 4000);
+    OBJ.onglet = 1;
+    openObjets();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = avant;
+  }
+}
+
 // ── Marqueur dans l'éditeur ─────────────────────────────────────────────
 // Décision 0021 : une note qui cite un objet non relu l'affiche avec un marqueur.
 var OBJ_NOTE = {path: null};
