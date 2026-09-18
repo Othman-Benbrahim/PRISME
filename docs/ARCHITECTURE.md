@@ -1,6 +1,6 @@
 # Architecture du code
 
-État après l'étape E3. Mis à jour à chaque étape qui déplace des responsabilités.
+État après l'étape E4. Mis à jour à chaque étape qui déplace des responsabilités.
 
 ## Lancement
 
@@ -20,6 +20,7 @@
 | `vault.py` | Racine autorisée, garde de chemin, corbeille, instantanés, parcours des `.md` |
 | `markdown.py` | Extraction des liens et des tags, résolution des références |
 | `frontmatter.py` | Lecture et écriture de l'en-tête YAML, sans dépendance |
+| `engram/` | **Ingestion des sources** : `contrat.py` (vérification et empreintes), `extracteurs.py` (ChatGPT, Claude, Mistral, texte, HTML, JSON), `identite.py` (identité des passages), `notes.py` (rendu, parties, archive), `ingestion.py` (import idempotent, registre) |
 | `provenance.py` | Identifiants, horloge d'enregistrement, estampillage des notes produites par une machine, validation des champs saisis à la main |
 | `index/` | **Index SQLite** : `store.py` (base et schéma), `segmenter.py` (découpage), `resolver.py` (résolution des liens), `indexer.py` (mise à jour), `search.py` (recherche, tags, graphe, backlinks) |
 | `providers.py` | Fournisseurs IA (OpenAI-compatibles, Anthropic), appel générique |
@@ -35,6 +36,7 @@
 | `routes/files.py` | Fichiers du vault, graphe, backlinks |
 | `routes/search.py` | Recherche plein texte, tags, état et reconstruction de l'index |
 | `routes/plugin_manager.py` | Gestionnaire de plugins : liste, installation, activation, secrets |
+| `routes/engram.py` | Import de sources : inspection, import, registre, contrôle |
 
 ## Interface `prisme_core/web/`
 
@@ -45,7 +47,8 @@ comportement dans `js/`, un fichier par zone. L'ordre des balises `<script>` com
 2. `helpers.js`, `tabs.js`, `editor.js`, `explorer.js`, `tags.js`, `backlinks.js`,
    `search.js`, `graph.js`, `synthesis.js`, `ai-selection.js`, `link-suggest.js`, `ai-file.js`,
    `plugin-manager.js`, `gutter.js` (numéros de ligne), `history.js` (annuler/rétablir),
-   `find-in-note.js` (recherche dans la note), `provenance.js` (fiche de provenance)
+   `find-in-note.js` (recherche dans la note), `provenance.js` (fiche de provenance),
+   `engram.js` (import de sources)
 3. les plugins actifs, un fichier chacun (`/plugins/<id>/ui.js`)
 4. `mindmap.js`, `layout.js`, `settings.js`, `init.js`, `onboarding.js`, `ai-stream.js`
 

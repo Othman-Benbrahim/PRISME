@@ -1,6 +1,6 @@
 # 0014 · Forme des notes importées
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : appliquée en E4
 - **Écrite** : 2026-09-16
 
 **Retenu.** Une note par source ; au-delà d'un seuil réglable (200 000 caractères au

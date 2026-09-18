@@ -1,6 +1,6 @@
 # 0013 · ENGRAM : toutes les sources, un seul contrat
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : appliquée en E4 (extracteurs légers ; formats lourds à venir)
 - **Écrite** : 2026-09-16
 
 **Retenu.** Exports ChatGPT et Claude, Markdown, texte, HTML, dépôts, PDF, DOCX, EPUB,

@@ -1,6 +1,6 @@
 # 0015 · Fichiers d'origine
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : appliquée en E4
 - **Écrite** : 2026-09-16
 
 **Retenu.** Copie dans `_sources/` ou simple référence, au choix pour chaque source, avec

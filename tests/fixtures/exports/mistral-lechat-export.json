@@ -1,0 +1,1 @@
+{"app": "Le Chat", "provider": "mistral", "conversations": [{"title": "Veille OSINT", "createdAt": "2026-01-20T14:00:00Z", "messages": [{"role": "user", "content": "Résume la méthode OSINT.", "createdAt": "2026-01-20T14:00:05Z"}, {"role": "assistant", "content": "Collecter, recouper, évaluer des sources ouvertes.", "createdAt": "2026-01-20T14:00:30Z"}]}]}

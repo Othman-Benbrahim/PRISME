@@ -20,10 +20,10 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0010 | [Index SQLite dans le profil](0010-index-sqlite-dans-le-profil.md) | appliquée en E2 |
 | 0011 | [Double granularité](0011-double-granularite.md) | appliquée en E2 |
 | 0012 | [Identifiants posés au besoin](0012-identifiants-poses-au-besoin.md) | appliquée en E3 |
-| 0013 | [ENGRAM : toutes les sources, un seul contrat](0013-engram-toutes-les-sources-un-seul-contrat.md) | acceptée, non encore appliquée |
-| 0014 | [Forme des notes importées](0014-forme-des-notes-importees.md) | acceptée, non encore appliquée |
-| 0015 | [Fichiers d'origine](0015-fichiers-d-origine.md) | acceptée, non encore appliquée |
-| 0016 | [Passages retirés d'une source](0016-passages-retires-d-une-source.md) | acceptée, non encore appliquée |
+| 0013 | [ENGRAM : toutes les sources, un seul contrat](0013-engram-toutes-les-sources-un-seul-contrat.md) | appliquée en E4 |
+| 0014 | [Forme des notes importées](0014-forme-des-notes-importees.md) | appliquée en E4 |
+| 0015 | [Fichiers d'origine](0015-fichiers-d-origine.md) | appliquée en E4 |
+| 0016 | [Passages retirés d'une source](0016-passages-retires-d-une-source.md) | appliquée en E4 |
 | 0017 | [Objets conceptuels](0017-objets-conceptuels.md) | acceptée ; amendée par 0021 (entrée directe des imports en masse) et par la révision ci-dessous |
 | 0018 | [Accès des agents](0018-acces-des-agents.md) | acceptée, non encore appliquée |
 | 0019 | [Recherche sémantique](0019-recherche-semantique.md) | acceptée, non encore appliquée |
