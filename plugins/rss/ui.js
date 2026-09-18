@@ -134,7 +134,8 @@ async function rssAddFeed(){
 }
 
 async function rssRemoveFeed(url){
-  if(!confirm('Retirer ce flux de la liste ?')) return;
+  if(!await confirmer({titre:'Retirer un flux', ok:'Retirer',
+      message:'Retirer ce flux de la liste des sources RSS ?'})) return;
   var r = await post('/api/plugins/rss/remove', {url: url});
   if(r.error){ toast('⚠ '+r.error); return; }
   rssReloadList();

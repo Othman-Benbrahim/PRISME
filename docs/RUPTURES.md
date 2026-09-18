@@ -5,6 +5,15 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## Dialogues dans l'interface
+
+| Avant | Après |
+|---|---|
+| ＋ ouvrait un `prompt` du navigateur | Ligne de saisie dans l'explorateur (`Entrée` valide, `Échap` annule) |
+| Confirmations par `confirm` | Fenêtre de PRISME (`confirmer()`), bouton rouge pour les actions destructrices |
+| — | Pour les plugins : `confirmer()` et `demanderTexte()` sont disponibles globalement |
+
+
 ## E4 — ENGRAM
 
 Étape uniquement additive : rien de ce qui existait ne change de comportement.

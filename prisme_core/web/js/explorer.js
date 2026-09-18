@@ -69,7 +69,8 @@ $('ctx-graph').addEventListener('click',function(){
 $('ctx-del').addEventListener('click',async function(){
   hideCtx(); if(CTX_IDX<0) return;
   var item=FILE_ITEMS[CTX_IDX];
-  if(!confirm('Supprimer « '+item.name+' » ?')) return;
+  if(!await confirmer({titre:'Supprimer', danger:true, ok:'Supprimer',
+      message:'Supprimer « '+item.name+' » ? L\'élément part dans la corbeille .trash du vault.'})) return;
   var r=await post('/api/files/delete',{path:item.path});
   if(r.error){toast('⚠ '+r.error);return;}
   if(TABS[item.path]) closeTab(item.path);
@@ -109,3 +110,35 @@ async function setWorkspaceDir(dir){
   toast('✓ Espace de travail : '+dir.split(/[/\\]/).pop());
 }
 
+
+
+// ── Création d'un fichier : une ligne de saisie en haut de la liste ──
+function startNewFile(){
+  if($('fl-new-row')) { $('fl-new-input').focus(); return; }
+  var ligne=document.createElement('div');
+  ligne.className='fi'; ligne.id='fl-new-row';
+  ligne.innerHTML='<span class="ic">📄</span><input id="fl-new-input" type="text" placeholder="nom du fichier, puis Entrée">';
+  var liste=$('fl');
+  liste.insertBefore(ligne, liste.firstChild);
+  var inp=$('fl-new-input');
+  inp.style.cssText='background:var(--bg3);border:1px solid var(--acc);border-radius:4px;color:var(--tx);'
+    +'font-family:var(--font);font-size:12px;padding:1px 6px;width:100%;outline:none';
+  inp.focus();
+  var fini=false;
+  async function valider(){
+    if(fini) return; fini=true;
+    var nom=inp.value.trim();
+    ligne.remove();
+    if(!nom) return;
+    var r=await post('/api/files/new',{dir:CUR_DIR,name:nom});
+    if(r.error){ toast('⚠ '+r.error); return; }
+    openFileTab(r.path,'# '+nom.replace(/\.md$/i,'')+'\n\n');
+    loadDir(CUR_DIR);
+    toast('✓ Créé dans '+CUR_DIR.split(/[/\\]/).pop());
+  }
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){ e.preventDefault(); valider(); }
+    else if(e.key==='Escape'){ fini=true; ligne.remove(); }
+  });
+  inp.addEventListener('blur',valider);
+}

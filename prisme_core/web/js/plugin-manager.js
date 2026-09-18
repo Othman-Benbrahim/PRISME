@@ -66,7 +66,8 @@ async function pmToggle(id, enabled){
 }
 
 async function pmUninstall(id){
-  if(!confirm('Désinstaller « '+id+' » ? Son dossier part dans la corbeille des plugins et ses secrets sont effacés.')) return;
+  if(!await confirmer({titre:'Désinstaller un plugin', danger:true, ok:'Désinstaller',
+      message:'Désinstaller « '+id+' » ? Son dossier part dans la corbeille des plugins et ses secrets sont effacés.'})) return;
   var r = await post('/api/plugin-manager/uninstall', {id:id});
   if(r.error){ toast('⚠ '+r.error); return; }
   toast('✓ Désinstallé'+(r.restart_advised?' — redémarrez PRISME pour le décharger complètement':''), 5000);

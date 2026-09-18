@@ -33,9 +33,10 @@ function switchTab(path){
   if(typeof loadProvenance==='function') loadProvenance(path);
   highlightFile(path);
 }
-function closeTab(path){
+async function closeTab(path){
   if(TABS[path]&&TABS[path].modified)
-    if(!confirm('Fermer sans sauvegarder ?')) return;
+    if(!await confirmer({titre:'Modifications non enregistrées', danger:true, ok:'Fermer sans enregistrer',
+        message:'« '+path.split(/[/\\]/).pop()+' » a des modifications non enregistrées.'})) return;
   delete TABS[path];
   histForget(path);
   var keys=Object.keys(TABS);
