@@ -25,16 +25,18 @@ async function doSearch(){
       var head=m.heading?'<span class="sr-head">'+mark(m.heading)+'</span> ':'';
       return '<div class="sr-match">'+head+text+'</div>';
     }).join('');
-    return '<div class="sr-item" onclick="openResult(\''+eu(r.path)+'\')">'
+    return '<div class="sr-item" onclick="openResult(\''+eu(r.path)+'\',\''+eu(q)+'\')">'
       +'<div class="sr-name">📄 '+esc(r.name)+'</div>'
       +'<div class="sr-rel">'+esc(r.rel)+'</div>'
       +matches+'</div>';
   }).join('');
 }
-async function openResult(encoded){
+async function openResult(encoded,encodedQuery){
   var path=decodeURIComponent(encoded);
+  var query=encodedQuery?decodeURIComponent(encodedQuery):'';
   var d=await fetch('/api/files/read?path='+eu(path)).then(function(r){return r.json();});
   if(d.error){toast('⚠ '+d.error);return;}
   openFileTab(path,d.content); closeSearch();
+  if(query) setTimeout(function(){ openFind(query); },120);
 }
 

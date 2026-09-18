@@ -44,7 +44,8 @@ async function callFileAI(msgs){
 function applyFileAI(mode){
   if(!ACTIVE||!FAIRES) return;
   var v=mode==='a'?$('md-editor').value+'\n\n'+FAIRES:FAIRES;
-  $('md-editor').value=v; TABS[ACTIVE].content=v; TABS[ACTIVE].modified=v!==TABS[ACTIVE].saved;
+  histSnapshot();
+  $('md-editor').value=v; TABS[ACTIVE].content=v; TABS[ACTIVE].modified=v!==TABS[ACTIVE].saved; histSnapshot(); gutterRender();
   renderTabBar(); if(EDITOR_MODE!=='edit') updatePreview();
   updateMindmap(v,ACTIVE.split(/[/\\]/).pop()); toast('✓ Appliqué — Ctrl+S pour sauvegarder');
 }

@@ -5,6 +5,16 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## Confort d'édition
+
+| Avant | Après |
+|---|---|
+| `Ctrl+F` : recherche du navigateur dans la page | Recherche dans la note ouverte (`Ctrl+Maj+F` reste la recherche globale) |
+| `Ctrl+Z` : annulation native du navigateur, perdue au changement d'onglet | Historique de PRISME, un par fichier ouvert, 200 pas, en mémoire |
+| Éditeur sans repère de position | Gouttière de numéros de ligne et barre d'état « Ligne N, col N » |
+
+Aucun changement de format ni de route.
+
 ## E2 — Index SQLite
 
 | Avant | Après |

@@ -149,9 +149,11 @@ function linksInsert(i){
   // Texte simple : le passage devient l'alias du lien. Sinon, le lien est ajouté après.
   var plain = !/[\[\]`*_#|<>]/.test(s.passage);
   var repl = plain ? '[[' + s.link + '|' + s.passage + ']]' : s.passage + ' [[' + s.link + ']]';
+  histSnapshot();
   ed.value = text.slice(0, idx) + repl + text.slice(idx + s.passage.length);
   ed.focus(); ed.setSelectionRange(idx, idx + repl.length);
   onEditorInput();
+  histSnapshot();
   s.done = 'Inséré — Ctrl+S pour enregistrer';
   linksRender();
 }

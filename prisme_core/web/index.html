@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="/static/css/ai-stream.css">
 <link rel="stylesheet" href="/static/css/plugin-manager.css">
 <link rel="stylesheet" href="/static/css/link-suggest.css">
+<link rel="stylesheet" href="/static/css/editeur.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
@@ -55,16 +56,30 @@
         <button class="mbtn"    id="btn-mode-preview"  onclick="setMode('preview')">👁 Aperçu</button>
         <button class="mbtn"    id="btn-mode-split"    onclick="setMode('split')"  >⧉ Scindé</button>
       </div>
+      <button class="hbtn" id="btn-undo" onclick="histUndo()" title="Annuler (Ctrl+Z)" disabled>↶</button>
+      <button class="hbtn" id="btn-redo" onclick="histRedo()" title="Rétablir (Ctrl+Y)" disabled>↷</button>
       <button class="hbtn" onclick="saveFile()">💾</button>
       <button class="hbtn" onclick="suggestLinks()" title="Suggérer des [[liens]]">🔗 Liens IA</button>
       <!-- PLUGIN_TOOLBAR_BUTTONS -->
     </div>
     <div id="ed-area">
       <div class="es" id="no-file"><div class="ei">📝</div><div>Ouvrez ou créez un fichier <strong>.md</strong></div></div>
-      <textarea id="md-editor" style="display:none" oninput="onEditorInput()"></textarea>
+      <div id="ed-edit-pane" style="display:none">
+        <div id="md-gutter"><div id="md-gutter-inner"></div></div>
+        <textarea id="md-editor" oninput="onEditorInput()"></textarea>
+        <div id="find-bar">
+          <input id="find-q" type="text" placeholder="Chercher dans la note" oninput="findRun()"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();findGo(event.shiftKey?-1:1);}">
+          <span id="find-count"></span>
+          <button onclick="findGo(-1)" title="Précédent (Maj+F3)">‹</button>
+          <button onclick="findGo(1)" title="Suivant (F3)">›</button>
+          <button onclick="closeFind()" title="Fermer (Échap)">✕</button>
+        </div>
+      </div>
       <div id="split-div" style="display:none"></div>
       <div id="md-preview" style="display:none"></div>
     </div>
+    <div id="ed-status"><span id="ed-pos"></span><span id="ed-hint">Ctrl+F : chercher dans la note · Ctrl+Z / Ctrl+Y : annuler, rétablir</span></div>
     <div id="fai-toggle" onclick="toggleFileAI()">
       <span>🤖 IA — Modifier ce fichier</span><span class="arr">▲</span>
     </div>
@@ -277,6 +292,9 @@
 <script src="/static/js/helpers.js"></script>
 <script src="/static/js/tabs.js"></script>
 <script src="/static/js/editor.js"></script>
+<script src="/static/js/gutter.js"></script>
+<script src="/static/js/history.js"></script>
+<script src="/static/js/find-in-note.js"></script>
 <script src="/static/js/explorer.js"></script>
 <script src="/static/js/tags.js"></script>
 <script src="/static/js/backlinks.js"></script>

@@ -5,10 +5,11 @@ function setMode(m){
   EDITOR_MODE=m;
   ['edit','preview','split'].forEach(function(n){ $('btn-mode-'+n).classList.toggle('on',n===m); });
   if(!ACTIVE) return;
-  var ed=$('md-editor'),pv=$('md-preview'),sd=$('split-div');
+  var ed=$('ed-edit-pane'),pv=$('md-preview'),sd=$('split-div');
   if(m==='edit'){ed.style.display='flex';pv.style.display='none';sd.style.display='none';ed.style.flex='1';}
   else if(m==='preview'){ed.style.display='none';pv.style.display='block';sd.style.display='none';pv.style.flex='1';updatePreview();}
   else{ed.style.display='flex';sd.style.display='block';pv.style.display='block';ed.style.flex='1';pv.style.flex='1';updatePreview();}
+  gutterRender();
 }
 function updatePreview(){
   if(typeof marked==='undefined') return;
@@ -27,6 +28,7 @@ function updatePreview(){
     return '<span class="wl" onclick="openWikilink(\''+safe+'\')" title="Ouvrir '+href+'">'+(label||href)+'</span>';
   });
   $('md-preview').innerHTML=html;
+  if(typeof FIND!=='undefined' && FIND.hits.length && $('find-bar').classList.contains('on')) findMarkPreview();
 }
 async function openWikilink(name){
   var fromParam = ACTIVE ? '&from='+eu(ACTIVE) : '';
