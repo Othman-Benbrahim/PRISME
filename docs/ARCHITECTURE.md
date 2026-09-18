@@ -42,7 +42,8 @@ comportement dans `js/`, un fichier par zone. L'ordre des balises `<script>` com
 1. `token.js` : jeton de session, installé avant tout appel à l'API
 2. `helpers.js`, `tabs.js`, `editor.js`, `explorer.js`, `tags.js`, `backlinks.js`,
    `search.js`, `graph.js`, `synthesis.js`, `ai-selection.js`, `link-suggest.js`, `ai-file.js`,
-   `plugin-manager.js`
+   `plugin-manager.js`, `gutter.js` (numéros de ligne), `history.js` (annuler/rétablir),
+   `find-in-note.js` (recherche dans la note)
 3. les plugins actifs, un fichier chacun (`/plugins/<id>/ui.js`)
 4. `mindmap.js`, `layout.js`, `settings.js`, `init.js`, `onboarding.js`, `ai-stream.js`
 

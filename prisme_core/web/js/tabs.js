@@ -12,10 +12,13 @@ function switchTab(path){
   if(!path){showNoFile();return;}
   var t=TABS[path];
   $('no-file').style.display='none';
-  $('md-editor').style.display=EDITOR_MODE==='preview'?'none':'flex';
+  $('ed-edit-pane').style.display=EDITOR_MODE==='preview'?'none':'flex';
   $('md-preview').style.display=EDITOR_MODE==='edit'?'none':'block';
   $('split-div').style.display=EDITOR_MODE==='split'?'block':'none';
   $('md-editor').value=t.content;
+  histBaseline(path,t.content); histButtons();
+  if($('find-bar').classList.contains('on')) closeFind();
+  gutterRender();
   $('ed-fname').textContent=path.split(/[/\\]/).pop();
   $('ed-fname').title=path;
   if(EDITOR_MODE!=='edit') updatePreview();
@@ -28,6 +31,7 @@ function closeTab(path){
   if(TABS[path]&&TABS[path].modified)
     if(!confirm('Fermer sans sauvegarder ?')) return;
   delete TABS[path];
+  histForget(path);
   var keys=Object.keys(TABS);
   ACTIVE=keys.length?keys[keys.length-1]:null;
   renderTabBar(); if(ACTIVE) switchTab(ACTIVE); else showNoFile();
@@ -49,7 +53,7 @@ $('tab-bar').addEventListener('click',function(e){
   if(tab) switchTab(decodeURIComponent(tab.dataset.p));
 });
 function showNoFile(){
-  $('no-file').style.display='flex'; $('md-editor').style.display='none';
+  $('no-file').style.display='flex'; $('ed-edit-pane').style.display='none';
   $('md-preview').style.display='none'; $('split-div').style.display='none';
   $('ed-fname').textContent='Aucun fichier';
 }
@@ -65,6 +69,7 @@ function onEditorInput(){
   TABS[ACTIVE].modified=v!==TABS[ACTIVE].saved;
   renderTabBar();
   if(EDITOR_MODE!=='edit') updatePreview();
+  gutterSchedule(); histButtons();
   debounceMM();
 }
 var mmTimer;
