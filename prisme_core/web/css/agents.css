@@ -1,0 +1,48 @@
+/* ── Agents : clés d'accès et journal ── */
+#magents .mb{width:740px;max-height:90vh;overflow-y:auto}
+
+#ag-tabs{display:flex;border-bottom:1px solid var(--bdr);margin:8px 0 2px}
+.ag-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx2);
+  font-family:var(--font);font-size:12px;padding:7px 4px;cursor:pointer;transition:all .12s}
+.ag-tab:hover{color:var(--tx)}
+.ag-tab.on{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* La clé en clair : une seule apparition, donc on la rend impossible à manquer. */
+#ag-nouvelle{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.45);
+  border-radius:var(--r);padding:11px 13px;margin-top:10px}
+#ag-nouvelle-cle{display:block;font-family:var(--mono);font-size:12px;color:var(--grn);
+  background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:9px 11px;
+  margin:7px 0;word-break:break-all;user-select:all}
+#ag-nouvelle .ag-a{margin-top:0}
+
+.ag-c{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);
+  padding:9px 11px;margin-bottom:6px;display:flex;flex-direction:column;gap:4px}
+.ag-c.revoquee{opacity:.55;border-style:dashed}
+.ag-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ag-h strong{font-size:12.5px}
+.ag-indice{font-family:var(--mono);font-size:10.5px;color:var(--tx2);background:var(--bg4);
+  border-radius:4px;padding:1px 6px}
+.ag-etat{margin-left:auto;font-size:10.5px;color:var(--tx2)}
+.ag-etat.ok{color:var(--grn)}
+
+.ag-droits{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.ag-d{font-size:10.5px;padding:2px 9px;border-radius:10px;background:var(--bg4);
+  border:1px solid var(--bdr2);color:var(--tx2);cursor:pointer;user-select:none;
+  display:inline-flex;align-items:center;gap:5px}
+.ag-d.on{color:var(--tx);border-color:var(--acc)}
+.ag-d.fige{cursor:default;opacity:.7}
+.ag-d input{margin:0;width:11px;height:11px;accent-color:var(--acc)}
+.ag-avert{font-size:11px;color:var(--yel);line-height:1.5}
+
+.ag-a{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.ag-a .btn{width:auto;padding:3px 9px;font-size:11px}
+
+#ag-filtre{font-size:11px;color:var(--tx2);margin:8px 0}
+#ag-filtre .btn{width:auto;padding:2px 8px;font-size:10.5px;margin-left:6px}
+.ag-t{width:100%;border-collapse:collapse;font-size:11.5px}
+.ag-t th{text-align:left;color:var(--tx2);font-weight:500;padding:5px 7px;
+  border-bottom:1px solid var(--bdr);font-size:10.5px}
+.ag-t td{padding:5px 7px;border-bottom:1px solid var(--bdr);vertical-align:top}
+.ag-t td code{font-family:var(--mono);font-size:10.5px;color:var(--tx3)}
+.ag-t tr.refus td{color:var(--red)}
+.ag-t tr.refus td code{color:var(--red)}

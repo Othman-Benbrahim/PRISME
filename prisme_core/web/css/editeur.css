@@ -64,6 +64,11 @@ mark.fh.cur{background:rgba(251,191,36,.55);color:#111}
 .pv-del:hover{color:var(--red)}
 
 /* ── Dialogues dans l'interface ── */
+/* Le dialogue est toujours au-dessus : il est ouvert PAR une autre fenêtre
+   (Sources, Objets, Agents, Plugins) et doit rester cliquable par-dessus elle.
+   Tous les recouvrements partagent z-index:90 et #mdialog vient plus tôt dans le
+   DOM — sans cette règle, la fenêtre appelante intercepte les clics. */
+#mdialog{z-index:120}
 #mdialog .mb{width:430px}
 .dlg-msg{font-size:12.5px;color:var(--tx3);line-height:1.6;margin-top:8px}
 .dlg-aide{font-size:11px;color:var(--tx2);line-height:1.5;margin-top:6px}

@@ -13,7 +13,7 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | — | `provenance-editable` | Fiche de provenance modifiable, choix des sources, pose d'identifiant | Fait |
 | — | `dialogues-interface` | Création de fichier et confirmations dans l'interface, sans popup | Fait |
 | E4 | `e4-engram` | Contrat d'extraction, identité des passages, importeurs légers (ChatGPT, Claude, Mistral, texte, HTML) | Fait |
-| E5 | `e5-objets` | File de validation, entrée directe des imports en masse, objet Source | En revue |
-| E6 | `e6-api-agents` | API HTTP locale à clés | À faire |
+| E5 | `e5-objets` | File de validation, entrée directe des imports en masse, objet Source | Fait |
+| E6 | `e6-api-agents` | API HTTP locale à clés, droits par clé, journal | En revue |
 | E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, plugin ONNX | À faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |

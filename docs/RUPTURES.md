@@ -5,6 +5,29 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E6 — API locale à clés pour les agents
+
+Étape additive, sauf un correctif d'interface qui répare un comportement cassé.
+
+| Nouveauté | Détail |
+|---|---|
+| Surface agents | `/api/v1/` — authentifiée par **clé d'agent**, jamais par le jeton de session, et réciproquement |
+| Routes agent | `ping`, `notes`, `note`, `recherche`, `objets`, `file`, `proposer`, `note` (POST) |
+| Routes de gestion | `/api/agents/cles` (GET, POST), `/cles/droits`, `/cles/revoquer`, `/cles/oublier`, `/api/agents/journal` |
+| Profil | `~/.prisme/agents/cles.json` (empreintes seules) et `agents/journal.jsonl` (borné, avec rotation) |
+| Notes écrites par un agent | En-tête `prisme_outil: agent`, `prisme_genere_par`, `prisme_agent`, `prisme_agent_cle` |
+| Interface | Bouton 🔑 Agents |
+
+`PRISME_NO_AUTH=1` change de portée : il dispense du jeton de session pour l'interface,
+mais **n'ouvre pas** `/api/v1/`. Une clé d'agent reste exigée.
+
+**Correctif :** `#mdialog` passe en `z-index:120`. Il partageait le `z-index` des autres
+fenêtres tout en venant plus tôt dans le DOM, si bien que la fenêtre appelante
+interceptait les clics : depuis `dialogues-interface`, « Oublier une source » (ENGRAM)
+et « Annuler ce lot » (E5) affichaient une confirmation impossible à valider.
+
+Aucun changement de schéma d'index : rien n'est reconstruit.
+
 ## E5 — Objets Source et file de validation
 
 Étape uniquement additive : rien de ce qui existait ne change de comportement.
