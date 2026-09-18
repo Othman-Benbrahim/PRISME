@@ -1,6 +1,6 @@
 # 0021 · Entrée directe des imports en masse
 
-- **Statut** : acceptée, non encore appliquée (E5)
+- **Statut** : appliquée en E5, pour le type Source
 - **Écrite** : 2026-09-17
 
 Inspirée d'Utopia (fiche 0015). Amende [0017](0017-objets-conceptuels.md).
@@ -21,3 +21,18 @@ Si chaque objet extrait d'un import en masse attend une validation, la file devi
 ## Écarté
 
 - Tout faire passer par la file (0017 dans sa version initiale).
+
+## Application en E5
+
+Pour le type Source, le signal vérifiable est la **forme** de la référence : une URL
+valide, un DOI, un identifiant arXiv ou un ISBN repérés par expression régulière entrent
+directement, avec `prisme_relu: false` et un `prisme_lot`. Les mentions en clair que
+seule l'IA reconnaît partent en file, et chacune doit citer un extrait littéral de la
+note, vérifié avant affichage : une proposition dont l'extrait est introuvable est
+écartée sans être montrée.
+
+« Annuler ce lot » retire les objets non relus et conserve les autres. Retirer un objet
+mémorise le rejet avec sa raison, que l'IA relit avant de proposer à nouveau. Une note
+qui cite un objet non relu porte un marqueur ambre dans l'en-tête de l'éditeur.
+
+Le seuil par type reste à faire : il n'a de sens qu'avec un deuxième type d'objet.

@@ -5,6 +5,23 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E5 — Objets Source et file de validation
+
+Étape uniquement additive : rien de ce qui existait ne change de comportement.
+
+| Nouveauté | Détail |
+|---|---|
+| Dossier créé dans le vault | `Objets/Sources/` — un `.md` par référence citée, lisible dans Obsidian |
+| En-tête des objets | `prisme_reference`, `prisme_genre`, `prisme_statut` (`citee` / `ingeree`), `prisme_relu`, `prisme_lot`, `prisme_cite_par`, `prisme_alias`, `prisme_fusions` |
+| Routes | `/api/objets/sources`, `/balayer`, `/ia`, `/relu`, `/lier`, `/supprimer`, `/statuts`, `/lot/annuler`, `/note`, `/file`, `/file/accepter`, `/file/rejeter`, `/file/fusionner`, `/file/defusionner`, `/rejets/oublier` |
+| File de validation | `~/.prisme/objets/file.json` — propositions et rejets mémorisés, hors du vault |
+| Interface | Bouton 🔖 Sources citées ; marqueur 🔖 dans l'en-tête de l'éditeur pour une note qui cite des objets non relus |
+| Dialogues | `demanderTexte()` accepte `libre: true` : une réponse vide est acceptée (champ facultatif) |
+
+Le type `source` existait déjà dans `prisme_core.provenance.TYPES` : aucun champ
+nouveau n'est ajouté au vocabulaire de provenance. Aucun changement de schéma
+d'index : rien n'est reconstruit.
+
 ## Dialogues dans l'interface
 
 | Avant | Après |
