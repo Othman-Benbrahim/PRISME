@@ -10,6 +10,7 @@ Regles appliquees :
   chaque date ayant un champ d'etat compagnon : date | inconnue | ouverte.
 Seul l'en-tete est ecrit : le corps d'une note n'est jamais modifie ici.
 """
+import re
 import time
 import uuid
 from datetime import datetime, timezone
@@ -67,6 +68,8 @@ def ecrire(path, champs):
         return False
     snapshot(p, force=True)
     p.write_text(nouveau, encoding="utf-8")
+    from .index import notify_changed        # import tardif : l'index lit le frontmatter
+    notify_changed(p)
     return True
 
 
@@ -140,6 +143,68 @@ def sources_vers_ids(chemins):
             ident = None
         ids.append(ident or brut)
     return ids
+
+
+# Champs qu'on peut renseigner a la main depuis la fiche de provenance.
+MODIFIABLES = ("prisme_type", "prisme_outil", "prisme_genere_par", "prisme_preset",
+               "prisme_enregistre_le", "prisme_invalide_le", "prisme_publie_le",
+               "prisme_parent", "prisme_valide_du", "prisme_valide_au",
+               "prisme_valide_du_etat", "prisme_valide_au_etat")
+TYPES = ("note", "source", "synthese", "reponse", "import")
+_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?)?$")
+
+
+class ChampInvalide(ValueError):
+    pass
+
+
+def valider(champs):
+    """Verifie et normalise les champs saisis a la main. Leve ChampInvalide."""
+    propres = {}
+    for cle, valeur in (champs or {}).items():
+        cle = str(cle).strip()
+        if cle not in MODIFIABLES:
+            raise ChampInvalide(f"Champ non modifiable : {cle}")
+        if isinstance(valeur, list):
+            propres[cle] = [str(v).strip() for v in valeur if str(v).strip()] or None
+            continue
+        valeur = "" if valeur is None else str(valeur).strip()
+        if not valeur:
+            propres[cle] = None                       # vide = on retire la cle
+            continue
+        if cle.endswith("_etat") and valeur not in ETATS:
+            raise ChampInvalide(f"{cle} doit valoir : {', '.join(ETATS)}")
+        if cle in ("prisme_enregistre_le", "prisme_invalide_le", "prisme_publie_le",
+                   "prisme_valide_du", "prisme_valide_au") and not _DATE.match(valeur):
+            raise ChampInvalide(f"{cle} : date attendue au format AAAA-MM-JJ (heure facultative)")
+        if len(valeur) > 500:
+            raise ChampInvalide(f"{cle} : valeur trop longue")
+        propres[cle] = valeur
+    # Une date renseignee implique l'etat « date » ; une date absente avec un etat
+    # « date » n'a pas de sens (docs/decisions/0022).
+    for champ in ("prisme_valide_du", "prisme_valide_au"):
+        etat = champ + "_etat"
+        if propres.get(champ) and propres.get(etat) in (None, ""):
+            propres[etat] = "date"
+        if propres.get(etat) == "date" and not propres.get(champ):
+            raise ChampInvalide(f"{etat} vaut « date » mais {champ} est vide")
+    return propres
+
+
+def appliquer(path, champs, sources=None):
+    """Ecrit une provenance saisie a la main. Pose un identifiant si la note n'en a pas,
+    et un identifiant sur chaque note citee. Renvoie le nouveau contenu."""
+    p = safe_path(path)
+    if not p.is_file():
+        raise FileNotFoundError(str(p))
+    propres = valider(champs)
+    if sources is not None:
+        refs = sources_vers_ids(sources)
+        propres["prisme_sources"] = refs or None
+    if not lire(p).get("prisme_id"):
+        propres["prisme_id"] = new_id()
+    ecrire(p, propres)
+    return p.read_text(encoding="utf-8", errors="replace")
 
 
 def duree_depuis(ts):

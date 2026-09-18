@@ -5,6 +5,17 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## Provenance modifiable
+
+| Avant | Après |
+|---|---|
+| Provenance posée seulement à la création d'une note générée | Fiche ⓘ modifiable : ajouter, corriger ou retirer des champs sur n'importe quelle note |
+| — | `POST /api/provenance` (champs validés) ; `POST /api/provenance/id` renvoie aussi le contenu |
+| `GET /api/provenance` : champs de l'index seulement | L'en-tête du fichier fait foi, complété par l'index |
+| Badge 🤖 dès qu'un outil était renseigné | 🤖 seulement si un modèle est intervenu ; sinon ⓘ |
+
+Aucun changement de schéma : l'index n'est pas reconstruit.
+
 ## E3 — Provenance
 
 | Avant | Après |

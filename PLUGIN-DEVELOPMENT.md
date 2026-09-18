@@ -112,6 +112,8 @@ session, ajouté automatiquement par la page.
 | `ctx.write_note(chemin, contenu, provenance=None)` | Écrit une note, avec instantané ; déclenche `note_saved` ou `note_created`. Avec `provenance={"type": ..., "sources": [...]}`, l'en-tête de provenance est posé et les notes citées reçoivent un identifiant |
 | `ctx.note_meta(chemin)` | En-tête de provenance d'une note |
 | `ctx.ensure_id(chemin)` | Pose un identifiant stable sur une note et le renvoie |
+
+Une provenance peut aussi être renseignée à la main par l'utilisateur depuis la fiche ⓘ de l'éditeur, ou par `POST /api/provenance` (`{path, champs, sources}`).
 | `ctx.data_dir()` | Dossier privé du plugin : `~/.prisme/plugins/<id>/` |
 | `ctx.adopt_legacy_file(nom)` | Reprend une seule fois `~/.secondbrain/<nom>` dans `data_dir()` |
 | `ctx.secret(nom)` | Secret déclaré : coffre chiffré de PRISME, puis variable d'environnement |
