@@ -21,7 +21,8 @@ async function saveSynAsFile(){
   var r=await post('/api/files/new',{dir:SYN_DIR,name:name});
   if(r.error&&r.error!=='Fichier existant'){toast('⚠ '+r.error);return;}
   var path=r.path||SYN_DIR+'/'+name;
-  await post('/api/files/save',{path:path,content:'# Synthèse — '+SYN_DIR.split(/[/\\]/).pop()+'\n\n'+SYN_RESULT});
+  await saveGenerated(path, '# Synthèse — '+SYN_DIR.split(/[/\\]/).pop()+'\n\n'+SYN_RESULT,
+    {type:'synthese', outil:'synthese-dossier', prisme_dossier_source:SYN_DIR});
   openFileTab(path,'# Synthèse — '+SYN_DIR.split(/[/\\]/).pop()+'\n\n'+SYN_RESULT);
   loadDir(CUR_DIR); closeSyn(); toast('✓ Synthèse sauvegardée');
 }

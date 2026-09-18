@@ -465,7 +465,8 @@ async function rssSaveAsFile(){
 
   var content = head + signalsMd + body + rawList;
 
-  await post('/api/files/save', {path: newPath, content: content});
+  await saveGenerated(newPath, content, {type:'synthese', outil:'rss',
+    sources:RSS.feeds.map(function(f){return f.url;}).filter(Boolean)});
   openFileTab(newPath, content);
   loadDir(CUR_DIR);
   closeRSS();

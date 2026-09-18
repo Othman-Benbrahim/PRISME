@@ -19,7 +19,7 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0009 | [Hooks synchrones](0009-hooks-synchrones.md) | appliquée en E1 |
 | 0010 | [Index SQLite dans le profil](0010-index-sqlite-dans-le-profil.md) | appliquée en E2 |
 | 0011 | [Double granularité](0011-double-granularite.md) | appliquée en E2 |
-| 0012 | [Identifiants posés au besoin](0012-identifiants-poses-au-besoin.md) | acceptée, non encore appliquée |
+| 0012 | [Identifiants posés au besoin](0012-identifiants-poses-au-besoin.md) | appliquée en E3 |
 | 0013 | [ENGRAM : toutes les sources, un seul contrat](0013-engram-toutes-les-sources-un-seul-contrat.md) | acceptée, non encore appliquée |
 | 0014 | [Forme des notes importées](0014-forme-des-notes-importees.md) | acceptée, non encore appliquée |
 | 0015 | [Fichiers d'origine](0015-fichiers-d-origine.md) | acceptée, non encore appliquée |
@@ -29,5 +29,5 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0019 | [Recherche sémantique](0019-recherche-semantique.md) | acceptée, non encore appliquée |
 | 0020 | [Méthode de travail](0020-methode-de-travail.md) | appliquée depuis l'étape 00 |
 | 0021 | [Entrée directe des imports en masse](0021-entree-directe-des-imports-en-masse.md) | acceptée, non encore appliquée (E5) |
-| 0022 | [Horloges des objets](0022-horloges-des-objets.md) | acceptée, non encore appliquée (E3) |
+| 0022 | [Horloges des objets](0022-horloges-des-objets.md) | appliquée en E3 (horloge d'enregistrement) |
 | 0023 | [Clés et secrets chiffrés (DPAPI)](0023-cles-et-secrets-chiffres-dpapi.md) | appliquée en E1 |

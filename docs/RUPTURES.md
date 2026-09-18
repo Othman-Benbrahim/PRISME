@@ -5,6 +5,22 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E3 — Provenance
+
+| Avant | Après |
+|---|---|
+| Notes générées sans trace d'origine | En-tête `prisme_*` : identifiant, type, date, outil, modèle, preset, sources |
+| `/api/files/save` : `{path, content}` | Accepte `{provenance: {...}}` et renvoie `content` (note estampillée) |
+| — | Nouvelles routes `/api/provenance` et `/api/provenance/id` |
+| — | Un `prisme_id` est posé sur une note citée par une note générée (écriture limitée à l'en-tête, instantané forcé) |
+| Tags : seulement `#tag` dans le corps | Les `tags:` de l'en-tête comptent aussi |
+| Index en schéma 1 | Schéma 2 (table `note_meta`) : **l'index se reconstruit tout seul** au premier lancement |
+| Plugins : `post('/api/files/save', …)` | `saveGenerated(chemin, contenu, provenance)` côté interface, `ctx.write_note(..., provenance=...)` côté serveur |
+
+L'instantané de `.trash/versions/` était limité à une copie toutes les 5 minutes par
+fichier ; une écriture non demandée par l'utilisateur (pose d'identifiant) en fait
+toujours une.
+
 ## Confort d'édition
 
 | Avant | Après |

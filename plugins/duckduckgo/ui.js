@@ -229,7 +229,8 @@ async function saveDDGAsFile(){
   }).join('\n');
   var content = head + DDG.synthesis + '\n\n---\n\n## Liste brute des résultats\n\n' + resList + '\n';
 
-  await post('/api/files/save', {path: newPath, content: content});
+  await saveGenerated(newPath, content, {type:'synthese', outil:'duckduckgo',
+    sources:(ACTIVE?[ACTIVE]:[]).concat(DDG.results.map(function(r){return r.url;}).filter(Boolean))});
   openFileTab(newPath, content);
   loadDir(CUR_DIR);
   closeDuckDuckGo();

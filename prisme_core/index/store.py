@@ -14,7 +14,7 @@ from ..paths import DATA_DIR
 
 # Toute evolution du schema OU des regles d'extraction (segments, tags, liens)
 # doit incrementer ce numero : l'index existant est alors reconstruit tout seul.
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 INDEX_DIR = DATA_DIR / "index"
 MAP_FILE = INDEX_DIR / "vaults.json"
 _MAP_LOCK = threading.Lock()
@@ -78,6 +78,19 @@ CREATE TABLE IF NOT EXISTS segments (
 );
 CREATE INDEX IF NOT EXISTS segments_file ON segments(file_id);
 CREATE INDEX IF NOT EXISTS segments_sha ON segments(sha256);
+CREATE TABLE IF NOT EXISTS note_meta (
+    file_id       INTEGER PRIMARY KEY REFERENCES files(id) ON DELETE CASCADE,
+    prisme_id     TEXT,
+    type          TEXT NOT NULL DEFAULT '',
+    outil         TEXT NOT NULL DEFAULT '',
+    genere_par    TEXT NOT NULL DEFAULT '',
+    preset        TEXT NOT NULL DEFAULT '',
+    enregistre_le TEXT NOT NULL DEFAULT '',
+    invalide_le   TEXT NOT NULL DEFAULT '',
+    parent        TEXT NOT NULL DEFAULT '',
+    sources       TEXT NOT NULL DEFAULT '[]'
+);
+CREATE INDEX IF NOT EXISTS note_meta_id ON note_meta(prisme_id);
 CREATE TABLE IF NOT EXISTS links (
     id          INTEGER PRIMARY KEY,
     file_id     INTEGER NOT NULL REFERENCES files(id) ON DELETE CASCADE,

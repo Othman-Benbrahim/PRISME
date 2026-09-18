@@ -83,15 +83,17 @@ SNAPSHOT_INTERVAL = 300         # 5 min : une sauvegarde par Ctrl+S ne spamme pa
 
 _LAST_SNAP = {}
 
-def snapshot(p):
+def snapshot(p, force=False):
     """Copie la version actuelle dans .trash/versions/ avant de l'ecraser.
-    Limite a une copie toutes les SNAPSHOT_INTERVAL secondes par fichier."""
+    Limite a une copie toutes les SNAPSHOT_INTERVAL secondes par fichier, sauf
+    si force=True : une ecriture que l'utilisateur n'a pas demandee (pose d'un
+    identifiant) garde toujours une version precedente."""
     try:
         if not p.exists() or p.is_dir() or in_trash(p):
             return None
         now  = time.time()
         last = _LAST_SNAP.get(str(p), 0)
-        if now - last < SNAPSHOT_INTERVAL:
+        if not force and now - last < SNAPSHOT_INTERVAL:
             return None
         d = vault_root() / ".trash" / "versions" / time.strftime("%Y-%m-%d")
         d.mkdir(parents=True, exist_ok=True)

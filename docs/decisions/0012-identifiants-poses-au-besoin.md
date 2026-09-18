@@ -1,6 +1,6 @@
 # 0012 · Identifiants posés au besoin
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : appliquée en E3
 - **Écrite** : 2026-09-16
 
 **Retenu.** Une note humaine ne reçoit `prisme_id` que lorsque quelque chose y fait

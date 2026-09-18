@@ -622,7 +622,8 @@ async function saveOsintCxAsFile(){
     + '*Type :* `' + (OSCX.data.type || OSCX.type) + '`  \n'
     + '*Date :* ' + new Date().toISOString() + '\n\n'
     + '```json\n' + JSON.stringify(OSCX.data, null, 2) + '\n```\n';
-  await post('/api/files/save', {path: newPath, content: md});
+  await saveGenerated(newPath, md, {type:'import', outil:'osint-cx',
+    prisme_requete:OSCX.query});
   openFileTab(newPath, md);
   loadDir(CUR_DIR);
   closeOsintCx();

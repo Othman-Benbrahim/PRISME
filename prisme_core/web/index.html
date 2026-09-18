@@ -51,6 +51,7 @@
     <div id="tab-bar"><button id="tab-new" onclick="newFilePrompt()" title="Nouveau fichier">＋</button></div>
     <div id="ed-bar">
       <span id="ed-fname">Aucun fichier</span>
+      <button class="hbtn" id="ed-prov" style="display:none" onclick="openProvenance()">ⓘ</button>
       <div class="mode-grp">
         <button class="mbtn on" id="btn-mode-edit"    onclick="setMode('edit')"   >✏️ Éditer</button>
         <button class="mbtn"    id="btn-mode-preview"  onclick="setMode('preview')">👁 Aperçu</button>
@@ -200,6 +201,15 @@
   </div>
 </div></div>
 
+<!-- ── Modal Provenance ── -->
+<div id="mprov" class="ov"><div class="mb" style="width:520px">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="mt" style="flex:1">ⓘ Provenance</div>
+    <button class="hbtn" onclick="closeProvenance()">✕</button>
+  </div>
+  <div id="pv-body"></div>
+</div></div>
+
 <!-- ── Modal Gestionnaire de plugins ── -->
 <div id="mplugins" class="ov"><div class="mb">
   <div style="display:flex;align-items:center;gap:10px">
@@ -295,6 +305,7 @@
 <script src="/static/js/gutter.js"></script>
 <script src="/static/js/history.js"></script>
 <script src="/static/js/find-in-note.js"></script>
+<script src="/static/js/provenance.js"></script>
 <script src="/static/js/explorer.js"></script>
 <script src="/static/js/tags.js"></script>
 <script src="/static/js/backlinks.js"></script>

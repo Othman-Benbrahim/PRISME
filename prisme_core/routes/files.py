@@ -1,4 +1,5 @@
 """Fichiers du vault : liste, lecture, ecriture, renommage, corbeille, liens."""
+import json
 import shutil
 from pathlib import Path
 
@@ -6,6 +7,7 @@ from flask import Blueprint, jsonify, request
 
 from .. import hooks
 from ..config import rd_cfg
+from .. import provenance
 from ..index import fresh_index, notify_changed
 from ..index import search as query
 from ..index.resolver import LinkResolver
@@ -53,11 +55,26 @@ def save_file():
         p = safe_path(d.get("path", ""))
         p.parent.mkdir(parents=True, exist_ok=True)
         created = not p.exists()
+        contenu = d.get("content", "")
+        prov = d.get("provenance") or {}
+        if prov:                                # (la note peut avoir ete creee juste avant par /api/files/new)
+            # Note produite par une machine : en-tete de provenance, et un identifiant
+            # est pose sur chaque note citee (docs/decisions/0012).
+            contenu = provenance.estampiller(
+                contenu,
+                type=str(prov.get("type") or "note"),
+                outil=str(prov.get("outil") or ""),
+                genere_par=str(prov.get("genere_par") or provenance.decrire_modele(rd_cfg())),
+                preset=str(prov.get("preset") or ""),
+                sources=provenance.sources_vers_ids(prov.get("sources") or []),
+                parent=str(prov.get("parent") or ""),
+                extra={k: v for k, v in prov.items() if k.startswith(provenance.PREFIX)})
         snap = snapshot(p)                      # version precedente -> .trash/versions/
-        p.write_text(d.get("content", ""), encoding="utf-8")
+        p.write_text(contenu, encoding="utf-8")
         notify_changed(p)
         incidents = hooks.emit("note_created" if created else "note_saved", path=str(p), origin="editeur")
-        return jsonify({"ok": True, "snapshot": str(snap) if snap else None, "hooks": incidents})
+        return jsonify({"ok": True, "snapshot": str(snap) if snap else None, "hooks": incidents,
+                        "content": contenu if contenu != d.get("content", "") else None})
     except (PermissionError, FileNotFoundError) as e: return _path_err(e)
     except Exception as e: return jsonify({"error": str(e)}), 500
 
@@ -163,3 +180,42 @@ def find_file():
     if not resolved or not Path(resolved).is_file():
         return jsonify({"error": "Fichier introuvable : " + ref}), 404
     return jsonify({"path": resolved, "content": Path(resolved).read_text(encoding="utf-8", errors="replace")})
+
+
+@bp.route("/api/provenance", methods=["GET"])
+def note_provenance():
+    """Provenance de la note demandee, avec ses sources resolues."""
+    p = safe_path(request.args.get("path", ""))
+    idx = fresh_index()
+    meta = query.note_meta(idx, str(p))
+    if not meta:
+        meta = {k.replace(provenance.PREFIX, "", 1): v
+                for k, v in provenance.lire(p).items() if k.startswith(provenance.PREFIX)}
+        meta["sources"] = meta.get("sources") or []
+    sources = meta.get("sources") or []
+    if isinstance(sources, str):
+        try:
+            sources = json.loads(sources)
+        except ValueError:
+            sources = [sources]
+    resolues = []
+    for ref in sources:
+        note = query.by_prisme_id(idx, ref)
+        resolues.append({"ref": ref, "path": note["path"], "name": note["name"]} if note
+                        else {"ref": ref, "path": None, "name": ref})
+    parent = query.by_prisme_id(idx, meta.get("parent"))
+    return jsonify({
+        "path": str(p),
+        "genere": bool(meta.get("outil") or meta.get("genere_par")),
+        "meta": {k: v for k, v in meta.items() if k != "file_id"},
+        "sources": resolues,
+        "parent": parent,
+        "champs_connus": provenance.CHAMPS,
+    })
+
+
+@bp.route("/api/provenance/id", methods=["POST"])
+def ensure_note_id():
+    """Pose un identifiant sur une note (utilise quand on veut la citer)."""
+    p = safe_path((request.get_json(silent=True) or {}).get("path", ""))
+    return jsonify({"path": str(p), "prisme_id": provenance.assurer_id(p)})

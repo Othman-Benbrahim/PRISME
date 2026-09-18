@@ -127,3 +127,34 @@ def backlinks(index, target, root_filter=None):
 def all_paths(index):
     with index.read() as conn:
         return [r[0] for r in conn.execute("SELECT path FROM files")]
+
+
+def note_meta(index, path):
+    """En-tete de provenance d'une note, tel que l'index l'a lu."""
+    with index.read() as conn:
+        row = conn.execute(
+            "SELECT m.* FROM note_meta m JOIN files f ON f.id = m.file_id WHERE f.path = ?",
+            (path,)).fetchone()
+    return dict(row) if row else {}
+
+
+def by_prisme_id(index, ident):
+    """Chemin et nom de la note portant cet identifiant."""
+    if not ident:
+        return None
+    with index.read() as conn:
+        row = conn.execute(
+            "SELECT f.path, f.name, f.rel FROM note_meta m JOIN files f ON f.id = m.file_id "
+            "WHERE m.prisme_id = ?", (str(ident),)).fetchone()
+    return dict(row) if row else None
+
+
+def notes_generees(index, limit=200):
+    """Notes produites par une machine, les plus recentes d'abord."""
+    with index.read() as conn:
+        rows = conn.execute(
+            "SELECT f.path, f.name, f.rel, m.type, m.outil, m.genere_par, m.enregistre_le "
+            "FROM note_meta m JOIN files f ON f.id = m.file_id "
+            "WHERE m.outil != '' OR m.genere_par != '' "
+            "ORDER BY m.enregistre_le DESC LIMIT ?", (limit,)).fetchall()
+    return [dict(r) for r in rows]

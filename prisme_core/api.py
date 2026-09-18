@@ -138,14 +138,39 @@ class PluginContext:
         from .index import search as query
         return query.search(fresh_index(), text, limit_files=limit)
 
+    def note_meta(self, path):
+        """En-tete de provenance d'une note : {"prisme_id": ..., "prisme_type": ...}."""
+        from . import provenance as prov
+        return {k: v for k, v in prov.lire(self.safe_path(path)).items() if k.startswith(prov.PREFIX)}
+
+    def ensure_id(self, path):
+        """Pose un identifiant stable sur une note et le renvoie."""
+        from . import provenance as prov
+        return prov.assurer_id(self.safe_path(path))
+
     def read_note(self, path):
         return self.safe_path(path, must_exist=True).read_text(encoding="utf-8", errors="replace")
 
-    def write_note(self, path, content):
-        """Ecrit une note (instantane de l'ancienne version) et declenche note_saved."""
+    def write_note(self, path, content, provenance=None):
+        """Ecrit une note et declenche note_saved (ou note_created).
+
+        provenance : dict facultatif pour une note produite par le plugin, par ex.
+        {"type": "synthese", "sources": [chemin1, chemin2], "preset": "..."}.
+        L'identifiant du plugin est enregistre comme outil, et un identifiant est
+        pose sur chaque note citee."""
         self._require("vault_write")
         p = self.safe_path(path)
         created = not p.exists()
+        if created and provenance is not None:
+            from . import provenance as prov
+            content = prov.estampiller(
+                content,
+                type=str(provenance.get("type") or "note"),
+                outil=provenance.get("outil") or self.id,
+                genere_par=str(provenance.get("genere_par") or prov.decrire_modele(rd_cfg())),
+                preset=str(provenance.get("preset") or ""),
+                sources=prov.sources_vers_ids(provenance.get("sources") or []),
+                parent=str(provenance.get("parent") or ""))
         p.parent.mkdir(parents=True, exist_ok=True)
         snapshot(p)
         p.write_text(content, encoding="utf-8")
