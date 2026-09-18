@@ -5,6 +5,21 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E4 — ENGRAM
+
+Étape uniquement additive : rien de ce qui existait ne change de comportement.
+
+| Nouveauté | Détail |
+|---|---|
+| Routes | `/api/engram/formats`, `/inspect`, `/import`, `/sources`, `/oublier` |
+| Dossiers créés dans le vault | `Sources/` (notes importées) et `_sources/` (copies, en mode copie) |
+| Notes importées | En-tête `prisme_source_*` (empreinte, mode, chemin, extracteur, partie) |
+| Ancres de bloc | Chaque passage porte `^p-xxxxxxxx` : c'est là que vit son identifiant |
+| Registre | `~/.prisme/engram/engram.json` — reconstructible depuis les notes |
+| Interface | Bouton 📥 Sources |
+
+Aucun changement de schéma d'index : rien n'est reconstruit.
+
 ## Provenance modifiable
 
 | Avant | Après |

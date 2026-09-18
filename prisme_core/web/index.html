@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/static/css/plugin-manager.css">
 <link rel="stylesheet" href="/static/css/link-suggest.css">
 <link rel="stylesheet" href="/static/css/editeur.css">
+<link rel="stylesheet" href="/static/css/engram.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
@@ -20,6 +21,7 @@
   <button class="hbtn" onclick="newFilePrompt()">＋ Nouveau</button>
   <button class="hbtn" onclick="saveFile()">💾 Sauvegarder</button>
   <button class="hbtn" id="btn-mm" onclick="toggleMM()">◀ Carte</button>
+  <button class="hbtn" onclick="openEngram()" title="Importer une source dans le vault">📥 Sources</button>
   <button class="hbtn" onclick="openPlugins()" title="Installer, activer, configurer les plugins">🧩 Plugins</button>
   <button class="hbtn" onclick="openCfg()">⚙ Paramètres</button>
 </header>
@@ -201,6 +203,37 @@
   </div>
 </div></div>
 
+<!-- ── Modal ENGRAM : import de sources ── -->
+<div id="mengram" class="ov"><div class="mb">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="mt" style="flex:1">📥 Importer une source</div>
+    <button class="hbtn" onclick="closeEngram()">✕</button>
+  </div>
+  <div id="eng-formats"></div>
+  <div class="eng-bloc">
+    <h4>Fichier à importer</h4>
+    <div class="eng-ligne">
+      <input id="eng-chemin" type="text" placeholder="chemin complet du fichier (ex. D:\Exports\conversations.json)"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();engInspecter();}">
+      <button class="btn bs" onclick="engInspecter()">Vérifier</button>
+    </div>
+    <div id="eng-inspection"></div>
+    <div class="eng-ligne" style="margin-top:8px">
+      <select id="eng-mode" title="Copier le fichier dans le vault, ou n'en garder que la référence">
+        <option value="reference">Référence (le fichier reste où il est)</option>
+        <option value="copie">Copie dans _sources/</option>
+      </select>
+      <input id="eng-dossier" type="text" placeholder="dossier des notes">
+      <button class="btn bp" id="eng-importer" onclick="engImporter(false)" disabled>Importer</button>
+    </div>
+    <div id="eng-rapport"></div>
+  </div>
+  <div class="eng-bloc">
+    <h4>Sources suivies</h4>
+    <div id="eng-sources"></div>
+  </div>
+</div></div>
+
 <!-- ── Modal Provenance ── -->
 <div id="mprov" class="ov"><div class="mb" style="width:520px">
   <div style="display:flex;align-items:center;gap:10px">
@@ -306,6 +339,7 @@
 <script src="/static/js/history.js"></script>
 <script src="/static/js/find-in-note.js"></script>
 <script src="/static/js/provenance.js"></script>
+<script src="/static/js/engram.js"></script>
 <script src="/static/js/explorer.js"></script>
 <script src="/static/js/tags.js"></script>
 <script src="/static/js/backlinks.js"></script>

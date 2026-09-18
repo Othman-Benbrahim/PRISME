@@ -1,6 +1,6 @@
 # 0016 · Passages retirés d'une source
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : appliquée en E4 (propagation aux notes citantes reportée)
 - **Écrite** : 2026-09-16
 
 **Retenu.** Conservés en fin de note sous « Passages retirés de la source », dans un

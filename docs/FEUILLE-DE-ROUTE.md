@@ -10,8 +10,8 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E2 | `e2-index-sqlite` | Index SQLite FTS5 dans le profil, double granularité fichier + segment, questions de référence | Fait |
 | — | `confort-editeur` | Numéros de ligne, annuler/rétablir, recherche dans la note | Fait |
 | E3 | `e3-provenance` | Frontmatter `prisme_*`, identifiants posés au besoin, horloge d'enregistrement | Fait |
-| — | `provenance-editable` | Fiche de provenance modifiable, choix des sources, pose d'identifiant | En revue |
-| E4 | `e4-engram` | Contrat d'extraction, identité des passages, importeurs légers | À faire |
+| — | `provenance-editable` | Fiche de provenance modifiable, choix des sources, pose d'identifiant | Fait |
+| E4 | `e4-engram` | Contrat d'extraction, identité des passages, importeurs légers (ChatGPT, Claude, Mistral, texte, HTML) | En revue |
 | E5 | `e5-objets` | File de validation, entrée directe des imports en masse, objet Source | À faire |
 | E6 | `e6-api-agents` | API HTTP locale à clés | À faire |
 | E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, plugin ONNX | À faire |
