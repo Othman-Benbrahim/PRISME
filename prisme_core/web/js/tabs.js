@@ -2,7 +2,12 @@
 //  ONGLETS
 // ══════════════════════════════════════════════════
 function openFileTab(path,content){
+  // Une note qui vient d'être estampillée par le serveur s'ouvre avec son en-tête
+  if(typeof STAMPED!=='undefined' && STAMPED[path]){ content=STAMPED[path]; delete STAMPED[path]; }
   if(!TABS[path]) TABS[path]={content:content,saved:content,modified:false};
+  else if(TABS[path].saved!==content && !TABS[path].modified){
+    TABS[path].content=content; TABS[path].saved=content;
+  }
   switchTab(path);
 }
 function switchTab(path){
@@ -25,6 +30,7 @@ function switchTab(path){
   updateMindmap(t.content,path.split(/[/\\]/).pop());
   if(ACTIVE_MM_TAB===1) loadBacklinks(path);
   if(typeof linksOnSwitch==='function') linksOnSwitch(path);
+  if(typeof loadProvenance==='function') loadProvenance(path);
   highlightFile(path);
 }
 function closeTab(path){

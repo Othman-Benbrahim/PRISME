@@ -1,6 +1,6 @@
 # Architecture du code
 
-État après l'étape E2. Mis à jour à chaque étape qui déplace des responsabilités.
+État après l'étape E3. Mis à jour à chaque étape qui déplace des responsabilités.
 
 ## Lancement
 
@@ -19,6 +19,8 @@
 | `envfile.py` | Chargement des fichiers `.env` |
 | `vault.py` | Racine autorisée, garde de chemin, corbeille, instantanés, parcours des `.md` |
 | `markdown.py` | Extraction des liens et des tags, résolution des références |
+| `frontmatter.py` | Lecture et écriture de l'en-tête YAML, sans dépendance |
+| `provenance.py` | Identifiants, horloge d'enregistrement, estampillage des notes produites par une machine |
 | `index/` | **Index SQLite** : `store.py` (base et schéma), `segmenter.py` (découpage), `resolver.py` (résolution des liens), `indexer.py` (mise à jour), `search.py` (recherche, tags, graphe, backlinks) |
 | `providers.py` | Fournisseurs IA (OpenAI-compatibles, Anthropic), appel générique |
 | `api.py` | **API publique des plugins** (`PluginContext`, version 1) |
@@ -43,7 +45,7 @@ comportement dans `js/`, un fichier par zone. L'ordre des balises `<script>` com
 2. `helpers.js`, `tabs.js`, `editor.js`, `explorer.js`, `tags.js`, `backlinks.js`,
    `search.js`, `graph.js`, `synthesis.js`, `ai-selection.js`, `link-suggest.js`, `ai-file.js`,
    `plugin-manager.js`, `gutter.js` (numéros de ligne), `history.js` (annuler/rétablir),
-   `find-in-note.js` (recherche dans la note)
+   `find-in-note.js` (recherche dans la note), `provenance.js` (fiche de provenance)
 3. les plugins actifs, un fichier chacun (`/plugins/<id>/ui.js`)
 4. `mindmap.js`, `layout.js`, `settings.js`, `init.js`, `onboarding.js`, `ai-stream.js`
 

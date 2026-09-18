@@ -67,7 +67,8 @@ async function aiOnSel(action){
   content+='---\n\n'+r.response+'\n\n';
   content+='---\n\n## Extrait original\n\n> '+selected.split('\n').join('\n> ')+'\n';
 
-  await post('/api/files/save',{path:newPath,content:content});
+  await saveGenerated(newPath, content, {type:'reponse', outil:'ia-selection',
+    preset:meta.label, sources:ACTIVE?[ACTIVE]:[]});
   openFileTab(newPath,content);
   loadDir(CUR_DIR);
   toast('✓ '+meta.title+' créée');

@@ -189,7 +189,8 @@ async function saveArxivAsFile(){
   }).join('\n');
   var content=head+ARX.synthesis+'\n\n---\n\n## Liste brute des papiers\n\n'+papersList+'\n';
 
-  await post('/api/files/save',{path:newPath,content:content});
+  await saveGenerated(newPath, content, {type:'synthese', outil:'arxiv',
+    sources:(ACTIVE?[ACTIVE]:[]).concat(ARX.papers.map(function(p){return p.url;}).filter(Boolean))});
   openFileTab(newPath,content); loadDir(CUR_DIR); closeArxiv();
   toast('✓ Synthèse sauvegardée');
 }

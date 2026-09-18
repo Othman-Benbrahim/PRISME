@@ -109,7 +109,9 @@ session, ajouté automatiquement par la page.
 | `ctx.iter_notes(dossier=None)` | Parcourt les `.md` du vault |
 | `ctx.search(texte, limit=20)` | Recherche plein texte dans l'index ; les termes trouvés sont encadrés par `\x01` et `\x02` |
 | `ctx.read_note(chemin)` | Lit une note du vault |
-| `ctx.write_note(chemin, contenu)` | Écrit une note, avec instantané de l'ancienne version ; déclenche `note_saved` ou `note_created` |
+| `ctx.write_note(chemin, contenu, provenance=None)` | Écrit une note, avec instantané ; déclenche `note_saved` ou `note_created`. Avec `provenance={"type": ..., "sources": [...]}`, l'en-tête de provenance est posé et les notes citées reçoivent un identifiant |
+| `ctx.note_meta(chemin)` | En-tête de provenance d'une note |
+| `ctx.ensure_id(chemin)` | Pose un identifiant stable sur une note et le renvoie |
 | `ctx.data_dir()` | Dossier privé du plugin : `~/.prisme/plugins/<id>/` |
 | `ctx.adopt_legacy_file(nom)` | Reprend une seule fois `~/.secondbrain/<nom>` dans `data_dir()` |
 | `ctx.secret(nom)` | Secret déclaré : coffre chiffré de PRISME, puis variable d'environnement |
@@ -155,6 +157,9 @@ module : il peut être saisi après le démarrage.
 - Les déclarations globales (`var`, `let`, `const`, `function`) partagent l'espace
   global avec le cœur et les autres plugins : préfixez vos noms (`monPluginOuvrir`).
 - Appelez vos routes par leur URL complète : `fetch('/api/plugins/mon-plugin/recherche', ...)`.
+- Pour enregistrer une note produite par votre plugin depuis l'interface :
+  `saveGenerated(chemin, contenu, {type: 'synthese', outil: 'mon-plugin', sources: [...]})`.
+  N'appelez plus `/api/files/save` directement pour une note générée : elle perdrait sa provenance.
 - Fonctions du cœur utilisables : `$(id)`, `post(url, donnees)`, `esc(texte)`,
   `toast(message, duree)`, `openJson(url)`, et les variables `ACTIVE` (chemin de la note
   ouverte) et `CUR_DIR` (dossier affiché).

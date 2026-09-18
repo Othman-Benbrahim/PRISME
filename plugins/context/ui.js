@@ -199,7 +199,8 @@ async function ctxSaveAsFile(){
   head += '\n\n---\n\n## ✨ Réponse de l\'IA\n\n';
 
   var content = head + CTX.answer + '\n';
-  await post('/api/files/save', {path: newPath, content: content});
+  await saveGenerated(newPath, content, {type:'reponse', outil:'context',
+    sources:Array.from(CTX.selected)});
   openFileTab(newPath, content);
   loadDir(CUR_DIR);
   closeContextBuilder();

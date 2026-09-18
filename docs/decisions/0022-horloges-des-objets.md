@@ -1,6 +1,6 @@
 # 0022 · Horloges des objets
 
-- **Statut** : acceptée, non encore appliquée (E3)
+- **Statut** : appliquée en E3 (horloge d'enregistrement ; horloge du monde réservée)
 - **Écrite** : 2026-09-17
 
 Inspirée d'Utopia (fiches 0019 et 0022).

@@ -9,11 +9,13 @@
   l'ancien en une operation : l'index en service n'est jamais a moitie ecrit.
 """
 import hashlib
+import json
 import os
 import threading
 import time
 from pathlib import Path
 
+from .. import frontmatter
 from ..markdown import extract_link_refs, extract_tags
 from ..vault import SKIP_DIRS
 from . import store
@@ -33,6 +35,19 @@ def walk_notes(root):
         for fn in sorted(filenames):
             if fn.lower().endswith(".md") and not fn.startswith("."):
                 yield os.path.join(dirpath, fn)
+
+
+frontmatter_prefix = "prisme_"
+
+
+def _txt(value):
+    return "" if value is None else (", ".join(str(v) for v in value) if isinstance(value, list) else str(value))
+
+
+def _liste(value):
+    if value is None:
+        return []
+    return [str(v) for v in value] if isinstance(value, list) else [str(value)]
 
 
 def _context_line(content, ref):
@@ -276,9 +291,22 @@ class VaultIndex:
             "INSERT INTO links(file_id, raw, target_path, context) VALUES (?,?,?,?)",
             [(file_id, ref, resolver.resolve(ref, path) if resolver else None, _context_line(content, ref))
              for ref in sorted(extract_link_refs(content))])
+        meta = frontmatter.parse(content)
+        conn.execute("DELETE FROM note_meta WHERE file_id = ?", (file_id,))
+        if any(k.startswith(frontmatter_prefix) for k in meta):
+            conn.execute(
+                "INSERT INTO note_meta(file_id, prisme_id, type, outil, genere_par, preset, "
+                "enregistre_le, invalide_le, parent, sources) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (file_id, _txt(meta.get("prisme_id")), _txt(meta.get("prisme_type")),
+                 _txt(meta.get("prisme_outil")), _txt(meta.get("prisme_genere_par")),
+                 _txt(meta.get("prisme_preset")), _txt(meta.get("prisme_enregistre_le")),
+                 _txt(meta.get("prisme_invalide_le")), _txt(meta.get("prisme_parent")),
+                 json.dumps(_liste(meta.get("prisme_sources")), ensure_ascii=False)))
+        # tags du corps (#tag) et de l'en-tete (tags: [...]), comme dans Obsidian
+        tags = set(extract_tags(content)) | {t.lstrip("#").strip() for t in _liste(meta.get("tags")) if str(t).strip()}
         conn.execute("DELETE FROM tags WHERE file_id = ?", (file_id,))
         conn.executemany("INSERT INTO tags(file_id, tag) VALUES (?,?)",
-                         [(file_id, t) for t in sorted(set(extract_tags(content)))])
+                         [(file_id, t) for t in sorted(tags)])
 
     def _resolve_all(self, conn, resolver):
         rows = conn.execute("SELECT l.id, l.raw, f.path FROM links l JOIN files f ON f.id = l.file_id").fetchall()
