@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="/static/css/editeur.css">
 <link rel="stylesheet" href="/static/css/engram.css">
 <link rel="stylesheet" href="/static/css/objets.css">
+<link rel="stylesheet" href="/static/css/agents.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
@@ -24,6 +25,7 @@
   <button class="hbtn" id="btn-mm" onclick="toggleMM()">◀ Carte</button>
   <button class="hbtn" onclick="openEngram()" title="Importer une source dans le vault">📥 Sources</button>
   <button class="hbtn" onclick="openObjets()" title="Recenser et valider les références citées dans vos notes">🔖 Sources citées</button>
+  <button class="hbtn" onclick="openAgents()" title="Clés d'accès des agents extérieurs">🔑 Agents</button>
   <button class="hbtn" onclick="openPlugins()" title="Installer, activer, configurer les plugins">🧩 Plugins</button>
   <button class="hbtn" onclick="openCfg()">⚙ Paramètres</button>
 </header>
@@ -304,6 +306,52 @@
   </div>
 </div></div>
 
+<!-- ── Modal Agents : clés d'accès et journal ── -->
+<div id="magents" class="ov"><div class="mb">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="mt" style="flex:1">🔑 Agents</div>
+    <button class="hbtn" onclick="closeAgents()">✕</button>
+  </div>
+  <div id="ag-tabs">
+    <button class="ag-tab on" id="agt0" onclick="agOnglet(0)">Clés d'accès</button>
+    <button class="ag-tab"    id="agt1" onclick="agOnglet(1)">Journal</button>
+  </div>
+
+  <div id="agp0">
+    <div class="eng-bloc">
+      <h4>Nouvelle clé</h4>
+      <div class="eng-ligne">
+        <input id="ag-nom" type="text" placeholder="nom de l'agent (ex. Veille arXiv)"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();agCreer();}">
+        <button class="btn bp" onclick="agCreer()">Créer</button>
+      </div>
+      <div class="ag-droits" style="margin-top:7px">
+        <label class="ag-d on fige"><input type="checkbox" checked disabled>lecture</label>
+        <label class="ag-d on"><input type="checkbox" id="ag-proposition" checked>proposition</label>
+        <label class="ag-d"><input type="checkbox" id="ag-ecriture">écriture directe</label>
+      </div>
+      <div class="eng-note">L'agent lit vos notes et dépose ses trouvailles dans la file de
+        validation : rien n'entre dans le vault sans votre accord. L'écriture directe se
+        donne au cas par cas, et se retire à tout moment.</div>
+      <div id="ag-nouvelle" style="display:none">
+        <strong>Copiez cette clé maintenant.</strong> PRISME n'en garde que l'empreinte :
+        elle ne sera plus jamais affichée.
+        <code id="ag-nouvelle-cle"></code>
+        <div class="ag-a">
+          <button class="btn bp" onclick="agCopier()">Copier</button>
+          <button class="btn bs" onclick="agFermerNouvelle()">J'ai copié</button>
+        </div>
+      </div>
+    </div>
+    <div id="ag-liste" style="margin-top:10px"></div>
+  </div>
+
+  <div id="agp1" style="display:none">
+    <div id="ag-filtre"></div>
+    <div id="ag-journal"></div>
+  </div>
+</div></div>
+
 <!-- ── Modal Provenance ── -->
 <div id="mprov" class="ov"><div class="mb" style="width:520px">
   <div style="display:flex;align-items:center;gap:10px">
@@ -412,6 +460,7 @@
 <script src="/static/js/provenance.js"></script>
 <script src="/static/js/engram.js"></script>
 <script src="/static/js/objets.js"></script>
+<script src="/static/js/agents.js"></script>
 <script src="/static/js/explorer.js"></script>
 <script src="/static/js/tags.js"></script>
 <script src="/static/js/backlinks.js"></script>
