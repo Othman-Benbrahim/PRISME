@@ -107,14 +107,38 @@ def _normaliser_espaces(s):
     return re.sub(r"\s+", " ", (s or "")).strip().lower()
 
 
-def proposer_par_ia(dossier=None, limite=MAX_NOTES_IA):
+def _a_examiner(dossier, note):
+    """Les notes que l'appel doit lire : une seule si `note` est donnée, sinon le lot.
+
+    Demander l'analyse d'une note précise est un geste délibéré : on ne lui applique
+    donc ni le plafond du lot ni la longueur minimale, qui servent à ne pas gaspiller
+    des appels sur un balayage automatique.
+    """
+    from ..vault import safe_path
+
+    if note:
+        p = safe_path(note)
+        if not p.is_file() or p.suffix.lower() != ".md":
+            raise sources.ObjetInvalide("Note introuvable : %s" % note)
+        racine_objets = (vault_root() / sources.DOSSIER).resolve()
+        if racine_objets in p.resolve().parents:
+            raise sources.ObjetInvalide("Cette note est elle-même un objet Source")
+        return [p], False
+    return sources.notes_du_vault(dossier), True
+
+
+def proposer_par_ia(dossier=None, limite=MAX_NOTES_IA, note=None):
     """Fait lire des notes par le modèle et dépose ses trouvailles en file.
+
+    `note` restreint l'analyse à cette seule note — c'est ce que déclenche le bouton
+    « Sources IA » de l'éditeur. Sans elle, le lot entier y passe.
 
     Aucune proposition n'entre dans le vault : l'IA propose, tu valides (0017).
     """
     cfg = rd_cfg()
     if needs_key(cfg):
         return {"error": "Clé API manquante — configurez-la dans Paramètres."}
+    a_lire, filtrer = _a_examiner(dossier, note)
 
     connues = {o["reference"] for o in sources.lister()}
     refus = file.raisons_connues()
@@ -124,14 +148,14 @@ def proposer_par_ia(dossier=None, limite=MAX_NOTES_IA):
             "- %s : %s" % (r["titre"] or r["cle"], r["raison"]) for r in refus)
 
     deposees, examinees, ecartees = [], 0, 0
-    for p in sources.notes_du_vault(dossier):
-        if examinees >= limite:
+    for p in a_lire:
+        if filtrer and examinees >= limite:
             break
         try:
             texte = p.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if len(texte.strip()) < MIN_CAR_IA:
+        if filtrer and len(texte.strip()) < MIN_CAR_IA:
             continue
         examinees += 1
         chemin = _chemin_relatif(p)

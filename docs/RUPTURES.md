@@ -5,6 +5,15 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## Sources IA sur la note ouverte
+
+| Avant | Après |
+|---|---|
+| « ✨ Demander à l'IA » balayait tout le vault ou un dossier | Bouton **🔖 Sources IA** dans l'éditeur : la note ouverte, elle seule, un appel |
+| `POST /api/objets/ia` : `{dossier, limite}` | Accepte aussi `{note}` ; plafond et longueur minimale ne s'appliquent pas à ce chemin |
+
+Le garde-fou de l'extrait littéral reste en place. Une note de `Objets/Sources` est refusée.
+
 ## E6 — API locale à clés pour les agents
 
 Étape additive, sauf un correctif d'interface qui répare un comportement cassé.

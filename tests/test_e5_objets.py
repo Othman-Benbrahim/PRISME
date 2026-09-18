@@ -259,6 +259,47 @@ class TestFile(ObjetsBase):
         self.assertEqual(r["ecartees"], 1)
         self.assertEqual(r["deposees"][0]["titre"], "Rapport Kybernetica")
 
+
+    def test_analyse_d_une_seule_note(self):
+        """Le bouton « Sources IA » de l'editeur n'analyse que la note ouverte."""
+        vus = []
+
+        def faux_appel(cfg, msgs, **kw):
+            vus.append(msgs[1]["content"])
+            return (json.dumps([{"titre": "Rapport Kybernetica",
+                                 "indice": "Le rapport Kybernetica sur la prospective",
+                                 "motif": "cite en clair"}]), None)
+
+        original = balayage._ai_call
+        balayage._ai_call = faux_appel
+        try:
+            r = balayage.proposer_par_ia(note="Veille.md")
+        finally:
+            balayage._ai_call = original
+        self.assertEqual(r["notes_examinees"], 1, "une seule note lue")
+        self.assertEqual(len(vus), 1)
+        self.assertIn("Veille.md", vus[0])
+        self.assertEqual(len(r["deposees"]), 1)
+
+    def test_note_courte_analysee_quand_on_la_demande(self):
+        """La longueur minimale protege le balayage automatique, pas un geste delibere."""
+        (VAULT / "Courte.md").write_text("# Courte\n\nLe rapport Kybernetica.\n", encoding="utf-8")
+        original = balayage._ai_call
+        balayage._ai_call = lambda cfg, msgs, **kw: ("[]", None)
+        try:
+            r = balayage.proposer_par_ia(note="Courte.md")
+        finally:
+            balayage._ai_call = original
+        self.assertEqual(r["notes_examinees"], 1)
+
+    def test_note_introuvable_ou_objet(self):
+        balayage.balayer()
+        with self.assertRaises(objets.ObjetInvalide):
+            balayage.proposer_par_ia(note="Absente.md")
+        objet = sources.lister()[0]
+        with self.assertRaises(objets.ObjetInvalide):
+            balayage.proposer_par_ia(note=objet["chemin"])
+
     def test_json_du_modele_tolere_les_balises(self):
         self.assertEqual(balayage._json_du_modele('```json\n[{"titre":"A"}]\n```'), [{"titre": "A"}])
         self.assertEqual(balayage._json_du_modele("Voici : [] merci"), [])
@@ -332,6 +373,9 @@ class TestRoutes(ObjetsBase):
         self.assertEqual(self.post("/api/objets/rejets/oublier", {"cle": "texte:a"}).status_code, 200)
         self.assertEqual(self.get("/api/objets/file")["rejets"], {})
 
+    def test_route_ia_sur_une_note(self):
+        self.assertEqual(self.post("/api/objets/ia", {"note": "Absente.md"}).status_code, 404)
+
     def test_route_note(self):
         self.post("/api/objets/balayer")
         d = self.get("/api/objets/note?path=Veille.md")
@@ -362,7 +406,8 @@ class TestInterface(unittest.TestCase):
 
     def test_page_cablee(self):
         for attendu in ('src="/static/js/objets.js"', 'href="/static/css/objets.css"',
-                        'id="mobjets"', 'onclick="openObjets()"', 'id="ed-objets"'):
+                        'id="mobjets"', 'onclick="openObjets()"', 'id="ed-objets"',
+                        'id="ed-src-ia"', 'onclick="objSourcesDeLaNote()"'):
             self.assertIn(attendu, self.html, attendu)
 
     def test_aucun_popup_du_navigateur(self):

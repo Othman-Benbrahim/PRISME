@@ -45,7 +45,10 @@ def proposer_ia():
     d = _corps()
     try:
         resultat = balayage.proposer_par_ia(dossier=d.get("dossier") or None,
-                                            limite=int(d.get("limite") or balayage.MAX_NOTES_IA))
+                                            limite=int(d.get("limite") or balayage.MAX_NOTES_IA),
+                                            note=d.get("note") or None)
+    except objets.ObjetInvalide as e:
+        return _erreur(e, 404)
     except (PermissionError, FileNotFoundError) as e:
         return _erreur(e, 403 if isinstance(e, PermissionError) else 404)
     except (TypeError, ValueError) as e:
