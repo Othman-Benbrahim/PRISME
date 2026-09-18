@@ -15,6 +15,30 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E4 | `e4-engram` | Contrat d'extraction, identité des passages, importeurs légers (ChatGPT, Claude, Mistral, texte, HTML) | Fait |
 | E5 | `e5-objets` | File de validation, entrée directe des imports en masse, objet Source | Fait |
 | E6 | `e6-api-agents` | API HTTP locale à clés, droits par clé, journal | Fait |
-| — | `sources-ia-note` | Bouton « Sources IA » : analyse de la note ouverte seule | En revue |
+| — | `sources-ia-note` | Bouton « Sources IA » : analyse de la note ouverte seule | Fait |
 | E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, plugin ONNX | À faire |
+| E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | À faire |
+| E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | À faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
+
+L'ordre E7 → E10 → E11 → E9 est fixé par [la décision 0027](decisions/0027-ordre-des-etapes-restantes.md) :
+la publication vient en dernier parce qu'elle sert des utilisateurs qui n'existent pas encore,
+là où E10 et E11 servent l'auteur tout de suite.
+
+## Hors périmètre
+
+Ce qui a été examiné et écarté, ou reporté sans étape. Rien ici n'est oublié : c'est
+décidé, ou explicitement en attente.
+
+| Sujet | État |
+|---|---|
+| Plugin de calibration (Brier, log loss, courbes) | Reporté après E11 — [0025](decisions/0025-calibration-en-plugin.md). Le cœur fournira le type Prédiction, le plugin fera le calcul. |
+| Horloge du monde active | S'activera avec ce plugin — [0026](decisions/0026-horloge-du-monde-activee.md). Les champs sont réservés depuis E3, aucune migration à prévoir. |
+| Mécanisme de gel des objets | Prévu dans le modèle (0017), non implémenté. |
+| Seuil d'entrée directe par type | Sans objet tant qu'il n'y a qu'un type (0021). |
+| Rejets synchronisés avec le vault | Décidé — [0024](decisions/0024-synchronisation-entre-machines.md) — reste à appliquer. |
+| Données de plugins dans le vault | À trancher plus tard (0024). |
+| Modèle de décision hébergé (type Jev) | Examiné, écarté : cloud obligatoire, poids fermés, calibration annoncée moindre hors anglais. Les principes sont reproductibles sans dépendance payante. |
+| Verrouillage réparti, écritures concurrentes | Assumé : le dernier qui écrit gagne, `.trash/versions/` sert de filet (0024). |
+| Chiffrement des secrets hors Windows | DPAPI est Windows seul (0023). À traiter en E9 si la publication vise macOS et Linux. |
+| Épreuve du réel : vault de l'auteur, build PyInstaller | Jamais faits. À planifier avant E9. |
