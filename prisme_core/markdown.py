@@ -76,4 +76,5 @@ def resolve_ref(raw_ref, source_path, vault_paths):
     return None
 
 def extract_tags(content):
-    return list({t for t in re.findall(r"(?<!\w)#([a-zA-Z0-9_\-]+)", content)})
+    """Tags #comme-ceci, accents compris (#methode et #méthode sont deux tags distincts)."""
+    return list({t for t in re.findall(r"(?<!\w)#([\w\-]*[^\W\d_][\w\-]*)", content, re.UNICODE)})

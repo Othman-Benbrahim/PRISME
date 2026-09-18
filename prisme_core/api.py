@@ -131,6 +131,13 @@ class PluginContext:
     def iter_notes(self, directory=None):
         return iter_md(str(self.safe_path(directory or vault_root())))
 
+    def search(self, text, limit=20):
+        """Recherche plein texte dans le vault : [{path, name, rel, matches:[{line, heading, text}]}].
+        Les passages trouves sont encadres par les caracteres \\x01 et \\x02."""
+        from .index import fresh_index
+        from .index import search as query
+        return query.search(fresh_index(), text, limit_files=limit)
+
     def read_note(self, path):
         return self.safe_path(path, must_exist=True).read_text(encoding="utf-8", errors="replace")
 
@@ -142,6 +149,8 @@ class PluginContext:
         p.parent.mkdir(parents=True, exist_ok=True)
         snapshot(p)
         p.write_text(content, encoding="utf-8")
+        from .index import notify_changed        # import tardif : l'index importe vault/markdown
+        notify_changed(p)
         hooks.emit("note_created" if created else "note_saved", path=str(p), origin=self.id)
         return p
 

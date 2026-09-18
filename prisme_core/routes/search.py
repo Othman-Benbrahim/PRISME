@@ -1,44 +1,41 @@
-"""Recherche plein texte et nuage de tags."""
-from pathlib import Path
-
+"""Recherche plein texte, tags et etat de l'index."""
 from flask import Blueprint, jsonify, request
 
-from ..vault import scoped_dir
-from ..search_index import index_refresh
+from ..index import fresh_index, get_index
+from ..index import search as query
+from ..vault import scoped_dir, vault_root
 
 bp = Blueprint("search", __name__)
 
+
+def _scope():
+    scoped = scoped_dir(request.args.get("dir"))
+    return None if scoped == str(vault_root()) else scoped
+
+
 @bp.route("/api/search", methods=["GET"])
 def search_files():
-    query = request.args.get("q", "").strip()
-    dir_p = scoped_dir(request.args.get("dir"))
-    if len(query) < 2: return jsonify({"results": []})
-    results, total = [], 0
-    ql = query.lower()
-    idx = index_refresh(dir_p)
-    for sp in sorted(idx):
-        entry = idx[sp]
-        if ql not in entry["lower"]: continue
-        f = Path(sp)
-        matches = []
-        for i, line in enumerate(entry["text"].split("\n")):
-            if ql in line.lower():
-                matches.append({"line": i+1, "text": line[:140].strip()})
-                if len(matches) >= 4: break
-        try:    rel = str(f.relative_to(Path(dir_p)))
-        except Exception: rel = f.name
-        results.append({"path": sp, "name": f.name, "rel": rel, "matches": matches})
-        total += 1
-        if total >= 40: break
-    return jsonify({"results": results})
+    text = request.args.get("q", "").strip()
+    scope = _scope()
+    if len(text) < 2:
+        return jsonify({"results": []})
+    idx = fresh_index()
+    return jsonify({"results": query.search(idx, text, root_filter=scope),
+                    "index": {"state": idx.state, "progress": idx.progress}})
+
 
 @bp.route("/api/tags", methods=["GET"])
 def get_tags():
-    dir_p = scoped_dir(request.args.get("dir"))
-    tags = {}
-    idx = index_refresh(dir_p)
-    for sp in sorted(idx):
-        for tag in idx[sp]["tags"]:
-            tags.setdefault(tag, []).append(sp)
-    return jsonify({"tags": [{"tag": k, "count": len(v), "files": v}
-                              for k, v in sorted(tags.items(), key=lambda x: -len(x[1]))]})
+    return jsonify({"tags": query.tags(fresh_index(), _scope())})
+
+
+@bp.route("/api/index/status", methods=["GET"])
+def index_status():
+    return jsonify(get_index().status())
+
+
+@bp.route("/api/index/rebuild", methods=["POST"])
+def index_rebuild():
+    idx = get_index()
+    started = idx.start_background(rebuild=True)
+    return jsonify({"started": started, **idx.status()})

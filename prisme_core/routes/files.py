@@ -6,8 +6,10 @@ from flask import Blueprint, jsonify, request
 
 from .. import hooks
 from ..config import rd_cfg
-from ..markdown import extract_link_refs, resolve_ref
-from ..vault import _path_err, in_trash, iter_md, safe_path, scoped_dir, snapshot, to_trash, vault_root
+from ..index import fresh_index, notify_changed
+from ..index import search as query
+from ..index.resolver import LinkResolver
+from ..vault import _path_err, in_trash, safe_path, scoped_dir, snapshot, to_trash, vault_root
 
 bp = Blueprint("files", __name__)
 
@@ -53,6 +55,7 @@ def save_file():
         created = not p.exists()
         snap = snapshot(p)                      # version precedente -> .trash/versions/
         p.write_text(d.get("content", ""), encoding="utf-8")
+        notify_changed(p)
         incidents = hooks.emit("note_created" if created else "note_saved", path=str(p), origin="editeur")
         return jsonify({"ok": True, "snapshot": str(snap) if snap else None, "hooks": incidents})
     except (PermissionError, FileNotFoundError) as e: return _path_err(e)
@@ -73,6 +76,7 @@ def new_file():
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(f"# {name.replace('.md','')}\n\n", encoding="utf-8")
+        notify_changed(path)
         incidents = hooks.emit("note_created", path=str(path), origin="editeur")
         return jsonify({"ok": True, "path": str(path), "hooks": incidents})
     except Exception as e: return jsonify({"error": str(e)}), 500
@@ -95,6 +99,7 @@ def rename_file():
     try:
         old.rename(new_path)
     except Exception as e: return jsonify({"error": str(e)}), 500
+    notify_changed(old, new_path)
     incidents = hooks.emit("note_renamed", path=str(new_path), old_path=str(old), origin="editeur")
     return jsonify({"ok": True, "new_path": str(new_path), "hooks": incidents})
 
@@ -113,91 +118,48 @@ def delete_file():
         if in_trash(p):                      # deja dans la corbeille : suppression definitive
             if p.is_dir(): shutil.rmtree(p)
             else: p.unlink()
+            notify_changed(p)
             return jsonify({"ok": True, "trashed": False})
         dest = to_trash(p)
+        notify_changed(p)
         incidents = hooks.emit("note_deleted", path=str(p), origin="editeur")
         return jsonify({"ok": True, "trashed": True, "trash_path": str(dest), "hooks": incidents})
     except Exception as e: return jsonify({"error": str(e)}), 500
 
+def _scope_arg():
+    """Parametre dir : None pour tout le vault, sinon un sous-dossier du vault."""
+    raw = request.args.get("dir")
+    scoped = scoped_dir(raw)
+    return None if scoped == str(vault_root()) else scoped
+
+
 @bp.route("/api/files/graph", methods=["GET"])
 def files_graph():
-    dir_p = scoped_dir(request.args.get("dir"))
-    files = sorted(iter_md(dir_p))
-    vault_paths = {str(f) for f in files}
-    degree = {str(f): 0 for f in files}
-    edges, seen = [], set()
-    for f in files:
-        try:
-            content = f.read_text(encoding="utf-8")
-            for ref in extract_link_refs(content):
-                target = resolve_ref(ref, str(f), vault_paths)
-                if target and target != str(f):
-                    key = tuple(sorted([str(f), target]))
-                    if key not in seen:
-                        seen.add(key); edges.append({"source": str(f), "target": target})
-                    degree[str(f)]   = degree.get(str(f),   0) + 1
-                    degree[target]   = degree.get(target,   0) + 1
-        except: pass
-    nodes = [{"id": str(f), "name": f.stem, "path": str(f),
-              "degree": degree.get(str(f), 0),
-              "rel": str(f.relative_to(dir_p)) if str(f).startswith(dir_p) else f.name}
-             for f in files]
-    return jsonify({"nodes": nodes, "links": edges})
+    scope = _scope_arg()
+    return jsonify(query.graph(fresh_index(), scope))
+
 
 @bp.route("/api/files/backlinks", methods=["GET"])
 def backlinks():
     file_path = request.args.get("path", "")
-    dir_p     = scoped_dir(request.args.get("dir"))
-    if not file_path: return jsonify({"backlinks": []})
-    try:
-        target_resolved = str(Path(file_path).resolve())
-    except Exception:
-        target_resolved = file_path
+    scope = _scope_arg()
+    if not file_path:
+        return jsonify({"backlinks": []})
+    target = str(safe_path(file_path))
+    return jsonify({"backlinks": query.backlinks(fresh_index(), target, scope)})
 
-    vault_paths = {str(f) for f in iter_md(dir_p)}
-    results = []
-    for f in sorted(iter_md(dir_p)):
-        if str(f) == file_path: continue
-        try:
-            content = f.read_text(encoding="utf-8")
-            refs = extract_link_refs(content)
-            matched = None
-            for ref in refs:
-                resolved = resolve_ref(ref, str(f), vault_paths)
-                if not resolved: continue
-                try: resolved_norm = str(Path(resolved).resolve())
-                except: resolved_norm = resolved
-                if resolved_norm == target_resolved:
-                    matched = ref; break
-            if matched:
-                # Cherche une ligne contenant la référence pour le contexte
-                ctx = ""
-                ml = matched.lower()
-                for l in content.split("\n"):
-                    if ml in l.lower():
-                        ctx = l.strip()[:150]; break
-                results.append({"path": str(f), "name": f.name, "ctx": ctx, "ref": matched})
-        except: pass
-    return jsonify({"backlinks": results})
 
 @bp.route("/api/files/find", methods=["GET"])
 def find_file():
-    """Trouve un .md à partir d'une référence brute, avec résolution intelligente."""
-    ref      = request.args.get("name", "").strip()
-    src      = request.args.get("from", "").strip()
-    dir_p    = scoped_dir(request.args.get("dir"))
-    if not ref: return jsonify({"error": "Référence vide"}), 400
-    if src: src = str(safe_path(src))
-    try:
-        vault_paths = {str(f) for f in iter_md(dir_p)}
-        # 1. Si source connue, résoudre depuis là
-        if src:
-            resolved = resolve_ref(ref, src, vault_paths)
-            if resolved:
-                return jsonify({"path": resolved, "content": Path(resolved).read_text(encoding="utf-8")})
-        # 2. Sinon, tenter une résolution sans contexte source
-        resolved = resolve_ref(ref, "", vault_paths)
-        if resolved:
-            return jsonify({"path": resolved, "content": Path(resolved).read_text(encoding="utf-8")})
+    """Trouve un .md a partir d'une reference brute, avec la meme resolution que l'index."""
+    ref = request.args.get("name", "").strip()
+    src = request.args.get("from", "").strip()
+    if not ref:
+        return jsonify({"error": "Référence vide"}), 400
+    if src:
+        src = str(safe_path(src))
+    idx = fresh_index()
+    resolved = LinkResolver(query.all_paths(idx)).resolve(ref, src or None)
+    if not resolved or not Path(resolved).is_file():
         return jsonify({"error": "Fichier introuvable : " + ref}), 404
-    except Exception as e: return jsonify({"error": str(e)}), 500
+    return jsonify({"path": resolved, "content": Path(resolved).read_text(encoding="utf-8", errors="replace")})

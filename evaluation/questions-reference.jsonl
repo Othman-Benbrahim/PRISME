@@ -1,0 +1,10 @@
+{"id": "q1", "question": "score de Brier", "attendu": "Superprévision.md", "raison": "terme cité dans le corps et dans le journal"}
+{"id": "q2", "question": "brier", "attendu": "Superprévision.md", "raison": "recherche par préfixe partiel"}
+{"id": "q3", "question": "bayesienne", "attendu": "Superprévision.md", "raison": "insensible aux accents (bayésienne)"}
+{"id": "q4", "question": "prevision probabilite", "attendu": "Superprévision.md", "raison": "deux mots sans accents, dans des segments différents du même fichier"}
+{"id": "q5", "question": "signal faible régime", "attendu": "Signaux faibles.md", "raison": "mots dispersés dans un même segment"}
+{"id": "q6", "question": "cartographie acteurs", "attendu": "references/OSINT.md", "raison": "titre de section, fichier dans un sous-dossier"}
+{"id": "q7", "question": "motif récurrent", "attendu": "Écriture fractale.md", "raison": "titre de section pondéré"}
+{"id": "q8", "question": "paillage tomates", "attendu": "Jardinage.md", "raison": "vocabulaire sans rapport avec le reste du vault"}
+{"id": "q9", "question": "journal mars", "attendu": "Journal 2026-03-12.md", "raison": "nom de fichier et titre"}
+{"id": "q10", "question": "ecriture", "attendu": "Écriture fractale.md", "raison": "nom de fichier accentué, requête sans accent"}

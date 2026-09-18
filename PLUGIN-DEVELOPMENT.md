@@ -107,6 +107,7 @@ session, ajouté automatiquement par la page.
 | `ctx.vault_root()` | Racine du vault |
 | `ctx.safe_path(chemin)` | Résout un chemin et lève `PermissionError` s'il sort du vault |
 | `ctx.iter_notes(dossier=None)` | Parcourt les `.md` du vault |
+| `ctx.search(texte, limit=20)` | Recherche plein texte dans l'index ; les termes trouvés sont encadrés par `\x01` et `\x02` |
 | `ctx.read_note(chemin)` | Lit une note du vault |
 | `ctx.write_note(chemin, contenu)` | Écrit une note, avec instantané de l'ancienne version ; déclenche `note_saved` ou `note_created` |
 | `ctx.data_dir()` | Dossier privé du plugin : `~/.prisme/plugins/<id>/` |

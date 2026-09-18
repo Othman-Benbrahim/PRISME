@@ -1,6 +1,6 @@
 # 0011 · Double granularité
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : appliquée en E2
 - **Écrite** : 2026-09-16
 
 **Retenu.** Une table par fichier (tags, liens, graphe) et une table par segment (recherche).
