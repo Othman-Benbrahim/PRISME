@@ -1,3 +1,8 @@
+> **PRISME :** le [guide utilisateur actuel](../../guides-plugins/osint-cx.md)
+> décrit les écrans, la configuration et les seuils du code actuel. Les sections
+> Second Brain ci-dessous sont conservées comme historique et ne constituent plus
+> le parcours d’installation ou d’utilisation de PRISME.
+
 # OSINT Cross-Reference — Plugin Second Brain
 
 Plugin OSINT défensif pour **Second Brain** permettant de regrouper plusieurs recherches publiques ou configurées autour d’un identifiant : pseudo, email, téléphone, IP, domaine, entreprise, profil social ou URL LinkedIn.

@@ -28,7 +28,8 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type. **Ne contient PAS le calcul de calibration** | Fusionnée (PR #18) |
 | — | `plugin-calibration` | Calibration en plugin, copies de référence et horloge du monde | Implémenté — PR #19 |
 | — | `plugin-constat-integre` | Constat dans PRISME : dossiers, ACH et propositions de prédiction | Implémenté — PR #20 |
-| E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
+| — | `docs-guides-plugins` | Guides Markdown des neuf plugins dans un dossier séparé | Étape préalable à E9 |
+| E9 | `e9-publication` | Application Windows `.exe`, plugins externes et guides réunis dans une archive de release | À faire après les guides |
 
 ### La chaîne Prédiction — ne pas fusionner les trois pièces
 
@@ -42,9 +43,14 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
    dossiers et ACH dans un plugin PRISME, sans extension ni clé d’agent.
    L’auteur formule le pari ; la file PRISME attend sa validation.
 
-E9 reste en attente des précisions de l'auteur.
+**Périmètre confirmé par l'auteur** : les guides des plugins précèdent E9. E9
+porte uniquement sur la distribution Windows et sa release : `PRISME.exe`, un
+dossier `plugins/` externe et le dossier `guides-plugins/`. Sans le dossier de
+plugins, le cœur doit fonctionner seul. Les dépendances nécessaires doivent être
+livrées et vérifiées ; les plugins ne sont pas compilés dans le cœur.
+Voir [0036](decisions/0036-guides-plugins-et-perimetre-e9.md).
 
-L'ordre est **E12 → E13 → E10 → E11 → E9**. E12 passe devant parce qu'elle touche `safe_path`,
+L'ordre est **E12 → E13 → E10 → E11 → guides des plugins → E9**. E12 passe devant parce qu'elle touche `safe_path`,
 la fonction la plus sensible du projet : plus elle arrive tard, plus il y a de code à
 revérifier contre elle. La place de E9 est fixée par [la décision 0027](decisions/0027-ordre-des-etapes-restantes.md) :
 la publication vient en dernier parce qu'elle sert des utilisateurs qui n'existent pas encore,

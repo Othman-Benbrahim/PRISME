@@ -39,3 +39,4 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0029 | [Recherche en arbre](0029-recherche-en-arbre.md) | acceptée, à appliquer (E13) |
 | 0033 | [Types d’objets et contrat des prédictions](0033-types-objets.md) | implémentée en E11, en revue |
 | 0034 | [Copies de référence de calibration](0034-copies-calibration.md) | implémentée, en revue |
+| 0036 | [Guides des plugins et périmètre E9](0036-guides-plugins-et-perimetre-e9.md) | acceptée ; guides livrés avant E9 |

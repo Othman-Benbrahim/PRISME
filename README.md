@@ -23,6 +23,12 @@ python prisme.py
 Le navigateur s'ouvre sur `http://localhost:5000`. Les tests se lancent avec
 `python -m unittest discover -s tests -v`.
 
+## Guides des plugins
+
+Le dossier [`guides-plugins/`](guides-plugins/README.md) contient un guide pratique
+par plugin : prise en main, réglages, exemples, résultats et dépannage.
+Commencez par son sommaire pour choisir le bon outil.
+
 ## Documents de référence
 
 - [`docs/decisions/`](docs/decisions/README.md) : les choix d'architecture et leurs raisons, une fiche par décision.
@@ -47,6 +53,6 @@ Voir `LICENSE`. Le code dérive de Second Brain V1, du même auteur.
 
 Le bouton **Constat** ouvre les dossiers d’analyse dans PRISME : notes et documents,
 relevé déterministe, ACH et validations par étapes. Aucune extension ni clé d’agent
-requise. [Mode d’emploi](plugins/constat/README.md) et
+requise. [Guide utilisateur](guides-plugins/constat.md) et
 [parcours de vérification](docs/branches/plugin-constat-integre.md).
 La calibration reste un plugin séparé ; E11 ne calcule aucun score.
