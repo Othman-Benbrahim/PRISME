@@ -1,0 +1,19 @@
+{
+  "id": "embeddings-locaux",
+  "name": "Embeddings locaux (ONNX)",
+  "version": "1.0.0",
+  "api_version": 1,
+  "description": "Recherche sémantique entièrement locale : un modèle e5 quantifié exécuté par ONNX Runtime. Rien ne sort de votre machine — ni vos notes, ni vos recherches.",
+  "author": "PRISME",
+  "permissions": [
+    "network"
+  ],
+  "buttons": [
+    {
+      "panel": "toolbar",
+      "label": "🧠 Embeddings",
+      "title": "Modèle local pour la recherche sémantique",
+      "onclick": "emblocOuvrir()"
+    }
+  ]
+}

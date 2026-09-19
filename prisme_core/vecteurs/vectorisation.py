@@ -88,7 +88,7 @@ def vectoriser(index=None, cfg=None, par_lot=64):
 
         for debut in range(0, len(a_faire), par_lot):
             lot = a_faire[debut:debut + par_lot]
-            vecteurs = fournisseur.vectoriser([t for _s, t in lot])
+            vecteurs = fournisseur.vectoriser_role([t for _s, t in lot], role="passage")
             magasin.enregistrer(list(zip([s for s, _t in lot], vecteurs)))
             ETAT["faits"] = min(debut + par_lot, len(a_faire))
         return {"ok": True, "vectorises": len(a_faire), "oublies": oublies,

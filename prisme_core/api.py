@@ -26,10 +26,13 @@ from .markdown import extract_link_refs, extract_tags, resolve_ref   # reexporte
 from .paths import DATA_DIR, LEGACY_DATA_DIR
 from .providers import _ai_call, needs_key
 from .vault import iter_md, safe_path, snapshot, vault_root
+from .vecteurs.contrat import Fournisseur as EmbeddingProvider          # reexporte
+from .vecteurs.contrat import VecteurIndisponible as EmbeddingUnavailable
 
 __all__ = [
     "API_VERSION", "EVENTS", "PERMISSIONS", "PluginContext", "PluginPermissionError",
     "extract_link_refs", "extract_tags", "resolve_ref",
+    "EmbeddingProvider", "EmbeddingUnavailable",
 ]
 
 API_VERSION = 1
@@ -205,6 +208,31 @@ class PluginContext:
         if name not in self._declared_secrets:
             raise PluginPermissionError(f"{self.id} : secret non declare dans le manifest : {name}")
         return secrets.plugin_secret(self.id, name) or os.getenv(name, "").strip() or default
+
+    # ── Embeddings ────────────────────────────────────────────────────
+    def register_embeddings(self, classe):
+        """Declare un fournisseur d'embeddings (docs/decisions/0019).
+
+        `classe` herite de EmbeddingProvider et recoit la configuration dans son
+        __init__. C'est la porte prevue pour un modele local : le coeur ne peut pas
+        embarquer une bibliotheque compilee, un plugin le peut.
+
+            class Local(ctx.EmbeddingProvider):
+                nom = "onnx"
+                distant = False
+            ctx.register_embeddings(Local)
+
+        Le nom apparait alors dans Parametres > Recherche semantique.
+        """
+        from .vecteurs.contrat import enregistrer
+        if not getattr(classe, "nom", ""):
+            raise ValueError(f"{self.id} : un fournisseur d'embeddings doit porter un nom")
+        enregistrer(classe)
+        self.log(f"fournisseur d'embeddings : {classe.nom}")
+        return classe
+
+    EmbeddingProvider = EmbeddingProvider
+    EmbeddingUnavailable = EmbeddingUnavailable
 
     # ── Hooks ─────────────────────────────────────────────────────────
     def on(self, event):

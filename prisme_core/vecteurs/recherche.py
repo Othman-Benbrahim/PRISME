@@ -31,7 +31,8 @@ def vecteur_de_requete(texte, cfg=None):
     fournisseur = fournisseur_configure(cfg)
     if fournisseur is None:
         raise VecteurIndisponible("Recherche sémantique désactivée")
-    vecteurs = fournisseur.vectoriser([texte])
+    # role « requete » : e5 et consorts encodent une question autrement qu un passage
+    vecteurs = fournisseur.vectoriser_role([texte], role="requete")
     return quant.normaliser(vecteurs[0]), fournisseur
 
 

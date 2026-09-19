@@ -1,0 +1,16 @@
+/* ── Embeddings locaux ── */
+.embloc-bloc{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);
+  padding:11px 13px;margin-top:10px}
+.embloc-bloc h4{font-size:12px;margin:0 0 8px;color:var(--tx)}
+.embloc-ligne{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.embloc-ligne input[type=text],.embloc-ligne input[type=number],.embloc-ligne select{
+  flex:1;min-width:150px;padding:6px 9px;font-size:12px;background:var(--bg);
+  border:1px solid var(--bdr);border-radius:6px;color:var(--tx);font-family:var(--font);outline:none}
+.embloc-ligne .btn{width:auto;padding:6px 12px;font-size:11.5px}
+.embloc-note{font-size:11px;color:var(--tx2);line-height:1.5;margin-top:6px}
+.embloc-etat{font-size:11.5px;line-height:1.5;padding:6px 9px;border-radius:6px;
+  border:1px solid var(--bdr);margin-top:6px}
+.embloc-etat.ok{color:var(--grn);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.06)}
+.embloc-etat.ko{color:var(--yel);border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.06)}
+.embloc-etat.neutre{color:var(--tx2);background:var(--bg)}
+.embloc-etat code{font-family:var(--mono);font-size:10.5px;color:var(--tx3);word-break:break-all}

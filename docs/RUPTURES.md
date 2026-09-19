@@ -5,6 +5,21 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## Plugin « Embeddings locaux » (ONNX)
+
+Étape additive : sans le plugin, ni ses bibliothèques, rien ne change.
+
+| Nouveauté | Détail |
+|---|---|
+| Plugin livré | `plugins/embeddings-locaux` — septième plugin du dépôt, dépendances `onnxruntime` et `tokenizers` **du plugin seul** |
+| API des plugins | `ctx.register_embeddings(classe)`, `ctx.EmbeddingProvider`, `ctx.EmbeddingUnavailable` ; `EmbeddingProvider` et `EmbeddingUnavailable` exportés par `prisme_core.api` |
+| Contrat des fournisseurs | `Fournisseur.prefixe(role)` et `vectoriser_role(textes, role)` : le cœur distingue désormais une requête d'un passage, ce que la famille e5 exige |
+| Routes du plugin | `/api/plugins/embeddings-locaux/etat`, `/reglages`, `/installer`, `/epingler`, `/essai` |
+| Interface | Bouton 🧠 Embeddings |
+
+`vectoriser(textes)` reste le seul point à implémenter : un fournisseur qui n'a pas
+besoin de rôles n'a rien à changer.
+
 ## E7 — Recherche sémantique
 
 Étape additive : sans fournisseur configuré, la recherche se comporte exactement comme avant.

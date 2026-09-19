@@ -1,0 +1,56 @@
+<div id="membloc" class="ov"><div class="mb" style="width:720px;max-height:90vh;overflow-y:auto">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="mt" style="flex:1">🧠 Embeddings locaux</div>
+    <button class="hbtn" onclick="emblocFermer()">✕</button>
+  </div>
+  <div class="minfo">Recherche sémantique entièrement locale. Le modèle tourne sur votre
+    processeur : ni vos notes, ni vos recherches ne quittent la machine.</div>
+
+  <div id="embloc-deps" class="embloc-etat"></div>
+
+  <div class="embloc-bloc">
+    <h4>Modèle</h4>
+    <div id="embloc-modele" class="embloc-etat"></div>
+    <div class="embloc-ligne">
+      <input id="embloc-dossier" type="text" placeholder="dossier contenant model.onnx et tokenizer.json">
+      <button class="btn bs" onclick="emblocEnregistrer()">Utiliser ce dossier</button>
+    </div>
+    <div class="embloc-note">La voie la plus sûre : téléchargez le modèle vous-même,
+      depuis la source de votre choix, et indiquez ici son dossier.</div>
+  </div>
+
+  <div class="embloc-bloc">
+    <h4>Ou télécharger un modèle connu</h4>
+    <div class="embloc-ligne">
+      <select id="embloc-catalogue"></select>
+      <button class="btn bp" id="embloc-installer" onclick="emblocInstaller()">Télécharger</button>
+    </div>
+    <div id="embloc-progres" class="embloc-etat" style="display:none"></div>
+    <div class="embloc-note">⚠ PRISME ne vérifie pas ces adresses : ce sont des dépôts publics
+      qui peuvent changer. Après installation, « Épingler l'empreinte » fige le fichier obtenu :
+      tout écart sera refusé lors d'un prochain téléchargement.</div>
+    <div class="embloc-ligne">
+      <button class="btn bs" onclick="emblocEpingler()">🔒 Épingler l'empreinte</button>
+      <button class="btn bs" onclick="emblocEssai()">Essayer le modèle</button>
+    </div>
+    <div id="embloc-essai" class="embloc-etat" style="display:none"></div>
+  </div>
+
+  <div class="embloc-bloc">
+    <h4>Réglages</h4>
+    <div class="embloc-ligne">
+      <label style="display:flex;align-items:center;gap:6px;font-size:11.5px">
+        <input type="checkbox" id="embloc-prefixes" style="width:auto;margin:0" onchange="emblocEnregistrer()">
+        Préfixes e5 (« query: » / « passage: »)
+      </label>
+      <input id="embloc-fils" type="number" min="0" max="32" placeholder="fils (0 = auto)" style="flex:0 0 130px">
+      <button class="btn bs" onclick="emblocEnregistrer()">Appliquer</button>
+    </div>
+    <div class="embloc-note">Les préfixes sont indispensables aux modèles e5 : sans eux, tout
+      fonctionne et la qualité s'effondre, sans que rien ne le signale. Décochez-les seulement
+      pour un modèle qui n'en veut pas.</div>
+  </div>
+
+  <div class="minfo">Une fois le modèle en place : Paramètres → Recherche sémantique →
+    fournisseur <strong>onnx</strong>, puis « Vectoriser le vault ».</div>
+</div></div>

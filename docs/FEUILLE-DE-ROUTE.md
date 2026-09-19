@@ -16,7 +16,8 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E5 | `e5-objets` | File de validation, entrée directe des imports en masse, objet Source | Fait |
 | E6 | `e6-api-agents` | API HTTP locale à clés, droits par clé, journal | Fait |
 | — | `sources-ia-note` | Bouton « Sources IA » : analyse de la note ouverte seule | Fait |
-| E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, fusion RRF, plancher de pertinence | En revue |
+| E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, fusion RRF, plancher de pertinence | Fait |
+| — | `plugin-embeddings-locaux` | Plugin ONNX : modèle e5 local, rien ne sort de la machine | En revue |
 | E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | À faire |
 | E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | À faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
@@ -41,5 +42,4 @@ décidé, ou explicitement en attente.
 | Modèle de décision hébergé (type Jev) | Examiné, écarté : cloud obligatoire, poids fermés, calibration annoncée moindre hors anglais. Les principes sont reproductibles sans dépendance payante. |
 | Verrouillage réparti, écritures concurrentes | Assumé : le dernier qui écrit gagne, `.trash/versions/` sert de filet (0024). |
 | Chiffrement des secrets hors Windows | DPAPI est Windows seul (0023). À traiter en E9 si la publication vise macOS et Linux. |
-| Plugin ONNX local | La porte est ouverte en E7 (`vecteurs.enregistrer`) ; le plugin reste à écrire. |
-| Épreuve du réel : vault de l'auteur, build PyInstaller | Jamais faits. À planifier avant E9. |
+| Épreuve du réel : vault de l'auteur, build PyInstaller | Jamais faits. Le plugin ONNX rend la question du `--onefile` avec bibliothèque compilée plus pressante. À planifier avant E9. |

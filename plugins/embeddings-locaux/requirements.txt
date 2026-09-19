@@ -1,0 +1,7 @@
+# Dependances de CE PLUGIN uniquement. Le coeur de PRISME n'en depend pas :
+# sans elles, le plugin se charge et se declare simplement indisponible.
+#
+#     pip install -r plugins/embeddings-locaux/requirements.txt
+#
+onnxruntime>=1.17
+tokenizers>=0.15
