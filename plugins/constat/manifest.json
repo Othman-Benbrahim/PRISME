@@ -1,0 +1,19 @@
+{
+  "id": "constat",
+  "name": "Constat — dossiers et analyse",
+  "version": "1.0.0",
+  "api_version": 1,
+  "description": "Dossiers, relevés et analyse ACH dans PRISME. Aucune extension nécessaire.",
+  "permissions": [
+    "vault_write",
+    "network"
+  ],
+  "buttons": [
+    {
+      "panel": "toolbar",
+      "label": "Constat",
+      "onclick": "constatOuvrir()",
+      "title": "Ouvrir les dossiers d’analyse"
+    }
+  ]
+}

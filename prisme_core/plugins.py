@@ -17,6 +17,7 @@ import threading
 import time
 import traceback
 import types
+from pathlib import Path
 
 from flask import Blueprint, abort, jsonify, send_from_directory
 
@@ -160,6 +161,14 @@ def load_one(directory):
     """Inscrit un dossier de plugin et le charge s'il est actif. Renvoie le Plugin ou None."""
     if not directory.is_dir() or directory.name.startswith((".", "_")):
         return None
+    # Git et les livraisons annulées peuvent laisser des répertoires vides
+    # ou des caches Python. Ils ne constituent pas une installation de plugin.
+    # En revanche, du code sans manifeste doit rester signalé comme incompatible.
+    if not (directory / "manifest.json").exists() and not any(
+        p.is_file() and "__pycache__" not in p.relative_to(directory).parts
+        for p in directory.rglob("*")
+    ):
+        return None
     manifest, err = read_manifest(directory)
     plugin = Plugin(directory, manifest or {})
     with _LOCK:
@@ -240,10 +249,13 @@ def dispatch(pid, sub):
     return plugin.ctx._dispatch(sub)
 
 
-@bp.route("/plugins/<pid>/<asset>")
+@bp.route("/plugins/<pid>/<path:asset>")
 def plugin_asset(pid, asset):
-    """Sert ui.css / ui.js d'un plugin ACTIF uniquement."""
-    if asset not in ("ui.css", "ui.js") or not is_active(pid):
+    """Sert les ressources UI autorisées d’un plugin actif, jamais ses sources Python."""
+    web = asset.startswith("web/") and Path(asset).suffix in (".js", ".css", ".html", ".md")
+    if any(part.startswith(".") for part in asset.split("/")):
+        abort(404)
+    if (asset not in ("ui.css", "ui.js") and not web) or not is_active(pid):
         abort(404)
     response = send_from_directory(REGISTRY[pid].dir, asset)
     response.headers["Cache-Control"] = "no-cache"

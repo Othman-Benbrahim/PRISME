@@ -61,3 +61,26 @@ def supprimer():
         return jsonify(registre.supprimer(d.get("cle", ""), d.get("raison", "")))
     except ObjetInvalide as e:
         return jsonify(error=str(e)), 400
+
+
+@bp.route(PREFIX + "/proposer", methods=["POST"])
+def proposer_interface():
+    """Proposition depuis une interface locale : jamais une acceptation implicite."""
+    import hashlib
+    from ..vault import vault_root
+    d = request.get_json(silent=True)
+    if not isinstance(d, dict):
+        return jsonify(error="Objet JSON attendu"), 400
+    espace = hashlib.sha256(str(vault_root()).encode("utf-8")).hexdigest()
+    if request.headers.get("X-Constat-Espace") != espace:
+        return jsonify(error="Le vault a changé. Rechargez l’interface."), 409
+    try:
+        if d.get("type") != "prediction":
+            raise ObjetInvalide("Prédiction attendue")
+        entree = registre.proposer("prediction", d.get("titre", ""), d.get("champs", {}),
+                                   origine="constat:interface", motif=d.get("motif", ""))
+        if entree is None:
+            return jsonify(error="Proposition déjà en file, rejet mémorisé ou plafond atteint"), 409
+        return jsonify(acceptee=True, entree=entree), 201
+    except ObjetInvalide as e:
+        return jsonify(error=str(e)), 400

@@ -42,3 +42,11 @@ Le navigateur s'ouvre sur `http://localhost:5000`. Les tests se lancent avec
 ## Licence
 
 Voir `LICENSE`. Le code dérive de Second Brain V1, du même auteur.
+
+## Constat intégré
+
+Le bouton **Constat** ouvre les dossiers d’analyse dans PRISME : notes et documents,
+relevé déterministe, ACH et validations par étapes. Aucune extension ni clé d’agent
+requise. [Mode d’emploi](plugins/constat/README.md) et
+[parcours de vérification](docs/branches/plugin-constat-integre.md).
+La calibration reste un plugin séparé ; E11 ne calcule aucun score.

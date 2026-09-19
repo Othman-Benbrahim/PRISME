@@ -1,7 +1,10 @@
 # 0031 · Constat verse des hypothèses, PRISME score les prédictions
 
-- **Statut** : acceptée, à appliquer (après E11)
+- **Statut** : partage des métiers conservé ; interface remplacée par [0035](0035-constat-integre.md)
 - **Écrite** : 2026-09-19
+
+> Mise à jour : l’auteur demande Constat **dans PRISME**, sans add-on requis.
+> Le bouton d’extension décrit ci-dessous est historique ; le plugin intégré le remplace.
 
 ## Problème
 
