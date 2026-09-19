@@ -14,11 +14,13 @@ function closeObjets(){ $('mobjets').classList.remove('on'); OBJ.fusion = null; 
 
 function objOnglet(i){
   OBJ.onglet = i;
-  for(var k = 0; k < 3; k++){
+  for(var k = 0; k < 5; k++){
     $('obt' + k).classList.toggle('on', k === i);
     $('obp' + k).style.display = k === i ? '' : 'none';
   }
   if(i === 0) objCharger();
+  else if(i === 3) typCharger();
+  else if(i === 4) typReglages();
   else objChargerFile();
 }
 
@@ -75,7 +77,7 @@ async function objBalayer(){
   if(d.error){ $('obj-rapport').innerHTML = '<div class="eng-err">⚠ ' + esc(d.error) + '</div>'; return; }
   $('obj-rapport').innerHTML = '<div class="eng-ok">✓ ' + d.notes_lues + ' note(s) lue(s) · '
     + d.references + ' référence(s) · ' + (d.crees || []).length + ' objet(s) créé(s), '
-    + (d.completes || []).length + ' complété(s)'
+    + (d.completes || []).length + ' complété(s) · ' + (d.deposees || []).length + ' en file'
     + ((d.ignores || []).length ? ' · ' + d.ignores.length + ' ignoré(s) (rejet mémorisé)' : '')
     + '</div><div class="pv-muted">Lot ' + esc(d.lot) + ' — annulable tant que rien n\'est relu.</div>';
   objCharger();
@@ -176,7 +178,8 @@ async function objChargerFile(){
       + 'proposition revienne, et sa raison est relue par l\'IA avant d\'en faire d\'autres.</div>';
 }
 
-function objCarteFile(e){
+function objCarteFile(e, index){
+  if(e.type && e.type !== "source") return typCarteFile(e, index);
   var id = 'f-' + btoa(unescape(encodeURIComponent(e.cle))).replace(/[^A-Za-z0-9]/g, '');
   return '<div class="obj-c file">'
     + '<div class="obj-h"><strong>' + esc(e.titre) + '</strong>'

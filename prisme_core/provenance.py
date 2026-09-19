@@ -25,7 +25,7 @@ ETATS = ("date", "inconnue", "ouverte")
 # Champs geres. Les champs "reserves" ne sont ecrits que si on les fournit.
 CHAMPS = {
     "prisme_id": "identifiant stable de la note",
-    "prisme_type": "note | synthese | import | source | reponse",
+    "prisme_type": "note | synthese | import | source | reponse | decision | hypothese | prediction | entite | tache",
     "prisme_enregistre_le": "date d'entree dans PRISME",
     "prisme_invalide_le": "date de retrait (vide tant que la note est valable)",
     "prisme_outil": "ce qui a produit la note (plugin, action de l'editeur)",
@@ -150,7 +150,8 @@ MODIFIABLES = ("prisme_type", "prisme_outil", "prisme_genere_par", "prisme_prese
                "prisme_enregistre_le", "prisme_invalide_le", "prisme_publie_le",
                "prisme_parent", "prisme_valide_du", "prisme_valide_au",
                "prisme_valide_du_etat", "prisme_valide_au_etat")
-TYPES = ("note", "source", "synthese", "reponse", "import")
+TYPES = ("note", "source", "synthese", "reponse", "import",
+         "decision", "hypothese", "prediction", "entite", "tache")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?)?$")
 
 

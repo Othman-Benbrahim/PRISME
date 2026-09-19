@@ -16,7 +16,8 @@ from ..agents.garde import exige
 from ..agents import cles as trousseau
 from ..index import fresh_index, notify_changed
 from ..index import search as query
-from ..objets import detection, sources
+from ..objets import detection, sources, registre
+from ..objets.sources import ObjetInvalide
 from ..objets import file as filedattente
 from ..vault import iter_md, safe_path, snapshot, vault_root
 
@@ -49,8 +50,9 @@ def ping():
             "GET /api/v1/recherche?q=": "chercher dans le vault (lecture)",
             "GET /api/v1/arbre?q=": "chercher en suivant les liens : carte des relations "
                                     "et notes retenues, sans appeler de modèle (lecture)",
-            "GET /api/v1/objets": "lister les objets Source (lecture)",
-            "POST /api/v1/proposer": "déposer une référence dans la file de validation (proposition)",
+            "GET /api/v1/types": "contrat des types et champs (lecture)",
+            "GET /api/v1/objets": "lister les objets typés et les Sources (lecture)",
+            "POST /api/v1/proposer": "déposer un objet dans la file de validation (proposition)",
             "POST /api/v1/note": "écrire une note (ecriture, accordé au cas par cas)",
         },
     })
@@ -147,7 +149,20 @@ def arbre():
 @bp.route(PREFIX + "/objets", methods=["GET"])
 @exige("lecture")
 def objets():
-    return jsonify({"sources": sources.lister(statut=request.args.get("statut") or None)})
+    type_objet = request.args.get("type") or None
+    try:
+        return jsonify({"sources": sources.lister(statut=request.args.get("statut") or None)
+                        if type_objet in (None, "source") else [],
+                        "objets": registre.lister(type_objet) if type_objet != "source" else []})
+    except ObjetInvalide as e:
+        return jsonify(error=str(e)), 400
+
+
+@bp.route(PREFIX + "/types", methods=["GET"])
+@exige("lecture")
+def types_objets():
+    from .types_objets import catalogue
+    return jsonify(catalogue())
 
 
 # ── Proposition ─────────────────────────────────────────────────────────
@@ -161,6 +176,19 @@ def proposer():
     ne bénéficie jamais de l'entrée directe.
     """
     d = request.get_json(silent=True) or {}
+    if not isinstance(d, dict):
+        return jsonify(error="Objet JSON attendu"), 400
+    if d.get("type", "source") != "source":
+        try:
+            entree = registre.proposer(d.get("type"), d.get("titre", ""), d.get("champs", {}),
+                origine=trousseau.origine(g.agent["id"], {"nom": g.agent["nom"]}),
+                note=d.get("note", ""), indice=d.get("indice", ""), motif=d.get("motif", ""))
+        except ObjetInvalide as e:
+            return jsonify(error=str(e)), 400
+        if entree is None:
+            return jsonify(acceptee=False, raison="Déjà en file, rejetée ou plafond atteint"), 409
+        return jsonify(acceptee=True, entree=entree,
+                       message="En attente de validation de l'auteur"), 201
     titre = str(d.get("titre") or "").strip()
     if not titre:
         return jsonify({"error": "Titre requis"}), 400

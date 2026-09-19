@@ -164,12 +164,13 @@ class Protocole(McpBase):
         self.assertIn("tools", r["result"])
         self.assertEqual(r["id"], s.n)
 
-    def test_les_huit_outils_sont_annonces(self):
+    def test_les_outils_sont_annonces(self):
         r = self.session().demander("tools/list")
         noms = [t["name"] for t in r["result"]["tools"]]
         self.assertEqual(sorted(noms), sorted([
             "prisme_notes", "prisme_lire", "prisme_chercher", "prisme_arbre",
-            "prisme_sources", "prisme_proposer", "prisme_ma_file", "prisme_ecrire"]))
+            "prisme_sources", "prisme_proposer", "prisme_ma_file", "prisme_ecrire",
+            "prisme_types", "prisme_objets"]))
 
     def test_chaque_outil_a_une_description_et_un_schema(self):
         r = self.session().demander("tools/list")
@@ -241,6 +242,24 @@ class Traduction(McpBase):
         self.assertTrue(json.loads(texte)["acceptee"])
         _r, mienne = self.session().outil("prisme_ma_file")
         self.assertIn("Superforecasting", mienne)
+
+    def test_prediction_incomplete_traverse_mcp_sans_ecriture(self):
+        res, texte = self.session().outil("prisme_proposer", {
+            "type": "prediction", "titre": "Pari MCP",
+            "champs": {"enonce": "Un événement à confirmer"}})
+        self.assertFalse(res.get("isError"), texte)
+        e = json.loads(texte)["entree"]
+        self.assertEqual(e["type"], "prediction")
+        self.assertEqual(e["champs"]["enonce"], "Un événement à confirmer")
+        self.assertFalse(list(VAULT_MCP.rglob("*Pari*")))
+
+    def test_types_et_objets_par_mcp(self):
+        res, texte = self.session().outil("prisme_types")
+        self.assertFalse(res.get("isError"), texte)
+        self.assertIn("prediction", json.loads(texte)["types"])
+        res, texte = self.session().outil("prisme_objets", {"type": "prediction"})
+        self.assertFalse(res.get("isError"), texte)
+        self.assertIn("objets", json.loads(texte))
 
     def test_caracteres_hors_latin1_traversent_le_protocole(self):
         """Les motifs de l'arbre portent `→` et `←`. Ils doivent arriver intacts.

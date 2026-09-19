@@ -36,3 +36,9 @@ mémorise le rejet avec sa raison, que l'IA relit avant de proposer à nouveau. 
 qui cite un objet non relu porte un marqueur ambre dans l'en-tête de l'éditeur.
 
 Le seuil par type reste à faire : il n'a de sens qu'avec un deuxième type d'objet.
+
+## Révision du 19 septembre 2026 — E11
+
+Voir [0033](0033-types-objets.md) : cinq types et paramètres par type implémentés,
+en revue. Aucun signal mécanique ne permet l’entrée directe des nouveaux types.
+Le gel et leur fusion réversible restent reportés ; la fusion Source reste disponible.

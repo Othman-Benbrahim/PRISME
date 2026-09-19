@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="/static/css/editeur.css">
 <link rel="stylesheet" href="/static/css/engram.css">
 <link rel="stylesheet" href="/static/css/objets.css">
+<link rel="stylesheet" href="/static/css/types-objets.css">
 <link rel="stylesheet" href="/static/css/agents.css">
 <link rel="stylesheet" href="/static/css/vecteurs.css">
 <link rel="stylesheet" href="/static/css/arbre.css">
@@ -293,13 +294,15 @@
 <!-- ── Modal Objets : sources citées, file de validation, rejets ── -->
 <div id="mobjets" class="ov"><div class="mb">
   <div style="display:flex;align-items:center;gap:10px">
-    <div class="mt" style="flex:1">🔖 Sources citées</div>
+    <div class="mt" style="flex:1">🔖 Objets du vault</div>
     <button class="hbtn" onclick="closeObjets()">✕</button>
   </div>
   <div id="obj-tabs">
     <button class="obj-tab on" id="obt0" onclick="objOnglet(0)">Objets Source</button>
     <button class="obj-tab"    id="obt1" onclick="objOnglet(1)">File de validation</button>
     <button class="obj-tab"    id="obt2" onclick="objOnglet(2)">Rejets mémorisés</button>
+    <button class="obj-tab" id="obt3" onclick="objOnglet(3)">Types d’objets</button>
+    <button class="obj-tab" id="obt4" onclick="objOnglet(4)">Entrée directe</button>
   </div>
 
   <div id="obp0">
@@ -351,6 +354,19 @@
 
   <div id="obp2" style="display:none">
     <div id="obj-rejets" style="margin-top:8px"></div>
+  </div>
+  <div id="obp3" style="display:none">
+    <p class="eng-note">Décisions, hypothèses, prédictions, entités et tâches restent des notes Markdown. L’auteur valide chaque création.</p>
+    <div class="eng-ligne">
+      <select id="typ-filtre" aria-label="Filtrer les types" onchange="typCharger()"><option value="">Tous les types</option></select>
+      <button class="btn bp" onclick="typNouveau()">Créer un objet</button>
+    </div>
+    <div id="typ-form" hidden></div>
+    <div id="typ-liste"></div>
+  </div>
+  <div id="obp4" style="display:none">
+    <p class="eng-note">Ces réglages concernent les imports mécaniques. Les propositions d’agents et de l’IA attendent toujours votre validation.</p>
+    <div id="typ-reglages"></div>
   </div>
 </div></div>
 
@@ -578,6 +594,7 @@
 <script src="/static/js/provenance.js"></script>
 <script src="/static/js/engram.js"></script>
 <script src="/static/js/objets.js"></script>
+<script src="/static/js/types-objets.js"></script>
 <script src="/static/js/agents.js"></script>
 <script src="/static/js/vecteurs.js"></script>
 <script src="/static/js/racines.js"></script>

@@ -1,9 +1,7 @@
-"""Objets conceptuels (docs/decisions/0017, 0021 et 0022).
+"""Objets conceptuels : Sources, Décisions, Hypothèses, Prédictions, Entités et Tâches.
 
-Premier et seul type implémenté : **Source**, le registre des références citées.
-Une référence repérée mécaniquement (URL, DOI, arXiv, ISBN) entre directement dans
-le vault avec le statut « non relu » ; une référence seulement déduite par l'IA part
-dans la file de validation. Rien n'entre par l'IA sans l'accord de l'auteur.
+La file de validation est commune. Voir types.py pour le contrat E11 ;
+registre.py pour les notes typées ; sources.py pour le registre bibliographique.
 """
 from . import detection
 from . import file

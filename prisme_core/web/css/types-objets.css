@@ -1,0 +1,17 @@
+/* Les nouveaux formulaires ont leur zone : core.css reste sous son plafond. */
+#obj-tabs{flex-wrap:wrap}
+.obj-tab{min-width:120px}
+#typ-form{margin:12px 0;padding:14px;border:1px solid var(--acc);border-radius:var(--r);background:var(--bg3)}
+#typ-form[hidden]{display:none}
+#typ-form form,#typ-form label,.typ-regle{display:flex;flex-direction:column;gap:7px}
+#typ-form form{gap:12px}
+#typ-form input,#typ-form select,.typ-regle input{box-sizing:border-box;width:100%;padding:7px;color:var(--tx);background:var(--bg);border:1px solid var(--bdr);border-radius:5px;font-family:var(--font)}
+#typ-form label,.typ-regle label{font-size:12px;color:var(--tx2)}
+.typ-regle{border-bottom:1px solid var(--bdr);padding:12px 0}
+.typ-regle input[type=checkbox]{width:auto;margin-right:8px}
+.typ-regle input[type=number]{width:100px;margin-left:8px}
+.typ-regle button{align-self:flex-start;width:auto}
+#typ-erreur:empty{display:none}
+#typ-liste{margin-top:12px}
+#typ-form blockquote{white-space:pre-wrap;overflow-wrap:anywhere}
+#typ-liste strong{overflow-wrap:anywhere}

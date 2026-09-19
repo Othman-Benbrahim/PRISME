@@ -180,7 +180,7 @@ OUTILS = [
     },
     {
         "name": "prisme_proposer",
-        "description": "Dépose une référence dans la file de validation de l'auteur. "
+        "description": "Dépose un objet typé ou une référence dans la file de validation de l'auteur. "
                        "RIEN n'entre dans le vault : l'auteur relit et décide. "
                        "C'est la voie normale pour un agent qui a trouvé quelque chose.",
         "inputSchema": {
@@ -188,6 +188,8 @@ OUTILS = [
             "properties": {
                 "titre": {"type": "string"},
                 "reference": {"type": "string", "description": "URL, DOI, arXiv, ISBN"},
+                "type": {"type": "string", "enum": ["source", "decision", "hypothese", "prediction", "entite", "tache"]},
+                "champs": {"type": "object", "description": "Champs du type ; voir prisme_types. Une fiche incomplète attend l'auteur."},
                 "note": {"type": "string", "description": "Note du vault concernée"},
                 "motif": {"type": "string", "description": "Pourquoi cette référence"},
             },
@@ -195,7 +197,20 @@ OUTILS = [
         },
         "appel": lambda a: appeler("POST", "/api/v1/proposer", corps={
             "titre": a.get("titre", ""), "reference": a.get("reference", ""),
+            "type": a.get("type", "source"), "champs": a.get("champs", {}),
             "note": a.get("note", ""), "motif": a.get("motif", "")}),
+    },
+    {
+        "name": "prisme_types",
+        "description": "Contrat des objets : champs requis, statuts et formats pour préparer une proposition typée.",
+        "inputSchema": {"type": "object", "properties": {}},
+        "appel": lambda a: appeler("GET", "/api/v1/types"),
+    },
+    {
+        "name": "prisme_objets",
+        "description": "Liste les décisions, hypothèses, prédictions, entités et tâches validées dans le vault.",
+        "inputSchema": {"type": "object", "properties": {"type": {"type": "string"}}},
+        "appel": lambda a: appeler("GET", "/api/v1/objets", {"type": a.get("type", "")}),
     },
     {
         "name": "prisme_ma_file",

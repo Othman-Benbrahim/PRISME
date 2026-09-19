@@ -21,7 +21,7 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E12 | `e12-racines` | Plusieurs racines de vault ; agents bornés à la principale | Fait |
 | E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | Fait |
 | E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | Fait |
-| E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | À faire |
+| E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | En revue — tests verts, vérification visuelle et Windows à faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
 
 L'ordre est **E12 → E13 → E10 → E11 → E9**. E12 passe devant parce qu'elle touche `safe_path`,
@@ -41,7 +41,7 @@ décidé, ou explicitement en attente.
 | Bouton « verser comme prédiction » dans Constat | Décidé — [0031](decisions/0031-constat-source-des-hypotheses.md). Après E11 : l'extension versera ses hypothèses ACH par `/api/v1/`, premier client extérieur de l'API des agents. |
 | Horloge du monde active | S'activera avec ce plugin — [0026](decisions/0026-horloge-du-monde-activee.md). Les champs sont réservés depuis E3, aucune migration à prévoir. |
 | Mécanisme de gel des objets | Prévu dans le modèle (0017), non implémenté. |
-| Seuil d'entrée directe par type | Sans objet tant qu'il n'y a qu'un type (0021). |
+| Seuil d'entrée directe par type | Implémenté en E11 (0033). Aucun signal automatique défini pour les cinq nouveaux types. |
 | Rejets synchronisés avec le vault | Décidé — [0024](decisions/0024-synchronisation-entre-machines.md) — reste à appliquer. |
 | Données de plugins dans le vault | À trancher plus tard (0024). |
 | Modèle de décision hébergé (type Jev) | Examiné, écarté : cloud obligatoire, poids fermés, calibration annoncée moindre hors anglais. Les principes sont reproductibles sans dépendance payante. |

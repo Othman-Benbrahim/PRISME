@@ -110,3 +110,11 @@ Les `.md` restent la source de vérité ; l'index n'est qu'un cache dérivé.
   passent en arrière-plan ; la recherche répond avec ce qui est déjà indexé.
 - **Reconstruction complète** : construite dans un fichier à part, qui remplace
   l'ancien en une seule opération, une fois qu'aucune lecture n'est en cours.
+
+## E11 — objets typés
+
+`objets/types.py` définit champs, validation et gabarits ; `registre.py` conserve
+les notes dans le vault principal ; `reglages.py` configure les seuils. La file
+existante conserve les champs et l’origine des propositions. `routes/types_objets.py`
+sert les formulaires ; `agent_api.py` et l’adaptateur MCP exposent le même contrat.
+Voir [OBJETS.md](OBJETS.md).

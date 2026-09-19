@@ -33,7 +33,7 @@ class ObjetInvalide(ValueError):
 
 # ── Emplacement et nommage ──────────────────────────────────────────────
 def dossier():
-    d = vault_root() / DOSSIER
+    d = safe_path(vault_root() / DOSSIER)
     d.mkdir(parents=True, exist_ok=True)
     return d
 
@@ -52,8 +52,9 @@ def nom_fichier(cle, genre):
 # ── Lecture ─────────────────────────────────────────────────────────────
 def _lire_note(p):
     try:
+        p = safe_path(p)
         texte = p.read_text(encoding="utf-8", errors="replace")
-    except OSError:
+    except (OSError, PermissionError):
         return None
     meta = frontmatter.parse(texte)
     if str(meta.get("prisme_type") or "") != "source":
@@ -182,6 +183,7 @@ def enregistrer(cle, genre="url", titre="", cite_par=(), lot="", relu=False,
     while p.exists():                       # collision de nom : deux clés proches
         p = dossier() / ("%s-%d.md" % (p.stem, i))
         i += 1
+    p = safe_path(p)
     p.write_text(entete + _corps(titre, cle, genre, cite_par, note_liee), encoding="utf-8")
     notify_changed(p)
     return {**_lire_note(p), "cree": True}

@@ -17,7 +17,7 @@ import time
 from ..config import rd_cfg
 from ..providers import _ai_call, needs_key
 from ..vault import vault_root
-from . import detection, file, sources
+from . import detection, file, sources, reglages
 
 MAX_NOTES_IA = 12          # au-delà, l'appel coûte cher et la file devient ingérable
 MAX_CAR_IA = 6000
@@ -75,17 +75,24 @@ def balayer(dossier=None, lot=None, limite=None):
                 entree["cite_par"].append(chemin)
 
     rejetes = file.rejets()
-    crees, completes, ignores = [], [], []
+    crees, completes, ignores, deposees = [], [], [], []
     for cle, ref in par_cle.items():
         if cle in rejetes:                    # un refus mémorisé ne revient pas tout seul
             ignores.append(cle)
+            continue
+        if not sources.par_cle(cle) and not reglages.autorise_source(cle):
+            entree = file.ajouter({**ref, "origine": "balayage", "lot": lot,
+                                   "note": ref["cite_par"][0], "cite_par": ref["cite_par"],
+                                   "motif": "Entrée directe désactivée pour les Sources"})
+            if entree:
+                deposees.append(entree)
             continue
         objet = sources.enregistrer(cle, genre=ref["genre"], titre=ref["titre"],
                                     cite_par=ref["cite_par"], lot=lot, relu=False,
                                     brut=ref["brut"])
         (crees if objet.get("cree") else completes).append(objet)
     return {"lot": lot, "notes_lues": lues, "references": len(par_cle),
-            "crees": crees, "completes": completes, "ignores": ignores,
+            "crees": crees, "completes": completes, "ignores": ignores, "deposees": deposees,
             "termine_le": time.strftime("%Y-%m-%dT%H:%M:%S")}
 
 
@@ -200,6 +207,8 @@ def accepter(cle, titre=None, reference=None, raison=""):
     entree = file.par_cle(cle)
     if not entree:
         raise sources.ObjetInvalide("Proposition inconnue : %s" % cle)
+    if entree.get("type", "source") != "source":
+        raise sources.ObjetInvalide("Utiliser la validation du type de cet objet")
     genre, finale = entree["genre"], cle
     if reference:
         verifiee = detection.cle_de(reference)
@@ -210,8 +219,8 @@ def accepter(cle, titre=None, reference=None, raison=""):
         genre = detection.references(reference)[0]["genre"]
     objet = sources.enregistrer(finale, genre=genre,
                                 titre=(titre or entree["titre"]).strip(),
-                                cite_par=[entree["note"]] if entree.get("note") else [],
-                                lot=entree.get("origine", "file"), relu=True,
+                                cite_par=entree.get("cite_par") or ([entree["note"]] if entree.get("note") else []),
+                                lot=entree.get("lot") or entree.get("origine", "file"), relu=True,
                                 brut=entree.get("brut", ""), raison=raison)
     file.retirer(cle)
     return {"objet": objet, "raison": raison}
@@ -244,7 +253,7 @@ def fusionner(cle_gardee, cle_absorbee, raison=""):
         raise sources.ObjetInvalide("Objet inconnu : %s" % cle_gardee)
     if not absorbe:
         # L'absorbée peut n'être qu'une proposition en file : on la retire aussi.
-        if file.par_cle(cle_absorbee):
+        if file.par_cle(cle_absorbee) and file.par_cle(cle_absorbee).get("type", "source") == "source":
             file.retirer(cle_absorbee)
             alias = sorted(set(garde["alias"]) | {cle_absorbee})
             provenance.ecrire(garde["chemin"], {"prisme_alias": alias})
