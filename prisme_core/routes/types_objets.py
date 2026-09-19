@@ -78,7 +78,8 @@ def proposer_interface():
         if d.get("type") != "prediction":
             raise ObjetInvalide("Prédiction attendue")
         entree = registre.proposer("prediction", d.get("titre", ""), d.get("champs", {}),
-                                   origine="constat:interface", motif=d.get("motif", ""))
+                                   origine="constat:interface", motif=d.get("motif", ""),
+                                   note=d.get("note", ""), indice=d.get("indice", ""))
         if entree is None:
             return jsonify(error="Proposition déjà en file, rejet mémorisé ou plafond atteint"), 409
         return jsonify(acceptee=True, entree=entree), 201

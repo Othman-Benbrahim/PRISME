@@ -1,4 +1,5 @@
 """Etape E7 : recherche semantique (docs/decisions/0019)."""
+import hashlib
 import random
 import unittest
 from pathlib import Path
@@ -55,9 +56,11 @@ class FournisseurFaux(Fournisseur):
                 for m in mots:
                     if m in bas:
                         v[dim] += 1.0
-            random.seed(abs(hash(bas)) % 10**6)
+            # hash() change entre processus ; un tirage local stable évite les
+            # faux rapprochements aléatoires et ne modifie pas le générateur global.
+            tirage = random.Random(hashlib.sha256(bas.encode("utf-8")).digest())
             for i in range(10, DIM):
-                v[i] = random.gauss(0, 0.05)
+                v[i] = tirage.gauss(0, 0.05)
             out.append(v)
         return out
 

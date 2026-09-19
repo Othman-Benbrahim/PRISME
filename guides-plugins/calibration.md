@@ -17,6 +17,21 @@ Accepter une proposition venant de [Constat](constat.md) ne crée pas sa copie d
 calibration. Une prédiction résolue avant inscription ne peut pas être copiée
 rétrospectivement pour obtenir un score.
 
+## Depuis Constat, avec les pièces de l'analyse
+
+Dans Constat, **Prédictions et Calibration** permet de relire et d'accepter la
+proposition, puis de confirmer sa copie sans quitter le dossier. Les deux gestes
+restent explicites. Le classement ACH ne remplit jamais la probabilité ni le
+résultat observé à votre place.
+
+Le panneau Calibration affiche aussi les **Pièces Constat** lorsqu'elles existent.
+Relisez-les avant de préparer la copie : citations exactes, sources, contradictions
+et historique accompagnent le pari dans `Objets/Calibration/`. Leur empreinte est
+vérifiée avec celle de la fiche ; un changement impose une nouvelle relecture.
+La copie reste exploitable après suppression de la note d'origine ou désactivation
+de Constat. Une ancienne prédiction sans pièces reste utilisable sans enrichissement
+inventé. Les formules et les conditions d'admissibilité des scores ne changent pas.
+
 ## Premier score : exemple fictif
 
 Faites ce test dans un vault d'essai, pour ne pas mélanger des résultats simulés

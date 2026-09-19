@@ -11,7 +11,7 @@ export async function demonstration(D,relever,_lireId,choisir){
  const brut={hypotheses:[{id:'H1',role:'dominante',enonce:'Le service Alpha sera rétabli après la maintenance',confirmerait:'Un test observe une réponse correcte',demolirait:'Un test après maintenance échoue'},
  {id:'H2',role:'dissidente',enonce:'Un incident matériel empêchera la remise en service',confirmerait:'Une pièce matérielle est déclarée défaillante',demolirait:'Le service fonctionne sans remplacement'},
  {id:'H3',role:'fractale',enonce:'La panne affecte aussi des services voisins',confirmerait:'Des tests sur des services voisins échouent',demolirait:'Tous les services voisins répondent'}],
- preuves:sources.map((s,i)=>({id:'P'+(i+1),enonce:'Observation fictive décrite dans '+s.titre,sources:[s.id]})),
+ preuves:sources.map((s,i)=>({id:'P'+(i+1),enonce:'Observation fictive décrite dans '+s.titre,sources:[s.id],passages:[{source:s.id,extrait:s.texte.split('. ')[1]+'.'}]})),
  matrice:{P1:{H1:'C',H2:'C',H3:'N'},P2:{H1:'C',H2:'N',H3:'N'},P3:{H1:'N',H2:'C',H3:'N'}}};
  const v=verifierSortie(5,brut,sources,{});await D.ajouter(id,{t:'etape',numero:5,nom:'ACH fictive — démonstration',parents:{},releveRef:releve.empreinteCorpus,
  reference:'ach-heuer.md',modele:'aucun',fournisseur:'jeu de démonstration fabriqué',brut:JSON.stringify(brut,null,2),...v,validee:false});return id;

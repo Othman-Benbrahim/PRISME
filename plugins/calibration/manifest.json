@@ -1,7 +1,19 @@
 {
-  "id": "calibration", "name": "Calibration des prédictions", "version": "1.0.0",
+  "id": "calibration",
+  "name": "Calibration des prédictions",
+  "version": "1.1.0",
   "api_version": 1,
   "description": "Copies datées des paris, Brier, log loss et calibration par domaine et horizon. Calculs locaux, sans modèle ni réseau.",
-  "author": "PRISME", "permissions": ["vault_write"],
-  "buttons": [{"panel": "toolbar", "label": "Calibration", "title": "Suivre et évaluer mes prédictions", "onclick": "calOuvrir()"}]
+  "author": "PRISME",
+  "permissions": [
+    "vault_write"
+  ],
+  "buttons": [
+    {
+      "panel": "toolbar",
+      "label": "Calibration",
+      "title": "Suivre et évaluer mes prédictions",
+      "onclick": "calOuvrir()"
+    }
+  ]
 }

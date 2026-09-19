@@ -5,7 +5,7 @@ export async function requete(route,corps){
   const r=await fetch(route.startsWith('/api/')?route:'/api/plugins/constat/'+route,{
     method:corps===undefined?'GET':'POST',headers:{'X-Prisme-Token':jeton,'X-Constat-Espace':espace,'Content-Type':'application/json'},
     ...(corps===undefined?{}:{body:JSON.stringify(corps)})});
-  const d=await r.json();if(!r.ok||d.error)throw Error(d.error||`PRISME : HTTP ${r.status}`);return d;
+  const d=await r.json();if(!r.ok||d.error){const e=Error(d.error||`PRISME : HTTP ${r.status}`);e.status=r.status;throw e;};return d;
 }
 const memoire={async get(k){return structuredClone(donnees[k]??null);},async set(k,v){donnees[k]=structuredClone(v);},async remove(k){delete donnees[k];},async keys(){return Object.keys(donnees);}};
 export const D=new Dossiers(memoire);

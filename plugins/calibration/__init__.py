@@ -15,7 +15,7 @@ def register(ctx):
         if not isinstance(d, dict):
             return jsonify(error='Objet JSON attendu'), 400
         try:
-            return jsonify(registre.inscrire(ctx, d.get('chemin',''), d.get('horloge',{}), d.get('version'))), 201
+            return jsonify(registre.inscrire(ctx, d.get('chemin',''), d.get('horloge',{}), d.get('version'), d.get('version_pieces'))), 201
         except (ValueError, FileExistsError) as e:
             return jsonify(error=str(e)), 400
 

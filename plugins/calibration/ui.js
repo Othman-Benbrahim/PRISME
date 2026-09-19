@@ -11,6 +11,7 @@ async function calCharger(){
     var cont=$('cal-predictions');cont.replaceChildren();
     (d.objets||[]).forEach(o=>{
       var ligne=calEl('article');ligne.append(calEl('strong',o.titre),calEl('p','p = '+o.champs.probabilite+' · échéance '+o.champs.echeance+' · '+o.champs.statut));
+      if(o.pieces){var details=calEl('details');details.append(calEl('summary','Pièces Constat '+(o.inscrite?'conservées dans la copie':'à relire avant copie')),calEl('pre',o.pieces.texte));ligne.append(details);}
       if(o.inscrite)ligne.append(calEl('span','Copie de référence présente'));
       else if(o.champs.statut==='ouverte'){
         var b=calEl('button','Préparer la copie');b.className='btn bs';b.type='button';b.onclick=()=>calPreparer(o);ligne.append(b);
@@ -32,7 +33,7 @@ async function calInscrire(e){
   e.preventDefault();var b=e.submitter;b.disabled=true;
   try{
     var h={};['du','au'].forEach(s=>{var et=$('cal-'+s+'-etat').value;h['prisme_valide_'+s+'_etat']=et;h['prisme_valide_'+s]=et==='date'?$('cal-'+s).value:null;});
-    var d=await post('/api/plugins/calibration/inscrire',{chemin:CAL.selection.chemin,version:CAL.selection.version,horloge:h});
+    var d=await post('/api/plugins/calibration/inscrire',{chemin:CAL.selection.chemin,version:CAL.selection.version,version_pieces:CAL.selection.pieces?.sha256,horloge:h});
     if(d.error)throw new Error(d.error);
     $('cal-form').hidden=true;await calCharger();calMessage('Pari copié le '+d.capture_le);loadDir(CUR_DIR);
   }catch(err){calMessage(err.message,true);}finally{b.disabled=false;}

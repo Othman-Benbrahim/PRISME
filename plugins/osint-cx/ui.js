@@ -24,60 +24,15 @@ function closeOsintCx(){
 }
 
 
-function toggleBrixHubBox(){
-  var cb = $('oscx-brixhub');
-  var box = $('oscx-brixhub-box');
-  if(box) box.style.display = cb && cb.checked ? 'block' : 'none';
-}
-
 function toggleLinkedInBox(){
   var cb = $('oscx-linkedin');
   var box = $('oscx-linkedin-box');
   if(box) box.style.display = cb && cb.checked ? 'block' : 'none';
 }
 
-function bxVal(id){
+function oscxVal(id){
   var el = $(id);
   return el ? el.value.trim() : '';
-}
-
-function collectBrixHubPayload(){
-  var payload = {};
-  var raw = bxVal('oscx-bx-json');
-  if(raw){
-    try{
-      payload = JSON.parse(raw);
-    }catch(e){
-      throw new Error('JSON BrixHub invalide : ' + e.message);
-    }
-  }
-  var map = [
-    ['oscx-bx-nom', 'nom_famille'],
-    ['oscx-bx-prenom', 'prenom'],
-    ['oscx-bx-ville', 'ville'],
-    ['oscx-bx-email', 'email'],
-    ['oscx-bx-tel', 'telephone'],
-    ['oscx-bx-user', 'nom_utilisateur']
-  ];
-  for(var i=0;i<map.length;i++){
-    var v = bxVal(map[i][0]);
-    if(v) payload[map[i][1]] = v;
-  }
-  if($('oscx-bx-flex') && $('oscx-bx-flex').checked) payload.flexible = true;
-  return payload;
-}
-
-function hasBrixPayload(payload){
-  return payload && Object.keys(payload).length > 0;
-}
-
-async function fetchBrixHubPayload(payload){
-  var resp = await fetch('/api/plugins/osint-cx/brixhub', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(payload)
-  });
-  return await resp.json();
 }
 
 function setOsintCxType(type){
@@ -91,17 +46,9 @@ function setOsintCxType(type){
 async function runOsintCxSearch(){
   if(OSCX.searching) return;
   var q = $('oscx-query').value.trim();
-  var withBrix = $('oscx-brixhub') && $('oscx-brixhub').checked;
-  var brixPayload = {};
-  try{
-    if(withBrix) brixPayload = collectBrixHubPayload();
-  }catch(e){
-    showOsintCxError(e.message);
-    return;
-  }
-  if(!q && !(withBrix && hasBrixPayload(brixPayload))){ toast('Requête vide'); return; }
+  if(!q){ toast('Requête vide'); return; }
   OSCX.searching = true;
-  OSCX.query = q || 'BrixHub';
+  OSCX.query = q;
   OSCX.data = null;
 
   $('oscx-form').style.display = 'none';
@@ -113,7 +60,6 @@ async function runOsintCxSearch(){
     var r = null;
     if(q){
       var extras = '';
-      if(withBrix && !hasBrixPayload(brixPayload)) extras += '&brixhub=1';
       if($('oscx-score') && $('oscx-score').checked) extras += '&score=1';
       else extras += '&score=0';
       if($('oscx-github') && $('oscx-github').checked) extras += '&github=1';
@@ -123,18 +69,13 @@ async function runOsintCxSearch(){
       if($('oscx-x') && $('oscx-x').checked) extras += '&x=1';
       if($('oscx-linkedin') && $('oscx-linkedin').checked){
         extras += '&linkedin=1';
-        var liUrl = bxVal('oscx-li-url');
+        var liUrl = oscxVal('oscx-li-url');
         if(liUrl) extras += '&linkedin_url=' + encodeURIComponent(liUrl);
       }
       if($('oscx-socialcli') && $('oscx-socialcli').checked) extras += '&socialcli=1';
       var url = '/api/plugins/osint-cx/crossref?q=' + encodeURIComponent(q) + '&type=' + encodeURIComponent(OSCX.type) + extras;
       r = await fetch(url).then(function(resp){ return resp.json(); });
       if(r.error || r.ok === false){ $('oscx-progress').style.display = 'none'; showOsintCxError(r.error || 'Recherche impossible'); return; }
-    }else{
-      r = {ok:true, query:'BrixHub', type:'brixhub', results:{}};
-    }
-    if(withBrix && hasBrixPayload(brixPayload)){
-      r.brixhub = await fetchBrixHubPayload(brixPayload);
     }
     $('oscx-progress').style.display = 'none';
     OSCX.data = r;
@@ -168,7 +109,7 @@ function renderOsintCxResults(data){
   else if(data.type === 'domain') renderOsintDomain(res);
   else renderOsintGeneric(res);
 
-  ['correlation','linkedin','github','wikidata','entreprise','reddit','x_profile','social_cli','brixhub'].forEach(function(key){
+  ['correlation','linkedin','github','wikidata','entreprise','reddit','x_profile','social_cli'].forEach(function(key){
     if(data[key]){
       var container = document.createElement('div');
       if(key === 'correlation') container.innerHTML = renderCorrelationBlock(data[key]);
@@ -179,7 +120,6 @@ function renderOsintCxResults(data){
       if(key === 'reddit') container.innerHTML = renderRedditBlock(data[key]);
       if(key === 'x_profile') container.innerHTML = renderXProfileBlock(data[key]);
       if(key === 'social_cli') container.innerHTML = renderSocialCliBlock(data[key]);
-      if(key === 'brixhub') container.innerHTML = renderBrixHubBlock(data[key]);
       if(container.firstChild) $('oscx-list').appendChild(container.firstChild);
     }
   });
@@ -277,7 +217,7 @@ function renderCorrelationBlock(sc){
   html += '<div class="oscx-score-head"><div class="oscx-score-title">🧭 Score de corrélation</div>'
     + '<div class="oscx-score-badge ' + oscxEsc(cls) + '">' + oscxEsc(score) + '/100 · ' + oscxEsc(sc.level || '') + '</div></div>';
   html += '<div class="oscx-score-bar"><div class="oscx-score-fill" style="width:' + Math.max(0, Math.min(100, score)) + '%"></div></div>';
-  html += '<div class="oscx-brix-meta"><span>Sources : <strong>' + oscxEsc(sc.sources_count || 0) + '</strong></span><span>Signaux : <strong>' + oscxEsc(sc.signals_count || 0) + '</strong></span></div>';
+  html += '<div class="oscx-meta"><span>Sources : <strong>' + oscxEsc(sc.sources_count || 0) + '</strong></span><span>Signaux : <strong>' + oscxEsc(sc.signals_count || 0) + '</strong></span></div>';
   var reasons = sc.reasons || [];
   if(reasons.length){
     html += '<div class="oscx-score-reasons">' + reasons.map(function(r){
@@ -298,24 +238,24 @@ function renderLinkedInBlock(li){
   if(!li){ return html + '<div class="oscx-note">Aucune réponse LinkedIn.</div></div>'; }
   if(!li.ok){
     html += '<div class="oscx-note">' + oscxEsc(li.error || 'Erreur LinkedIn/RapidAPI') + '</div>';
-    if(li.response_preview){ html += '<div class="oscx-brix-json">' + oscxEsc(li.response_preview) + '</div>'; }
+    if(li.response_preview){ html += '<div class="oscx-json">' + oscxEsc(li.response_preview) + '</div>'; }
     return html + '</div>';
   }
   if(li.found === false){ return html + '<div class="oscx-empty">Aucune donnée structurée LinkedIn exploitable.</div></div>'; }
   var p = li.profile || {};
   html += '<div class="oscx-x-head">';
   if(p.avatar_url){ html += '<img class="oscx-avatar" src="' + oscxEsc(p.avatar_url) + '" alt="Avatar LinkedIn">'; }
-  html += '<div><div class="oscx-brix-profile-title">' + oscxEsc(p.full_name || ((p.first_name || '') + ' ' + (p.last_name || '')).trim() || li.query || 'Profil LinkedIn') + '</div>'
+  html += '<div><div class="oscx-profile-title">' + oscxEsc(p.full_name || ((p.first_name || '') + ' ' + (p.last_name || '')).trim() || li.query || 'Profil LinkedIn') + '</div>'
     + '<div class="oscx-url"><a href="' + oscxEsc(p.profile_url || li.profile_url || '') + '" target="_blank" rel="noopener">' + oscxEsc(p.profile_url || li.profile_url || '') + '</a></div></div></div>';
   var rows = [
     ['Nom complet', p.full_name], ['Prénom', p.first_name], ['Nom', p.last_name], ['Headline', p.headline], ['Localisation', p.location], ['Entreprise', p.company], ['Résumé', p.summary]
   ].filter(function(r){ return r[1] != null && r[1] !== ''; });
   if(rows.length){
-    html += '<div class="oscx-grid oscx-brix-grid">' + rows.map(function(r){
+    html += '<div class="oscx-grid oscx-profile-grid">' + rows.map(function(r){
       return '<div class="oscx-k">' + oscxEsc(r[0]) + '</div><div class="oscx-v">' + oscxEsc(r[1]) + '</div>';
     }).join('') + '</div>';
   }
-  html += '<div class="oscx-brix-meta"><span>Méthode : <strong>' + oscxEsc(li.method || '') + '</strong></span><span>Source : <strong>RapidAPI</strong></span></div>';
+  html += '<div class="oscx-meta"><span>Méthode : <strong>' + oscxEsc(li.method || '') + '</strong></span><span>Source : <strong>RapidAPI</strong></span></div>';
   if(li.notice){ html += '<div class="oscx-note">' + oscxEsc(li.notice) + '</div>'; }
   return html + '</div>';
 }
@@ -329,18 +269,18 @@ function renderGitHubBlock(gh){
   var p = gh.profile || {};
   html += '<div class="oscx-x-head">';
   if(p.avatar_url){ html += '<img class="oscx-avatar" src="' + oscxEsc(p.avatar_url) + '" alt="Avatar GitHub">'; }
-  html += '<div><div class="oscx-brix-profile-title">' + oscxEsc(p.name || p.login || gh.query) + '</div>'
+  html += '<div><div class="oscx-profile-title">' + oscxEsc(p.name || p.login || gh.query) + '</div>'
     + '<div class="oscx-url"><a href="' + oscxEsc(p.html_url || '') + '" target="_blank" rel="noopener">' + oscxEsc(p.html_url || '') + '</a></div></div></div>';
   var rows = [
     ['Login', p.login], ['Nom affiché', p.name], ['Bio', p.bio], ['Entreprise', p.company], ['Localisation', p.location], ['Site', p.blog], ['Email public', p.email], ['X/Twitter', p.twitter_username], ['Créé le', p.created_at], ['Mis à jour', p.updated_at]
   ].filter(function(r){ return r[1] != null && r[1] !== ''; });
   if(rows.length){
-    html += '<div class="oscx-grid oscx-brix-grid">' + rows.map(function(r){
+    html += '<div class="oscx-grid oscx-profile-grid">' + rows.map(function(r){
       var v = (r[0] === 'Site' && String(r[1]).indexOf('http') === 0) ? '<a href="' + oscxEsc(r[1]) + '" target="_blank" rel="noopener">' + oscxEsc(r[1]) + '</a>' : oscxEsc(r[1]);
       return '<div class="oscx-k">' + oscxEsc(r[0]) + '</div><div class="oscx-v">' + v + '</div>';
     }).join('') + '</div>';
   }
-  html += '<div class="oscx-brix-meta"><span>Dépôts publics : <strong>' + oscxEsc(p.public_repos != null ? p.public_repos : '—') + '</strong></span><span>Followers : <strong>' + oscxEsc(p.followers != null ? p.followers : '—') + '</strong></span><span>Following : <strong>' + oscxEsc(p.following != null ? p.following : '—') + '</strong></span></div>';
+  html += '<div class="oscx-meta"><span>Dépôts publics : <strong>' + oscxEsc(p.public_repos != null ? p.public_repos : '—') + '</strong></span><span>Followers : <strong>' + oscxEsc(p.followers != null ? p.followers : '—') + '</strong></span><span>Following : <strong>' + oscxEsc(p.following != null ? p.following : '—') + '</strong></span></div>';
   if(gh.notice){ html += '<div class="oscx-note">' + oscxEsc(gh.notice) + '</div>'; }
   return html + '</div>';
 }
@@ -351,12 +291,12 @@ function renderWikidataBlock(wd){
   if(!wd){ return html + '<div class="oscx-note">Aucune réponse Wikidata.</div></div>'; }
   if(!wd.ok){ return html + '<div class="oscx-note">' + oscxEsc(wd.error || 'Erreur Wikidata') + '</div></div>'; }
   var results = wd.results || [];
-  html += '<div class="oscx-brix-meta"><span>Entités : <strong>' + oscxEsc(wd.count || results.length) + '</strong></span><span>Source publique</span></div>';
+  html += '<div class="oscx-meta"><span>Entités : <strong>' + oscxEsc(wd.count || results.length) + '</strong></span><span>Source publique</span></div>';
   if(!results.length){ html += '<div class="oscx-empty">Aucune entité Wikidata trouvée.</div>'; }
   else{
     html += '<div class="oscx-section">' + results.map(function(it){
       return '<div class="oscx-card"><div class="oscx-card-title">' + oscxEsc(it.label || it.id || 'Entité') + '</div>'
-        + '<div class="oscx-grid oscx-brix-grid"><div class="oscx-k">ID</div><div class="oscx-v">' + oscxEsc(it.id || '') + '</div>'
+        + '<div class="oscx-grid oscx-profile-grid"><div class="oscx-k">ID</div><div class="oscx-v">' + oscxEsc(it.id || '') + '</div>'
         + '<div class="oscx-k">Description</div><div class="oscx-v">' + oscxEsc(it.description || '') + '</div>'
         + '<div class="oscx-k">Lien</div><div class="oscx-v"><a href="' + oscxEsc(it.url || '') + '" target="_blank" rel="noopener">' + oscxEsc(it.url || '') + '</a></div></div></div>';
     }).join('') + '</div>';
@@ -372,18 +312,18 @@ function renderEntrepriseBlock(ent){
   if(!ent){ return html + '<div class="oscx-note">Aucune réponse.</div></div>'; }
   if(!ent.ok){ return html + '<div class="oscx-note">' + oscxEsc(ent.error || 'Erreur API Entreprises') + '</div></div>'; }
   var results = ent.results || [];
-  html += '<div class="oscx-brix-meta"><span>Résultats : <strong>' + oscxEsc(ent.count || results.length) + '</strong></span><span>Source publique</span></div>';
+  html += '<div class="oscx-meta"><span>Résultats : <strong>' + oscxEsc(ent.count || results.length) + '</strong></span><span>Source publique</span></div>';
   if(!results.length){ html += '<div class="oscx-empty">Aucune entreprise trouvée pour cette requête.</div>'; }
   else{
-    html += '<div class="oscx-brix-results">' + results.map(function(e){
+    html += '<div class="oscx-results">' + results.map(function(e){
       var dirs = e.dirigeants || [];
       var rows = [
         ['SIREN', e.siren], ['SIRET siège', e.siret_siege], ['État', e.etat_administratif], ['Nature juridique', e.nature_juridique],
         ['Activité', e.activite_principale], ['Catégorie', e.categorie_entreprise], ['Création', e.date_creation], ['Adresse', e.adresse]
       ].filter(function(r){ return r[1] != null && r[1] !== ''; });
-      var card = '<div class="oscx-brix-profile"><div class="oscx-brix-profile-head"><div class="oscx-brix-profile-title">' + oscxEsc(e.nom_complet || 'Entreprise') + '</div></div>';
+      var card = '<div class="oscx-profile"><div class="oscx-profile-head"><div class="oscx-profile-title">' + oscxEsc(e.nom_complet || 'Entreprise') + '</div></div>';
       if(rows.length){
-        card += '<div class="oscx-grid oscx-brix-grid">' + rows.map(function(r){ return '<div class="oscx-k">' + oscxEsc(r[0]) + '</div><div class="oscx-v">' + oscxEsc(r[1]) + '</div>'; }).join('') + '</div>';
+        card += '<div class="oscx-grid oscx-profile-grid">' + rows.map(function(r){ return '<div class="oscx-k">' + oscxEsc(r[0]) + '</div><div class="oscx-v">' + oscxEsc(r[1]) + '</div>'; }).join('') + '</div>';
       }
       if(dirs.length){
         card += '<div class="oscx-note"><strong>Dirigeants déclarés</strong><br>' + dirs.map(function(d){
@@ -405,7 +345,7 @@ function renderRedditBlock(rd){
   if(!rd.ok){ return html + '<div class="oscx-note">' + oscxEsc(rd.error || 'Erreur Reddit') + '</div></div>'; }
   if(rd.found === false){ return html + '<div class="oscx-empty">Aucun profil Reddit public trouvé.</div></div>'; }
   var p = rd.profile || {};
-  html += '<div class="oscx-grid oscx-brix-grid">'
+  html += '<div class="oscx-grid oscx-profile-grid">'
     + '<div class="oscx-k">Profil</div><div class="oscx-v"><a href="' + oscxEsc(p.url || '') + '" target="_blank" rel="noopener">' + oscxEsc(p.url || p.name || '') + '</a></div>'
     + '<div class="oscx-k">Créé le</div><div class="oscx-v">' + oscxEsc(p.created_iso || '') + '</div>'
     + '<div class="oscx-k">Karma commentaire</div><div class="oscx-v">' + oscxEsc(p.comment_karma) + '</div>'
@@ -428,7 +368,7 @@ function renderXProfileBlock(xp){
   if(!xp){ return html + '<div class="oscx-note">Aucune réponse X.</div></div>'; }
   if(!xp.ok){
     html += '<div class="oscx-note">' + oscxEsc(xp.error || 'Erreur X API') + '</div>';
-    if(xp.response_preview){ html += '<div class="oscx-brix-json">' + oscxEsc(xp.response_preview) + '</div>'; }
+    if(xp.response_preview){ html += '<div class="oscx-json">' + oscxEsc(xp.response_preview) + '</div>'; }
     return html + '</div>';
   }
   if(xp.found === false){ return html + '<div class="oscx-empty">Aucun profil X trouvé.</div></div>'; }
@@ -436,10 +376,10 @@ function renderXProfileBlock(xp){
   var metrics = p.public_metrics || {};
   html += '<div class="oscx-x-head">';
   if(p.profile_image_url){ html += '<img class="oscx-avatar" src="' + oscxEsc(p.profile_image_url) + '" alt="Avatar X">'; }
-  html += '<div><div class="oscx-brix-profile-title">' + oscxEsc(p.name || p.username || xp.query) + '</div>'
+  html += '<div><div class="oscx-profile-title">' + oscxEsc(p.name || p.username || xp.query) + '</div>'
     + '<div class="oscx-url"><a href="' + oscxEsc(p.url || ('https://x.com/' + xp.query)) + '" target="_blank" rel="noopener">' + oscxEsc(p.url || ('https://x.com/' + xp.query)) + '</a></div>'
     + '</div></div>';
-  html += '<div class="oscx-grid oscx-brix-grid">'
+  html += '<div class="oscx-grid oscx-profile-grid">'
     + '<div class="oscx-k">Username</div><div class="oscx-v">@' + oscxEsc(p.username || xp.query) + '</div>'
     + '<div class="oscx-k">ID</div><div class="oscx-v">' + oscxEsc(p.id || '') + '</div>'
     + '<div class="oscx-k">Bio</div><div class="oscx-v">' + oscxEsc(p.description || '') + '</div>'
@@ -448,7 +388,7 @@ function renderXProfileBlock(xp){
     + '<div class="oscx-k">Vérifié</div><div class="oscx-v">' + (p.verified ? 'oui' : 'non') + (p.verified_type ? ' · ' + oscxEsc(p.verified_type) : '') + '</div>'
     + '<div class="oscx-k">URL externe</div><div class="oscx-v">' + (p.external_url ? '<a href="' + oscxEsc(p.external_url) + '" target="_blank" rel="noopener">' + oscxEsc(p.external_url) + '</a>' : '') + '</div>'
     + '</div>';
-  html += '<div class="oscx-brix-meta">'
+  html += '<div class="oscx-meta">'
     + '<span>Followers : <strong>' + oscxEsc(metrics.followers_count != null ? metrics.followers_count : '—') + '</strong></span>'
     + '<span>Following : <strong>' + oscxEsc(metrics.following_count != null ? metrics.following_count : '—') + '</strong></span>'
     + '<span>Posts : <strong>' + oscxEsc(metrics.tweet_count != null ? metrics.tweet_count : '—') + '</strong></span>'
@@ -471,7 +411,7 @@ function renderSocialCliBlock(sc){
     return html + '</div>';
   }
   var results = sc.results || [];
-  html += '<div class="oscx-brix-meta"><span>Outil : <strong>' + oscxEsc(sc.tool || '') + '</strong></span><span>Profils : <strong>' + oscxEsc(sc.count || results.length) + '</strong></span></div>';
+  html += '<div class="oscx-meta"><span>Outil : <strong>' + oscxEsc(sc.tool || '') + '</strong></span><span>Profils : <strong>' + oscxEsc(sc.count || results.length) + '</strong></span></div>';
   if(!results.length){ html += '<div class="oscx-empty">Aucun profil trouvé par l’outil local.</div>'; }
   else{
     html += '<div class="oscx-section">' + results.slice(0, 80).map(function(r){
@@ -480,127 +420,6 @@ function renderSocialCliBlock(sc){
     }).join('') + '</div>';
   }
   if(sc.notice){ html += '<div class="oscx-note">' + oscxEsc(sc.notice) + '</div>'; }
-  return html + '</div>';
-}
-
-function brixFieldLabel(key){
-  var labels = {
-    nom_famille:'Nom', prenom:'Prénom', nom_naissance:'Nom de naissance', nom_affichage:'Nom affiché', nom_utilisateur:'Nom utilisateur',
-    date_naissance:'Date de naissance', annee_naissance:'Année de naissance', genre:'Genre', civilite:'Civilité',
-    email:'Email', telephone:'Téléphone', mobile:'Mobile', adresse_ip:'Adresse IP',
-    adresse:'Adresse', complement_adresse:'Complément', code_postal:'Code postal', ville:'Ville', ville_naissance:'Ville de naissance', lieu_naissance:'Lieu de naissance', pays:'Pays', region:'Région', departement:'Département',
-    nir:'NIR', iban:'IBAN', bic:'BIC', siret:'SIRET', siren:'SIREN',
-    vin_plaque:'VIN / Plaque', immatriculation:'Immatriculation', numero_serie:'Numéro de série', marque:'Marque', modele:'Modèle',
-    societe:'Société', profession:'Profession', fonction:'Fonction',
-    steam_id:'Steam ID', fivem_license:'FiveM license', fivem_license2:'FiveM license 2', fivem_id:'FiveM ID', xbox_live_id:'Xbox Live ID', live_id:'Live ID', discord_id:'Discord ID',
-    _confidence:'Confiance', _sources:'Sources'
-  };
-  return labels[key] || key.replace(/_/g, ' ');
-}
-
-function brixFormatValue(key, value){
-  if(value == null || value === '') return '';
-  if(key === '_sources' && Array.isArray(value)){
-    return '<div class="oscx-pills">' + value.map(function(src){ return '<span class="oscx-pill">' + oscxEsc(src) + '</span>'; }).join('') + '</div>';
-  }
-  if(key === '_confidence'){
-    var n = Number(value);
-    var cls = n >= 80 ? 'good' : (n >= 50 ? 'mid' : 'low');
-    return '<span class="oscx-confidence ' + cls + '">' + oscxEsc(value) + '/100</span>';
-  }
-  if(Array.isArray(value)) return value.map(oscxEsc).join('<br>');
-  if(typeof value === 'object') return '<pre class="oscx-mini-json">' + oscxEsc(JSON.stringify(value, null, 2)) + '</pre>';
-  return oscxEsc(value);
-}
-
-function brixProfileTitle(profile, index){
-  var parts = [];
-  if(profile.prenom) parts.push(profile.prenom);
-  if(profile.nom_famille) parts.push(profile.nom_famille);
-  if(profile.nom_affichage && !parts.length) parts.push(profile.nom_affichage);
-  if(profile.nom_utilisateur && !parts.length) parts.push('@' + profile.nom_utilisateur);
-  return parts.length ? parts.join(' ') : 'Profil #' + (index + 1);
-}
-
-function renderBrixProfileCard(profile, index){
-  var priority = [
-    'email','telephone','mobile','adresse_ip',
-    'adresse','complement_adresse','code_postal','ville','departement','region','pays',
-    'date_naissance','annee_naissance','ville_naissance','lieu_naissance','genre','civilite',
-    'nom_utilisateur','societe','profession','fonction',
-    'siret','siren','iban','bic','nir',
-    'immatriculation','vin_plaque','numero_serie','marque','modele',
-    'steam_id','fivem_license','fivem_license2','fivem_id','xbox_live_id','live_id','discord_id',
-    '_sources','_confidence'
-  ];
-  var used = {};
-  var rows = [];
-  priority.forEach(function(k){
-    if(profile[k] != null && profile[k] !== ''){
-      used[k] = true;
-      rows.push([k, profile[k]]);
-    }
-  });
-  Object.keys(profile).sort().forEach(function(k){
-    if(!used[k] && k !== 'nom_famille' && k !== 'prenom' && k !== 'nom_affichage') rows.push([k, profile[k]]);
-  });
-  var html = '<div class="oscx-brix-profile">'
-    + '<div class="oscx-brix-profile-head">'
-    + '<div class="oscx-brix-profile-title">' + oscxEsc(brixProfileTitle(profile, index)) + '</div>';
-  if(profile._confidence != null) html += '<div>' + brixFormatValue('_confidence', profile._confidence) + '</div>';
-  html += '</div>';
-  if(rows.length){
-    html += '<div class="oscx-grid oscx-brix-grid">';
-    rows.forEach(function(row){
-      if(row[0] === '_confidence') return;
-      html += '<div class="oscx-k">' + oscxEsc(brixFieldLabel(row[0])) + '</div><div class="oscx-v">' + brixFormatValue(row[0], row[1]) + '</div>';
-    });
-    html += '</div>';
-  }
-  return html + '</div>';
-}
-
-function renderBrixHubBlock(bx){
-  var ok = bx && bx.ok;
-  var title = ok ? '🧩 BrixHub API' : '🧩 BrixHub API — non disponible';
-  var html = '<div class="oscx-card"><div class="oscx-card-title">' + title + '</div>';
-  if(!bx){ return html + '<div class="oscx-note">Aucune réponse BrixHub.</div></div>'; }
-  if(!ok){
-    html += '<div class="oscx-note">' + oscxEsc(bx.error || 'Erreur BrixHub') + '</div>';
-    if(bx.response_preview){ html += '<div class="oscx-brix-json">' + oscxEsc(bx.response_preview) + '</div>'; }
-    if(bx.attempts){ html += '<div class="oscx-note"><strong>Tentatives</strong></div><div class="oscx-brix-json">' + oscxEsc(JSON.stringify(bx.attempts, null, 2)) + '</div>'; }
-    return html + '</div>';
-  }
-
-  var payload = bx.results || {};
-  var data = payload.data || {};
-  var profiles = Array.isArray(data.results) ? data.results : (Array.isArray(payload.results) ? payload.results : []);
-  var meta = payload.meta || bx.meta || {};
-
-  html += '<div class="oscx-grid">'
-    + '<div class="oscx-k">Endpoint</div><div class="oscx-v">' + oscxEsc(bx.endpoint || '') + '</div>'
-    + '<div class="oscx-k">Méthode</div><div class="oscx-v">' + oscxEsc(bx.method || 'POST') + '</div>'
-    + '<div class="oscx-k">Critères envoyés</div><div class="oscx-v"><code>' + oscxEsc(Object.keys(bx.criteria_sent || {}).join(', ') || '—') + '</code></div>'
-    + '</div>';
-
-  if(meta && Object.keys(meta).length){
-    html += '<div class="oscx-brix-meta">'
-      + '<span>Total : <strong>' + oscxEsc(meta.total != null ? meta.total : profiles.length) + '</strong></span>'
-      + '<span>Page : <strong>' + oscxEsc(meta.page || 1) + '</strong></span>'
-      + '<span>Par page : <strong>' + oscxEsc(meta.per_page || profiles.length || 0) + '</strong></span>'
-      + (meta.pages != null ? '<span>Pages : <strong>' + oscxEsc(meta.pages) + '</strong></span>' : '')
-      + (meta.took_ms != null ? '<span>Temps : <strong>' + oscxEsc(meta.took_ms) + ' ms</strong></span>' : '')
-      + (meta.total_is_capped ? '<span class="oscx-warn">Total plafonné</span>' : '')
-      + '</div>';
-  }
-
-  if(!profiles.length){
-    html += '<div class="oscx-empty">Aucun profil BrixHub trouvé pour ces critères.</div>';
-  }else{
-    html += '<div class="oscx-brix-results">' + profiles.map(renderBrixProfileCard).join('') + '</div>';
-  }
-
-  if(bx.notice){ html += '<div class="oscx-note">' + oscxEsc(bx.notice) + '</div>'; }
   return html + '</div>';
 }
 

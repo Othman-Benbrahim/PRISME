@@ -38,6 +38,13 @@ def _guard():
     if p.startswith(AGENTS_PREFIX):
         from ..agents.garde import controler
         return controler()
+    # Une interface Constat restée ouverte ne doit pas écrire dans un autre vault.
+    espace = request.headers.get("X-Constat-Espace")
+    if p.startswith("/api/") and espace:
+        import hashlib
+        from ..vault import vault_root
+        if espace != hashlib.sha256(str(vault_root()).encode("utf-8")).hexdigest():
+            return jsonify(error="Le vault a changé. Rechargez Constat."), 409
     if NO_AUTH:
         return None
     # Verrou 3 : jeton obligatoire sur /api/, sauf pour le recuperer.
