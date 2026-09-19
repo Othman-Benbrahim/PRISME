@@ -261,22 +261,113 @@ Les contrôles automatisés complètent les vérifications visuelles et les essa
 
 Pour signaler un problème, indiquez les étapes permettant de le reproduire, le système, la version de Python et le plugin concerné. Les contributions passent par des pull requests au périmètre explicite. Le document [PLUGIN-DEVELOPMENT.md](PLUGIN-DEVELOPMENT.md) décrit l'API des plugins.
 
-## État et prochaines étapes
+# PRISME — état et prochaines étapes
 
-Les fonctions du cœur, les objets typés, les neuf plugins et leurs guides sont présents dans le dépôt. PRISME reste en développement ; une validation sur votre propre corpus est nécessaire avant de tirer des conclusions sur la qualité de ses analyses.
+Arrêté au commit `8ecb7a2` (PR #23, « Constat : preuves traçables et transfert vers
+Calibration ; nettoyage OSINT »), le 2026-09-19.
 
-L'étape en cours est **E9 : distribution Windows et publication d'une release**. Le périmètre retenu est :
+---
 
-- une application lancée par `PRISME.exe`, sans installation manuelle de Python pour l'utilisateur final ;
-- un dossier `plugins/` externe, contenant les plugins fournis ;
-- leurs dépendances prises en charge dans la distribution ;
-- le dossier `guides-plugins/` livré avec l'ensemble ;
-- le fonctionnement du cœur lorsque le dossier des plugins est absent ;
-- une archive de release après vérification sous Windows.
+## 1. Où en est le projet
 
-**Cette distribution n'est pas encore publiée.** Le [parcours de vérification E9](docs/branches/e9-publication.md) décrit le contrôle avant release. L'installation documentée dans ce README utilise les sources. L'amélioration du passage direct de Constat vers Calibration est prévue pour être étudiée après E9.
+**Toutes les étapes numérotées sont fusionnées.**
 
-Le détail des étapes et des points en attente figure dans la [feuille de route](docs/FEUILLE-DE-ROUTE.md).
+| Étape | Objet | État |
+|---|---|---|
+| Base → E8 → E1 → E2 → E3 → E4 → E5 → E6 → E7 | Fondations : découpage, API plugins, index SQLite, provenance, ENGRAM, objets Source, API agents, embeddings | Fait |
+| E12 | Plusieurs racines de vault | Fait |
+| E13 | Recherche en arbre | Fait |
+| E10 | Adaptateur MCP au-dessus de `/api/v1/` | Fait |
+| **E11** | Types d'objets — **sans** calcul de calibration | Fait |
+| **plugin-calibration** | Brier, log loss | Fait |
+| **plugin-constat-integre** | Dossiers et ACH **dans PRISME**, sans extension Firefox | Fait |
+| **E9** | Distribution Windows | Fusionnée, pour construire l'exécutable |
+
+**Vérifications au dernier commit** : 436 tests Python, 141 tests JavaScript, et un
+parcours Chromium complet jusqu'aux scores fictifs — Brier 0,0400, log loss 0,2231.
+
+### Publication
+
+| Version | État |
+|---|---|
+| `v0.1.0-rc.1` — commit `d0e2232` | Publiée le 19/09 à 17:53, avec l'application portable Windows x64 |
+| `v0.1.0-rc.2` — commit `8ecb7a2` | À publier : archive des sources prête, notes rédigées |
+
+---
+
+## 2. Ce qui est en cours
+
+**`docs-guides-plugins`** — les guides des plugins, qui précèdent E9. C'est le seul
+chantier ouvert.
+
+---
+
+## 3. Prochaines étapes
+
+### Immédiat
+
+1. **Publier `v0.1.0-rc.2`** — et y joindre l'exécutable portable reconstruit sur
+   `8ecb7a2`. Sans lui, la release annonce une application portable qu'elle ne livre pas.
+2. **Terminer `docs-guides-plugins`** — dernier préalable à E9.
+3. **Reconstruire l'exécutable** sur le commit courant : rc.1 a été bâtie sur `d0e2232`,
+   donc son binaire ignore Constat, Calibration et le nettoyage OSINT.
+
+### Dettes à solder avant une version stable
+
+| Sujet | Pourquoi maintenant |
+|---|---|
+| **Découpage de `core.css`** | 293 caractères de marge sur un plafond de 20 000. La prochaine étape qui touche ce fichier fait sauter le garde-fou d'E8. |
+| **Synchronisation des rejets** | Décidée en **0024**, jamais appliquée. Environ une demi-journée. |
+| **Chiffrement hors Windows** | DPAPI est propre à Windows. Si la distribution vise macOS ou Linux, les clés y restent en clair — signalé au démarrage, mais en clair. |
+| **Gel des objets** | Prévu par **0017**, non implémenté. |
+| **Usage réel soutenu** | Jamais fait. C'est le seul essai capable d'invalider ce que les tests confirment entre eux. |
+
+### À vérifier une fois, puis oublier
+
+- **L'adaptateur MCP sur un vrai Claude Code.** Les tests reproduisent le protocole
+  fidèlement, mais aucun client réel ne s'y est branché.
+- **Le chargement d'`onnxruntime` depuis l'exécutable gelé** — le point que la décision
+  **0030** désignait comme seul capable de l'invalider, et qui ne se voit qu'au build.
+
+---
+
+## 4. Trois écarts à corriger dans la documentation
+
+Ce sont des divergences entre ce qui est écrit et ce qui existe. Aucune n'est grave ;
+toutes vieillissent mal si on les laisse.
+
+**La décision 0031 est dépassée.** Elle actait que Constat resterait une extension
+Firefox versant ses hypothèses par `/api/v1/`, avec PRISME comme seul dépositaire des
+scores. L'implémentation a pris l'autre voie : `plugin-constat-integre` place les
+dossiers et l'ACH **dans** PRISME, sans extension. Le résultat est défendable — un seul
+outil, un seul historique, pas de pont à maintenir — mais la fiche dit encore le
+contraire. Elle mérite un statut « remplacée », avec une ligne sur ce qui a fait changer
+d'avis. Conséquence à noter : l'API des agents n'a toujours **aucun client extérieur**,
+ce qui était l'autre intérêt de ce montage.
+
+**La feuille de route annonce encore 359 tests** dans sa dernière ligne. Le chiffre réel
+est 436 Python et 141 JavaScript. C'est mon chiffre d'E10 qui a survécu à quatre étapes.
+
+**L'ordre affiché reste E12 → E13 → E10 → E11 → E9**, alors que E9 est fusionnée et que
+deux plugins se sont intercalés. Le tableau gagnerait à refléter l'ordre réellement suivi.
+
+---
+
+## 5. Ce qui n'a pas changé et ne doit pas changer
+
+Rappel des invariants, parce qu'ils survivent aux étapes :
+
+- **`vault.py`** est la garde. Elle sert l'interface, les plugins et `/api/v1/` à la
+  fois. Toute modification doit échouer du côté restreint, jamais du côté permissif.
+- **L'IA propose, l'auteur valide.** Une proposition d'agent passe par la file, même
+  parfaitement vérifiable.
+- **Tout ce qu'une machine écrit est estampillé.**
+- **Aucun fichier monolithique** : 20 000 caractères, mesurés sur le texte et non sur
+  les octets du disque.
+- **Mesurer, pas supposer.** Précédent : l'arbre d'E13 ne fait pas économiser de jetons
+  — c'est le plafond de budget qui économise ; l'arbre apporte du rappel par les liens.
+- **La machine de l'auteur est Windows.** Encodage, fins de ligne, verrous de fichiers,
+  environnement des sous-processus : des tests verts ailleurs ne prouvent rien.
 
 ## Documentation
 
