@@ -1,8 +1,8 @@
 # PRISME
 
-<img width="1880" height="923" alt="Firefox_Screenshot_2026-09-19T19-13-53 076Z" src="https://github.com/user-attachments/assets/6e779569-870b-42ee-8ed1-a08739e2f93a" />
-
 <img width="1916" height="936" alt="Capture d&#39;écran 2026-09-19 211240" src="https://github.com/user-attachments/assets/6704cd92-c114-49a4-a2bf-9962bbe1a44a" />
+
+<img width="1880" height="923" alt="Firefox_Screenshot_2026-09-19T19-13-53 076Z" src="https://github.com/user-attachments/assets/6e779569-870b-42ee-8ed1-a08739e2f93a" />
 
 
 **Une mémoire personnelle locale pour relier ses sources, structurer ses analyses et suivre ses décisions.**
