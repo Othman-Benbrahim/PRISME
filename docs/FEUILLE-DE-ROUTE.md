@@ -19,8 +19,8 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, fusion RRF, plancher de pertinence | Fait |
 | — | `plugin-embeddings-locaux` | Plugin ONNX : modèle e5 local, rien ne sort de la machine | Fait |
 | E12 | `e12-racines` | Plusieurs racines de vault ; agents bornés à la principale | Fait |
-| E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | En revue |
-| E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | À faire |
+| E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | Fait |
+| E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | En revue |
 | E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | À faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
 
@@ -38,6 +38,7 @@ décidé, ou explicitement en attente.
 | Sujet | État |
 |---|---|
 | Plugin de calibration (Brier, log loss, courbes) | Reporté après E11 — [0025](decisions/0025-calibration-en-plugin.md). Le cœur fournira le type Prédiction, le plugin fera le calcul. |
+| Bouton « verser comme prédiction » dans Constat | Décidé — [0031](decisions/0031-constat-source-des-hypotheses.md). Après E11 : l'extension versera ses hypothèses ACH par `/api/v1/`, premier client extérieur de l'API des agents. |
 | Horloge du monde active | S'activera avec ce plugin — [0026](decisions/0026-horloge-du-monde-activee.md). Les champs sont réservés depuis E3, aucune migration à prévoir. |
 | Mécanisme de gel des objets | Prévu dans le modèle (0017), non implémenté. |
 | Seuil d'entrée directe par type | Sans objet tant qu'il n'y a qu'un type (0021). |
@@ -47,4 +48,6 @@ décidé, ou explicitement en attente.
 | Verrouillage réparti, écritures concurrentes | Assumé : le dernier qui écrit gagne, `.trash/versions/` sert de filet (0024). |
 | Chiffrement des secrets hors Windows | DPAPI est Windows seul (0023). À traiter en E9 si la publication vise macOS et Linux. |
 | Découpage de `core.css` | **Pressant.** 19 707 caractères sur un plafond de 20 000 : il reste 293 caractères de marge. La prochaine étape qui y touche fera sauter le garde-fou d'E8. À découper par zone (mise en page, éditeur, fenêtres) au prochain passage dans ce fichier. |
-| Épreuve du réel : vault de l'auteur, build PyInstaller | Jamais faits. Le plugin ONNX rend la question du `--onefile` avec bibliothèque compilée plus pressante. À planifier avant E9. |
+| Build PyInstaller | Tranché — [0030](decisions/0030-dependances-compilees-dans-l-executable.md) : `--onedir`, `onnxruntime` et `tokenizers` gelés dans l'exécutable, modèle e5 toujours téléchargé dans le profil. Reste à construire et à vérifier. |
+| Adaptateur MCP branché sur un vrai Claude Code | Jamais fait. Les tests reproduisent le protocole fidèlement (sous-processus, JSON-RPC), mais un client réel a ses exigences propres. Premier essai à faire. |
+| Épreuve du réel : vault de l'auteur | Les fonctions ont été essayées et répondent. L'usage soutenu sur le vault réel, lui, reste à faire — c'est le seul essai qui peut invalider ce que 359 tests confirment entre eux. |

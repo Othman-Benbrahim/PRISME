@@ -7,7 +7,7 @@ liste, pas levee. La majorite des tests ci-dessous verifient ce qui reste refuse
 import unittest
 from pathlib import Path
 
-from commun import ROOT, TMP, VAULT, reset_vault
+from commun import ROOT, TMP, VAULT, effacer, reset_vault
 
 from prisme_core import config, vault
 from prisme_core.agents import cles
@@ -24,8 +24,7 @@ class RacinesBase(unittest.TestCase):
         reset_vault()
         SECONDE.mkdir(parents=True, exist_ok=True)
         DEHORS.mkdir(parents=True, exist_ok=True)
-        for f in SECONDE.glob("*.md"):
-            f.unlink()
+        effacer(SECONDE.glob("*.md"))
         (SECONDE / "Second.md").write_text("# Second\n\nune note du second vault, mot-rare-second\n",
                                            encoding="utf-8")
         (DEHORS / "Prive.md").write_text("# Privé\n\nsecret\n", encoding="utf-8")

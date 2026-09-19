@@ -46,3 +46,13 @@
 .ag-t td code{font-family:var(--mono);font-size:10.5px;color:var(--tx3)}
 .ag-t tr.refus td{color:var(--red)}
 .ag-t tr.refus td code{color:var(--red)}
+
+/* Onglet MCP (E10) : le bloc de configuration se lit et se copie à la main,
+   donc il garde son indentation et ne se replie jamais. */
+#mcp-json {
+  background: var(--bg3); border: 1px solid var(--bd); border-radius: 6px;
+  padding: 10px 12px; margin: 8px 0 0; overflow: auto; max-height: 34vh;
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.5; white-space: pre;
+}
+#mcp-aide { margin-top: 8px; }
+#mcp-aide code { word-break: break-all; }

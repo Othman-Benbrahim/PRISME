@@ -363,6 +363,37 @@
   <div id="ag-tabs">
     <button class="ag-tab on" id="agt0" onclick="agOnglet(0)">Clés d'accès</button>
     <button class="ag-tab"    id="agt1" onclick="agOnglet(1)">Journal</button>
+    <button class="ag-tab"    id="agt2" onclick="agOnglet(2)">Claude Code (MCP)</button>
+  </div>
+
+  <!-- ── Onglet MCP (E10, décision 0032) ──
+       Une clé, un chemin absolu et une URL : trois choses à assembler sans se tromper,
+       et l'erreur ne se voit qu'au refus de démarrage du client. PRISME les assemble. -->
+  <div id="agp2" style="display:none">
+    <div class="eng-bloc">
+      <h4>Connecter Claude Code — ou tout agent qui parle MCP</h4>
+      <div class="eng-note">PRISME crée une clé et vous rend le bloc de configuration à
+        coller. L'agent pourra lire vos notes, chercher, explorer l'arbre des liens, et
+        déposer ses trouvailles dans la file de validation. <strong>Rien n'entre dans le
+        vault sans votre accord</strong> — l'écriture directe se donne ensuite, clé par
+        clé, dans l'onglet « Clés d'accès ».</div>
+      <div class="eng-ligne" style="margin-top:8px">
+        <input id="mcp-nom" type="text" placeholder="nom de l'agent (ex. Claude Code)"
+               value="Claude Code"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();mcpGenerer();}">
+        <button class="btn bp" onclick="mcpGenerer()">Générer la configuration</button>
+      </div>
+      <div id="mcp-sortie" style="display:none;margin-top:10px">
+        <strong>Collez ceci maintenant.</strong> La clé y figure en clair et PRISME ne la
+        réaffichera pas.
+        <pre id="mcp-json"></pre>
+        <div class="ag-a">
+          <button class="btn bp" onclick="mcpCopier()">Copier</button>
+          <button class="btn bs" onclick="mcpFermer()">J'ai collé</button>
+        </div>
+        <div class="eng-note" id="mcp-aide"></div>
+      </div>
+    </div>
   </div>
 
   <div id="agp0">
