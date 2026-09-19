@@ -16,6 +16,7 @@ async function openCfg(){
   $('mcfg').classList.add('on');
   loadIndexStatus();
   vecCharger();
+  racCharger();
 }
 function closeCfg(){$('mcfg').classList.remove('on');}
 // SB_SETTINGS_PATCH

@@ -18,11 +18,15 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | — | `sources-ia-note` | Bouton « Sources IA » : analyse de la note ouverte seule | Fait |
 | E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, fusion RRF, plancher de pertinence | Fait |
 | — | `plugin-embeddings-locaux` | Plugin ONNX : modèle e5 local, rien ne sort de la machine | En revue |
+| E12 | `e12-racines` | Plusieurs racines de vault ; agents bornés à la principale | En revue |
+| E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | À faire |
 | E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | À faire |
 | E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | À faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
 
-L'ordre E7 → E10 → E11 → E9 est fixé par [la décision 0027](decisions/0027-ordre-des-etapes-restantes.md) :
+L'ordre est **E12 → E13 → E10 → E11 → E9**. E12 passe devant parce qu'elle touche `safe_path`,
+la fonction la plus sensible du projet : plus elle arrive tard, plus il y a de code à
+revérifier contre elle. La place de E9 est fixée par [la décision 0027](decisions/0027-ordre-des-etapes-restantes.md) :
 la publication vient en dernier parce qu'elle sert des utilisateurs qui n'existent pas encore,
 là où E10 et E11 servent l'auteur tout de suite.
 

@@ -41,9 +41,11 @@
         <button onclick="newFilePrompt()" title="Nouveau fichier">＋</button>
       </div>
     </div>
+    <div id="fp-racines"></div>
     <div id="fp">
       <span id="fp-txt">…</span>
-      <button class="fp-ws" onclick="setWorkspace()" title="Définir comme espace de travail">⚑</button>
+      <button class="fp-ws" onclick="ajouterRacineCourante()" title="Ajouter ce dossier comme racine supplémentaire">＋</button>
+      <button class="fp-ws" onclick="setWorkspace()" title="Définir comme espace de travail principal">⚑</button>
     </div>
     <div id="tag-filter-bar"><span id="tf-label"></span><button onclick="clearTagFilter()">×</button></div>
     <div id="fl"></div>
@@ -177,7 +179,20 @@
   <input id="cmod" type="text" list="cfg-models" placeholder="nom exact du modèle">
   <datalist id="cfg-models"></datalist></div>
   <button class="btn bs" id="lmobtn" onclick="loadMods()" style="width:auto;padding:5px 12px;font-size:11px">↺ Charger les modèles</button>
-  <div><label>Dossier de notes</label><input id="cws" type="text"></div>
+  <div><label>Dossier de notes (racine principale)</label><input id="cws" type="text"></div>
+  <div class="vec-bloc">
+    <label>Racines supplémentaires <span id="rac-compte" style="font-weight:400;color:var(--tx2)"></span></label>
+    <div class="vec-note">Dans chaque racine, tout fonctionne comme dans la principale : voir,
+      ouvrir, éditer, indexer, chercher. Ailleurs sur le disque, rien ne change — vous ne voyez
+      que les dossiers. Un index et des vecteurs par racine ; les liens et les tags ne
+      traversent pas les racines.</div>
+    <div id="rac-liste"></div>
+    <div class="vec-ligne">
+      <input id="rac-chemin" type="text" placeholder="chemin d'un dossier existant"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();racAjouter();}">
+      <button class="btn bs" onclick="racAjouter()">Ajouter</button>
+    </div>
+  </div>
   <div><label>URL API</label><input id="curl" type="text"></div>
   <div class="vec-bloc">
     <label style="display:flex;align-items:center;gap:7px">
@@ -489,6 +504,7 @@
 <script src="/static/js/objets.js"></script>
 <script src="/static/js/agents.js"></script>
 <script src="/static/js/vecteurs.js"></script>
+<script src="/static/js/racines.js"></script>
 <script src="/static/js/explorer.js"></script>
 <script src="/static/js/tags.js"></script>
 <script src="/static/js/backlinks.js"></script>

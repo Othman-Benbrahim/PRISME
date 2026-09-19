@@ -5,6 +5,25 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E12 — Plusieurs racines de vault
+
+| Avant | Après |
+|---|---|
+| Une seule racine (`workspace`) | Une principale plus une liste (`workspaces`) ; tout fonctionne dans chacune |
+| Hors vault : dossiers seulement | **Inchangé** hors des racines déclarées : ni nom de fichier, ni lecture |
+| `safe_path` : une racine | Toutes les racines déclarées ; la restriction d'une requête d'agent est posée dans le contexte et honorée partout |
+| Clés d'agent | Bornées à la racine principale ; nouveau droit `toutes_racines`, accordé clé par clé |
+| `/api/search` | Couvre toutes les racines, fusion **RRF** ; chaque résultat porte sa `racine` |
+| `/api/tags` | Renvoie aussi la `racine` — les tags ne traversent pas les racines |
+| `/api/index/status` | Ajoute `racines` : un état par racine |
+| `/api/index/rebuild` | Accepte `{"racine": …}` ; sans elle, reconstruit toutes les racines |
+| `/api/files` | Renvoie `racine` et la liste `racines` |
+| — | Nouvelles routes `/api/racines` (GET, POST), `/retirer`, `/principale` |
+| Corbeille et versions dans la racine principale | Suivent la racine du fichier |
+
+Aucun changement de schéma d'index. Chaque racine a le sien, créé à la volée ; le vault
+existant n'est pas reconstruit.
+
 ## Plugin « Embeddings locaux » (ONNX)
 
 Étape additive : sans le plugin, ni ses bibliothèques, rien ne change.

@@ -28,10 +28,10 @@ def fournisseur_configure(cfg=None):
     return construire(cfg.get("emb_fournisseur") or "api", cfg)
 
 
-def etat(cfg=None):
+def etat(cfg=None, racine=None):
     """De quoi afficher en permanence ce qui est actif, comme l'exige 0019."""
     cfg = cfg or rd_cfg()
-    magasin = magasin_pour()
+    magasin = magasin_pour(racine)
     base = {"actif": bool(cfg.get("emb_actif")), "fournisseur": cfg.get("emb_fournisseur") or "api",
             "modele": cfg.get("emb_modele") or "", **magasin.etat(),
             "progression": dict(ETAT)}
@@ -59,7 +59,7 @@ def _segments_a_faire(index, magasin):
     return [(r["sha256"], r["text"]) for r in lignes if r["sha256"] not in connus], vivants
 
 
-def vectoriser(index=None, cfg=None, par_lot=64):
+def vectoriser(index=None, cfg=None, par_lot=64, racine=None):
     """Met le magasin à jour. Renvoie un compte rendu ; ne lève pas."""
     from ..index import fresh_index
 
@@ -77,8 +77,8 @@ def vectoriser(index=None, cfg=None, par_lot=64):
         if not ok:
             raise VecteurIndisponible(raison)
 
-        index = index or fresh_index()
-        magasin = magasin_pour()
+        index = index or fresh_index(racine)
+        magasin = magasin_pour(racine)
         # Changer de modèle vide le magasin : un index ne mélange jamais deux modèles.
         revectorise = magasin.fixer_signature(fournisseur.signature())
 

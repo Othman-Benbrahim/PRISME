@@ -17,15 +17,17 @@ bp = Blueprint("files", __name__)
 
 @bp.route("/api/files", methods=["GET"])
 def list_files():
-    """Contenu d'un dossier. Dans le vault : dossiers et fichiers. Hors du vault :
-    dossiers seulement, pour pouvoir choisir un autre espace de travail sans
-    exposer les noms de fichiers du reste du disque."""
-    root = vault_root()
+    """Contenu d'un dossier. Dans une racine declaree : dossiers et fichiers. Ailleurs :
+    dossiers seulement, pour pouvoir en choisir une nouvelle sans exposer les noms de
+    fichiers du reste du disque (docs/decisions/0028)."""
+    from ..vault import racine_de, vault_roots
+    racines = vault_roots()
     raw = request.args.get("path", "").strip()
-    p = Path(raw).expanduser() if raw else root
+    p = Path(raw).expanduser() if raw else racines[0]
     try:
         p = p.resolve()
-        inside = p == root or root in p.parents
+        racine = racine_de(p)
+        inside = racine is not None
         items = sorted(
             [{"name": i.name, "path": str(i), "is_dir": i.is_dir(),
               "is_md": i.suffix.lower() in (".md", ".txt", ".markdown")}
@@ -34,7 +36,10 @@ def list_files():
             key=lambda x: (not x["is_dir"], x["name"].lower())
         )
         return jsonify({"path": str(p), "parent": str(p.parent), "items": items,
-                        "outside_vault": not inside})
+                        "outside_vault": not inside,
+                        "racine": str(racine) if racine else "",
+                        "racines": [{"chemin": str(r), "nom": r.name,
+                                     "principale": i == 0} for i, r in enumerate(racines)]})
     except PermissionError: return jsonify({"error": "Accès refusé"}), 403
     except (FileNotFoundError, NotADirectoryError): return jsonify({"error": "Dossier introuvable"}), 404
     except OSError as e: return jsonify({"error": str(e)}), 400
