@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 # Distribution en dossier : PRISME.exe + _internal/ ; plugins copiés séparément.
 import os
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_submodules, collect_dynamic_libs, collect_data_files, copy_metadata
 
 ROOT = os.path.abspath(os.path.join(SPECPATH, ".."))
@@ -20,9 +21,9 @@ a = Analysis([os.path.join(ROOT, "prisme.py")], pathex=[ROOT],
              excludes=["tkinter", "onnx", "torch", "tensorflow"])
 # Le code des plugins doit rester exclusivement dans plugins/.
 for nom, chemin, _ in a.pure:
-    if os.path.commonpath([ROOT, os.path.abspath(chemin)]) == ROOT:
-        if os.path.relpath(chemin, ROOT).split(os.sep)[0] == "plugins":
-            raise RuntimeError("Plugin embarqué par erreur : " + nom)
+    # Le dépôt et Python peuvent se trouver sur deux lecteurs Windows différents.
+    if Path(chemin).resolve().is_relative_to(Path(ROOT) / "plugins"):
+        raise RuntimeError("Plugin embarqué par erreur : " + nom)
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True,
           name="PRISME", console=True, upx=False)
