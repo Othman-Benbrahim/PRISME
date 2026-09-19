@@ -7,6 +7,7 @@ function openSearch(){
 }
 function closeSearch(){ $('msearch').classList.remove('on'); }
 var searchTimer;
+var SR_PLUSIEURS_RACINES=false;
 function debouncedSearch(){ clearTimeout(searchTimer); searchTimer=setTimeout(doSearch,300); }
 async function doSearch(){
   var q=$('sq').value.trim(); if(q.length<2){$('sresults').innerHTML='<div class="s-empty">Tapez au moins 2 caractères</div>';return;}
@@ -14,6 +15,7 @@ async function doSearch(){
   var d=await fetch('/api/search?q='+eu(q)).then(function(r){return r.json();});
   if(d.error){$('sresults').innerHTML='<div class="s-empty">⚠ '+esc(d.error)+'</div>';return;}
   var res=d.results||[];
+  SR_PLUSIEURS_RACINES=(d.index_par_racine||[]).length>1;
   vecRendreModeRecherche(d.recherche);
   var building=d.index&&d.index.state==='construction'
     ?'<div class="s-empty">Index en construction ('+d.index.progress.done+' / '+d.index.progress.total+') : résultats partiels.</div>':'';
@@ -32,8 +34,12 @@ async function doSearch(){
           +(m.origine==='sens'?'sens':'mots + sens')+'</span> ':'';
       return '<div class="sr-match">'+org+head+text+'</div>';
     }).join('');
+    // Avec plusieurs racines, deux fichiers homonymes seraient indiscernables :
+    // on dit d'où vient le résultat (décision 0028).
+    var rac=(r.racine && SR_PLUSIEURS_RACINES)
+      ?'<span class="sr-racine">'+esc(r.racine.split(/[/\\]/).filter(Boolean).pop())+'</span>':'';
     return '<div class="sr-item" onclick="openResult(\''+eu(r.path)+'\',\''+eu(q)+'\')">'
-      +'<div class="sr-name">📄 '+esc(r.name)+'</div>'
+      +'<div class="sr-name">📄 '+esc(r.name)+rac+'</div>'
       +'<div class="sr-rel">'+esc(r.rel)+'</div>'
       +matches+'</div>';
   }).join('');

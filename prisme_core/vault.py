@@ -34,34 +34,93 @@ SKIP_DIRS = {"node_modules", "AppData", "Library", ".git", ".trash",
              "Program Files (x86)", "$RECYCLE.BIN", "OneDriveTemp"}
 
 def vault_root():
-    """Racine autorisee pour toute operation de fichier."""
+    """Racine principale. C'est elle que voit tout code qui n'a pas besoin des autres."""
     return Path(rd_cfg().get("workspace") or Path.home()).expanduser().resolve()
 
+
+def vault_roots(cfg=None):
+    """Toutes les racines declarees, la principale en tete (docs/decisions/0028).
+
+    Les doublons et les chemins illisibles sont ecartes ; une racine imbriquee dans une
+    autre est retiree, sinon un meme fichier appartiendrait a deux index."""
+    cfg = cfg or rd_cfg()
+    brutes = [cfg.get("workspace") or str(Path.home())] + list(cfg.get("workspaces") or [])
+    out = []
+    for brute in brutes:
+        try:
+            p = Path(str(brute or "").strip()).expanduser().resolve()
+        except OSError:
+            continue
+        if not str(p) or p in out:
+            continue
+        if any(a == p or a in p.parents for a in out):
+            continue                      # deja couverte par une racine precedente
+        out.append(p)
+    return out or [vault_root()]
+
+
+def racines_autorisees():
+    """Racines utilisables par la requete en cours.
+
+    Une requete d'agent est bornee par sa cle : la garde de `/api/v1/` pose la
+    restriction dans `g`, et elle vaut ici pour tout le monde — routes, plugins, code
+    appele en cascade. Oublier un appel echoue donc du cote restreint, jamais du cote
+    permissif (docs/decisions/0028)."""
+    try:
+        from flask import g, has_request_context
+        if has_request_context():
+            limite = getattr(g, "racines_agent", None)
+            if limite:
+                return [Path(x).expanduser().resolve() for x in limite]
+    except Exception:                     # noqa: BLE001 — hors contexte Flask (tests, scripts)
+        pass
+    return vault_roots()
+
+
+def _dans(p, racines):
+    return any(p == r or r in p.parents for r in racines)
+
+
 def safe_path(raw, must_exist=False):
-    """Resout un chemin et REFUSE tout ce qui sort du vault.
-    Un chemin relatif est interprete depuis la racine du vault.
-    Leve PermissionError (hors vault) ou FileNotFoundError."""
-    root = vault_root()
+    """Resout un chemin et REFUSE tout ce qui sort des racines declarees.
+    Un chemin relatif est interprete depuis la racine principale.
+    Leve PermissionError (hors racines) ou FileNotFoundError."""
+    racines = racines_autorisees()
     p = Path(str(raw or "").strip()).expanduser()
     if not p.is_absolute():
-        p = root / p
+        p = racines[0] / p
     try:
         p = p.resolve()
     except OSError:
         raise PermissionError("Chemin invalide")
-    if p != root and root not in p.parents:
+    if not _dans(p, racines):
+        noms = ", ".join(str(r) for r in racines)
         raise PermissionError(
-            "Hors de l'espace de travail (%s). Pour utiliser ce dossier, "
-            "définissez-le comme espace de travail." % root)
+            "Hors des espaces de travail (%s). Pour utiliser ce dossier, "
+            "ajoutez-le dans Paramètres." % noms)
     return p
+
+
+def racine_de(chemin):
+    """La racine declaree qui contient ce chemin, ou None."""
+    try:
+        p = Path(chemin).expanduser().resolve()
+    except OSError:
+        return None
+    for r in vault_roots():
+        if p == r or r in p.parents:
+            return r
+    return None
 
 def in_trash(p):
     return ".trash" in Path(p).parts
 
 def to_trash(p):
-    """Deplace vers <vault>/.trash/AAAA-MM-JJ/ au lieu de supprimer.
-    Rien n'est jamais perdu par un simple clic — le menage se fait a la main."""
-    trash = vault_root() / ".trash" / time.strftime("%Y-%m-%d")
+    """Deplace vers <racine>/.trash/AAAA-MM-JJ/ au lieu de supprimer.
+    Rien n'est jamais perdu par un simple clic — le menage se fait a la main.
+    La corbeille suit la racine du fichier : un fichier d'une racine secondaire ne
+    part pas dans la corbeille d'une autre."""
+    trash = (racine_de(p) or vault_root()) / ".trash" / time.strftime("%Y-%m-%d")
     trash.mkdir(parents=True, exist_ok=True)
     target = trash / p.name
     i = 1
@@ -95,7 +154,7 @@ def snapshot(p, force=False):
         last = _LAST_SNAP.get(str(p), 0)
         if not force and now - last < SNAPSHOT_INTERVAL:
             return None
-        d = vault_root() / ".trash" / "versions" / time.strftime("%Y-%m-%d")
+        d = (racine_de(p) or vault_root()) / ".trash" / "versions" / time.strftime("%Y-%m-%d")
         d.mkdir(parents=True, exist_ok=True)
         dest = d / ("%s_%s%s" % (p.stem, time.strftime("%H%M%S"), p.suffix))
         shutil.copy2(str(p), str(dest))
@@ -128,7 +187,7 @@ def iter_md(root):
 
 
 def scoped_dir(raw=None):
-    """Dossier demande par le client, ramene dans le vault (racine par defaut).
-    Leve PermissionError s'il sort du vault."""
+    """Dossier demande par le client, ramene dans les racines (principale par defaut).
+    Leve PermissionError s'il en sort."""
     raw = (raw or "").strip()
     return str(safe_path(raw) if raw else vault_root())

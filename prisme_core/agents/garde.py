@@ -48,6 +48,15 @@ def controler():
     if ident is None:
         return _refus(info, 403)                  # info porte la raison du refus
     g.agent = {"id": ident, "nom": info["nom"], "droits": list(info.get("droits", []))}
+    # Bornage des racines (docs/decisions/0028). Une cle voit la racine principale et
+    # rien d'autre, sauf si l'auteur lui a accorde des racines supplementaires. Pose ici,
+    # une seule fois : `vault.safe_path` l'honore ensuite partout, y compris dans les
+    # plugins appeles en cascade.
+    from ..vault import vault_root, vault_roots
+    if "toutes_racines" in info.get("droits", ()):
+        g.racines_agent = [str(r) for r in vault_roots()]
+    else:
+        g.racines_agent = [str(vault_root())]
     cles.marquer_utilisation(ident)
     return None
 

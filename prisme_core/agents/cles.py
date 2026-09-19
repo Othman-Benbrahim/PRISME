@@ -9,7 +9,9 @@ Droits :
 - `lecture` — chercher dans le vault, lire une note, lister les objets Source ;
 - `proposition` — déposer dans la file de validation d'E5, jamais dans le vault ;
 - `ecriture` — écrire directement une note ; **accordé au cas par cas**, jamais par
-  défaut, comme la décision 0018 l'exige.
+  défaut, comme la décision 0018 l'exige ;
+- `toutes_racines` — voir les racines secondaires du vault. Sans lui, une clé ne connaît
+  que la racine principale, quelles que soient les racines déclarées (0028).
 """
 import hashlib
 import hmac
@@ -20,7 +22,7 @@ import threading
 import time
 
 PREFIXE = "prisme-"
-DROITS = ("lecture", "proposition", "ecriture")
+DROITS = ("lecture", "proposition", "ecriture", "toutes_racines")
 DROITS_DEFAUT = ("lecture", "proposition")
 FICHIER = "cles.json"
 _VERROU = threading.Lock()

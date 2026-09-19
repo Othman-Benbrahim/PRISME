@@ -35,3 +35,5 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0025 | [Calibration en plugin](0025-calibration-en-plugin.md) | acceptée, non encore appliquée |
 | 0026 | [Activation de l'horloge du monde](0026-horloge-du-monde-activee.md) | acceptée, non encore appliquée |
 | 0027 | [Découpage et ordre des étapes restantes](0027-ordre-des-etapes-restantes.md) | acceptée |
+| 0028 | [Plusieurs racines de vault](0028-plusieurs-racines-de-vault.md) | appliquée en E12 |
+| 0029 | [Recherche en arbre](0029-recherche-en-arbre.md) | acceptée, à appliquer (E13) |

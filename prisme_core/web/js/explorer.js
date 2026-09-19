@@ -6,6 +6,7 @@ async function loadDir(path){
   var d=await fetch(url).then(function(r){return r.json();});
   if(d.error){toast('⚠ '+d.error);return;}
   CUR_DIR=d.path; $('fp-txt').textContent=d.path; $('fp-txt').title=d.path;
+  RACINES=d.racines||[]; renderRacines(d.racine);
   FILE_ITEMS=[];
   if(d.path!==d.parent) FILE_ITEMS.push({path:d.parent,is_dir:true,name:'..'});
   d.items.forEach(function(i){ FILE_ITEMS.push(i); });
@@ -103,11 +104,41 @@ function startRename(idx){
   inp.addEventListener('blur',confirm_rename);
 }
 
-// ── Workspace ──
+// ── Racines du vault (décision 0028) ──
+// Plusieurs dossiers déclarés, dans lesquels tout fonctionne. Ailleurs, on ne voit
+// que les dossiers — la garde n'est pas levée, elle porte sur une liste.
+var RACINES=[];
+
+// Le chemin est encodé dans l'attribut onclick — il peut contenir des quotes.
+// loadDir l'encode à nouveau pour l'URL : sans ce décodage, il partait en double.
+function racAller(encoded){ loadDir(decodeURIComponent(encoded)); }
+
+function renderRacines(courante){
+  var barre=$('fp-racines'); if(!barre) return;
+  if(RACINES.length<2){ barre.style.display='none'; barre.innerHTML=''; return; }
+  barre.style.display='';
+  barre.innerHTML=RACINES.map(function(r){
+    var active=courante && r.chemin===courante;
+    return '<button class="rac'+(active?' on':'')+(r.principale?' principale':'')+'" '
+      +'title="'+esc(r.chemin)+(r.principale?' (principale)':'')+'" '
+      +'onclick="racAller(\''+eu(r.chemin)+'\')">'+esc(r.nom||r.chemin)+'</button>';
+  }).join('');
+}
+
 async function setWorkspace(){ if(CUR_DIR) setWorkspaceDir(CUR_DIR); }
 async function setWorkspaceDir(dir){
   await post('/api/config',{workspace:dir}); loadDir(dir);
   toast('✓ Espace de travail : '+dir.split(/[/\\]/).pop());
+}
+
+// Ajoute le dossier affiché comme racine supplémentaire, sans toucher à la principale.
+async function ajouterRacineCourante(){
+  if(!CUR_DIR) return;
+  var d=await post('/api/racines',{chemin:CUR_DIR});
+  if(d.error){ toast('⚠ '+d.error,5000); return; }
+  toast('✓ Racine ajoutée — son index se construit');
+  loadDir(CUR_DIR);
+  if(typeof racCharger==='function') racCharger();
 }
 
 

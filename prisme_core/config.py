@@ -20,6 +20,8 @@ DEF_CFG = {
     "model"     : "",
     "base_url"  : "",
     "workspace" : str(DEFAULT_VAULT),
+    # Racines supplementaires (docs/decisions/0028). La principale reste "workspace".
+    "workspaces": [],
     "configured": False,
     # Recherche semantique (docs/decisions/0019). Parametree separement du chat :
     # on peut vouloir un modele local pour ecrire et une API pour vectoriser.

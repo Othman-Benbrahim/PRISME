@@ -43,6 +43,7 @@
 | `routes/objets.py` | Objets Source : balayage, statuts, lots, file de validation, rejets |
 | `routes/agent_api.py` | Surface `/api/v1/` des agents : lecture, proposition, écriture |
 | `routes/agents.py` | Gestion du trousseau depuis l'interface |
+| `routes/racines.py` | Racines du vault : déclarer, retirer, promouvoir |
 | `routes/vecteurs.py` | Recherche sémantique : état, test, vectorisation, paramétrage |
 | `api.py` (embeddings) | `register_embeddings`, `EmbeddingProvider`, `EmbeddingUnavailable` : la porte par laquelle un plugin apporte ses propres vecteurs |
 
@@ -57,7 +58,8 @@ comportement dans `js/`, un fichier par zone. L'ordre des balises `<script>` com
    `plugin-manager.js`, `gutter.js` (numéros de ligne), `history.js` (annuler/rétablir),
    `find-in-note.js` (recherche dans la note), `provenance.js` (fiche de provenance),
    `engram.js` (import de sources), `objets.js` (sources citées et file de validation),
-   `agents.js` (clés d'accès et journal), `vecteurs.js` (recherche sémantique)
+   `agents.js` (clés d'accès et journal), `vecteurs.js` (recherche sémantique),
+   `racines.js` (racines du vault)
 3. les plugins actifs, un fichier chacun (`/plugins/<id>/ui.js`)
 4. `mindmap.js`, `layout.js`, `settings.js`, `init.js`, `onboarding.js`, `ai-stream.js`
 

@@ -22,8 +22,8 @@ def get_index(root=None):
         return idx
 
 
-def fresh_index():
-    idx = get_index()
+def fresh_index(root=None):
+    idx = get_index(root)
     idx.ensure_fresh()
     return idx
 

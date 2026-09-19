@@ -36,13 +36,13 @@ def vecteur_de_requete(texte, cfg=None):
     return quant.normaliser(vecteurs[0]), fournisseur
 
 
-def semantique(texte, cfg=None, combien=PLAFOND_SEGMENTS):
+def semantique(texte, cfg=None, combien=PLAFOND_SEGMENTS, racine=None):
     """[(sha256 de segment, cosinus)] du plus proche au plus lointain.
 
     Deux étages : présélection binaire sur tout le magasin, puis cosinus exact sur les
     meilleurs candidats. Voir `quantification` pour les mesures.
     """
-    magasin = magasin_pour()
+    magasin = magasin_pour(racine)
     bits = magasin.bits()
     if not bits:
         raise VecteurIndisponible("Aucun vecteur : lancez la vectorisation dans les Paramètres")
@@ -83,7 +83,8 @@ def _lignes_par_sha(index, shas, root_filter=None):
     return out
 
 
-def hybride(index, texte, limit_files=40, per_file=3, root_filter=None, cfg=None):
+def hybride(index, texte, limit_files=40, per_file=3, root_filter=None, cfg=None,
+            racine=None):
     """Fusion RRF de la recherche lexicale et de la recherche sémantique.
 
     Renvoie (résultats, info) où `info` dit quel mode a réellement servi — l'utilisateur
@@ -96,7 +97,7 @@ def hybride(index, texte, limit_files=40, per_file=3, root_filter=None, cfg=None
     rang_lexical = [r["sha256"] for r in lex_rows]
 
     try:
-        sem = semantique(texte, cfg=cfg)
+        sem = semantique(texte, cfg=cfg, racine=racine)
         rang_semantique = [sha for sha, _score in sem]
         info["semantique"] = True
         info["mode"] = "hybride"
