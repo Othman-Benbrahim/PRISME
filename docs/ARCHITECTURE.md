@@ -22,6 +22,7 @@
 | `frontmatter.py` | Lecture et écriture de l'en-tête YAML, sans dépendance |
 | `engram/` | **Ingestion des sources** : `contrat.py` (vérification et empreintes), `extracteurs.py` (ChatGPT, Claude, Mistral, texte, HTML, JSON), `identite.py` (identité des passages), `notes.py` (rendu, parties, archive), `ingestion.py` (import idempotent, registre) |
 | `agents/` | **Accès des agents** : `cles.py` (trousseau, empreintes, droits), `garde.py` (authentification par clé, décorateur de droit), `journal.py` (journal JSONL borné) |
+| `vecteurs/` | **Recherche sémantique** : `contrat.py` (interface fournisseur, registre), `fournisseurs.py` (API compatible OpenAI, Ollama), `quantification.py` (binarisation, Hamming, cosinus, RRF), `magasin.py` (base des vecteurs, par empreinte de segment), `vectorisation.py` (mise à jour incrémentale), `recherche.py` (fusion, plancher, repli) |
 | `objets/` | **Objets conceptuels** : `detection.py` (repérage et normalisation des URL, DOI, arXiv, ISBN), `file.py` (file de validation et rejets mémorisés), `sources.py` (objets Source comme notes du vault, lots, lien ENGRAM), `balayage.py` (entrée directe, propositions de l'IA, accepter / rejeter / fusionner) |
 | `provenance.py` | Identifiants, horloge d'enregistrement, estampillage des notes produites par une machine, validation des champs saisis à la main |
 | `index/` | **Index SQLite** : `store.py` (base et schéma), `segmenter.py` (découpage), `resolver.py` (résolution des liens), `indexer.py` (mise à jour), `search.py` (recherche, tags, graphe, backlinks) |
@@ -42,6 +43,7 @@
 | `routes/objets.py` | Objets Source : balayage, statuts, lots, file de validation, rejets |
 | `routes/agent_api.py` | Surface `/api/v1/` des agents : lecture, proposition, écriture |
 | `routes/agents.py` | Gestion du trousseau depuis l'interface |
+| `routes/vecteurs.py` | Recherche sémantique : état, test, vectorisation, paramétrage |
 
 ## Interface `prisme_core/web/`
 
@@ -54,7 +56,7 @@ comportement dans `js/`, un fichier par zone. L'ordre des balises `<script>` com
    `plugin-manager.js`, `gutter.js` (numéros de ligne), `history.js` (annuler/rétablir),
    `find-in-note.js` (recherche dans la note), `provenance.js` (fiche de provenance),
    `engram.js` (import de sources), `objets.js` (sources citées et file de validation),
-   `agents.js` (clés d'accès et journal)
+   `agents.js` (clés d'accès et journal), `vecteurs.js` (recherche sémantique)
 3. les plugins actifs, un fichier chacun (`/plugins/<id>/ui.js`)
 4. `mindmap.js`, `layout.js`, `settings.js`, `init.js`, `onboarding.js`, `ai-stream.js`
 
@@ -74,6 +76,7 @@ rafraîchir le navigateur suffit.
 | `objets/file.json` | File de validation et rejets mémorisés — hors du vault, par construction |
 | `agents/cles.json` | Trousseau des agents : empreintes seules, jamais les clés |
 | `agents/journal.jsonl` | Journal des appels d'agent ; survit à la révocation des clés |
+| `vecteurs/<empreinte>.db` | Vecteurs d'un vault, par empreinte de segment ; **séparés de l'index**, qui se reconstruit sans les détruire |
 | `staging/` | Archives vérifiées en attente de confirmation (effacées après une heure) |
 | `corbeille-plugins/` | Plugins désinstallés ou remplacés |
 

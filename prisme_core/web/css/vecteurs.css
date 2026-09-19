@@ -1,0 +1,26 @@
+/* ── Recherche sémantique : paramétrage ── */
+.vec-bloc{border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;margin-top:10px;
+  background:var(--bg3);display:flex;flex-direction:column;gap:7px}
+.vec-note{font-size:11px;color:var(--tx2);line-height:1.5}
+.vec-ligne{display:flex;gap:6px;flex-wrap:wrap}
+.vec-ligne input,.vec-ligne select{flex:1;min-width:150px;padding:6px 9px;font-size:12px;
+  background:var(--bg);border:1px solid var(--bdr);border-radius:6px;color:var(--tx);
+  font-family:var(--font);outline:none}
+.vec-ligne select{flex:0 0 190px}
+.vec-ligne input#vec-url{flex:2 1 220px}
+.vec-ligne .btn{width:auto;padding:6px 12px;font-size:11.5px}
+
+/* L'etat est visible en permanence : on doit toujours savoir ce qui tourne et ou part le texte. */
+.vec-etat{font-size:11.5px;line-height:1.5;padding:6px 9px;border-radius:6px;border:1px solid var(--bdr)}
+.vec-etat.off{color:var(--tx2);background:var(--bg)}
+.vec-etat.ok{color:var(--grn);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.06)}
+.vec-etat.ko{color:var(--yel);border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.06)}
+.vec-etat.en-cours{color:var(--acc);border-color:var(--acc);background:rgba(91,141,238,.07)}
+
+/* Origine d'un resultat de recherche : par les mots, par le sens, ou les deux. */
+.sr-origine{font-size:9.5px;padding:1px 6px;border-radius:8px;margin-right:6px;
+  border:1px solid var(--bdr2);color:var(--tx2);white-space:nowrap;flex-shrink:0}
+.sr-origine.sens{color:var(--pur);border-color:rgba(192,132,252,.45)}
+.sr-origine.les-deux{color:var(--teal);border-color:rgba(52,211,153,.45)}
+#sr-mode{font-size:11px;color:var(--tx2);padding:4px 2px;line-height:1.5}
+#sr-mode .repli{color:var(--yel)}

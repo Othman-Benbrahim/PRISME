@@ -26,7 +26,7 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0016 | [Passages retirés d'une source](0016-passages-retires-d-une-source.md) | appliquée en E4 |
 | 0017 | [Objets conceptuels](0017-objets-conceptuels.md) | appliquée en E5 pour le type Source ; autres types en E11 |
 | 0018 | [Accès des agents](0018-acces-des-agents.md) | appliquée en E6 ; adaptateur MCP en E10 |
-| 0019 | [Recherche sémantique](0019-recherche-semantique.md) | acceptée, non encore appliquée (E7) |
+| 0019 | [Recherche sémantique](0019-recherche-semantique.md) | appliquée en E7 ; plugin ONNX à écrire |
 | 0020 | [Méthode de travail](0020-methode-de-travail.md) | appliquée depuis l'étape 00 |
 | 0021 | [Entrée directe des imports en masse](0021-entree-directe-des-imports-en-masse.md) | appliquée en E5, pour le type Source |
 | 0022 | [Horloges des objets](0022-horloges-des-objets.md) | appliquée en E3 (horloge d'enregistrement) ; horloge du monde précisée par 0026 |
