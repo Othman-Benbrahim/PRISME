@@ -70,3 +70,9 @@ certifié ; ses empreintes protègent contre les altérations accidentelles.
 L'essai du navigateur porte sur Constat, Calibration et l'ouverture d'OSINT. Le
 chargement du graphe général dépend de son CDN D3, inaccessible dans cet environnement
 de contrôle ; ce graphe ne fait pas partie des changements de cette branche.
+
+Un premier contrôle Windows a révélé un test E7 instable : le fournisseur simulé
+utilisait `hash()` pour initialiser un générateur aléatoire global. Son bruit variait
+selon le processus et pouvait créer un faux rapprochement. La graine dépend
+désormais du SHA-256 du texte et le générateur reste local au test. Le seuil de
+recherche et le code de production ne sont pas modifiés.
