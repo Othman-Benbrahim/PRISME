@@ -1,5 +1,6 @@
 """Recherche plein texte (FTS5, classement BM25) et requetes derivees de l'index."""
 import re
+from pathlib import Path
 
 from .store import fts5_available
 
@@ -10,7 +11,7 @@ _TOKEN = re.compile(r"\w+", re.UNICODE)
 def _scope(root_filter):
     if not root_filter:
         return "", []
-    prefix = root_filter.rstrip("/\\")
+    prefix = str(Path(root_filter).resolve()).rstrip("/\\")
     return " AND (f.path = ? OR f.path LIKE ? ESCAPE '\\')", [prefix, _like_prefix(prefix)]
 
 
@@ -108,7 +109,7 @@ def graph(index, root_filter=None):
         if key not in seen:
             seen.add(key)
             edges.append({"source": r["src"], "target": r["dst"]})
-    base = (root_filter or "").rstrip("/\\")
+    base = str(Path(root_filter).resolve()).rstrip("/\\") if root_filter else ""
     nodes = []
     for r in files:
         rel = r["path"][len(base):].lstrip("/\\") if base and r["path"].startswith(base) else r["rel"]

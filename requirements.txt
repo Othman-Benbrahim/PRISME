@@ -6,8 +6,8 @@
 # bibliothèque standard Python (re, time, json, html, datetime, pathlib,
 # urllib, threading, concurrent.futures, xml.etree.ElementTree, etc.).
 
-# Construction de l'exe (facultatif) : pip install pyinstaller
-#   puis : pyinstaller packaging/PRISME.spec
+# Construction Windows : packaging/construire-windows.ps1
+# Dépendances de construction : packaging/requirements-build.txt
 
 # ── Cœur (obligatoire) ─────────────────────────────────────────────
 flask>=3.0.0

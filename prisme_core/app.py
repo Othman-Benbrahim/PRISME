@@ -38,7 +38,9 @@ def create_app(with_plugins=True):
     return app
 
 
-def main():
+def main(port=5000, ouvrir_navigateur=True):
+    global PORT
+    PORT = port
     print(f"\n  {NAME} {__version__}\n  http://localhost:{PORT}  (Ctrl+C pour arreter)\n")
     if import_legacy_config():
         print("-> Configuration de Second Brain V1 reprise dans le profil PRISME")
@@ -58,5 +60,6 @@ def main():
         print(f"-> Index : {idx.db_path} ({'FTS5' if idx.fts else 'sans FTS5, recherche simple'})\n")
     except Exception as e:                                   # noqa: BLE001
         print(f"-> Index indisponible : {e}\n")
-    threading.Timer(1.6, lambda: webbrowser.open(f"http://localhost:{PORT}")).start()
+    if ouvrir_navigateur:
+        threading.Timer(1.6, lambda: webbrowser.open(f"http://localhost:{PORT}")).start()
     app.run(host=HOST, port=PORT, debug=False, threaded=True)

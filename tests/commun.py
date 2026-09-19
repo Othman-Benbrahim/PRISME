@@ -6,7 +6,9 @@ import tempfile
 import time
 from pathlib import Path
 
-TMP = Path(tempfile.mkdtemp(prefix="prisme-test-"))
+# Windows peut donner un chemin court (RUNNER~1) : comparer les mêmes chemins
+# canoniques que ceux conservés par le vault et l’index.
+TMP = Path(tempfile.mkdtemp(prefix="prisme-test-")).resolve()
 os.environ["PRISME_DATA_DIR"] = str(TMP / "profil")
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
