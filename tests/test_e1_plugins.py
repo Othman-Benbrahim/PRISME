@@ -103,6 +103,25 @@ class PluginEnv(unittest.TestCase):
 
 
 class TestChargementEtRoutes(PluginEnv):
+    def test_dossiers_residuels_ignores(self):
+        for nom, cache in (("vide", False), ("cache-seul", True)):
+            with self.subTest(nom=nom):
+                d = self.pdir / nom
+                (d / "sous-dossier").mkdir(parents=True)
+                if cache:
+                    (d / "__pycache__").mkdir()
+                    (d / "__pycache__" / "ancien.pyc").write_bytes(b"cache")
+                self.assertIsNone(plugins.load_one(d))
+                self.assertNotIn(nom, plugins.REGISTRY)
+
+    def test_code_sans_manifest_reste_incompatible(self):
+        d = self.pdir / "incomplet"
+        d.mkdir()
+        (d / "__init__.py").write_text("", encoding="utf-8")
+        p = plugins.load_one(d)
+        self.assertEqual(p.status, "incompatible")
+        self.assertIn("manifest", p.error)
+
     def test_routes_prefixees_et_assets(self):
         make_plugin_dir(self.pdir)
         c = self.client()
@@ -381,13 +400,24 @@ class TestPluginsLivres(PluginEnv):
     def test_tous_actifs(self):
         c = self.client()
         statuts = {pid: (p.status, p.error) for pid, p in plugins.REGISTRY.items()}
-        self.assertEqual(set(statuts), {"arxiv", "context", "duckduckgo", "osint-cx",
-                                        "prompts", "rss", "embeddings-locaux"})
+        attendus = {"arxiv", "context", "duckduckgo", "osint-cx",
+                    "prompts", "rss", "embeddings-locaux", "constat"}
+        # Calibration est une livraison séparée, éventuellement déjà installée.
+        if (self.pdir / "calibration" / "manifest.json").is_file():
+            attendus.add("calibration")
+        self.assertEqual(set(statuts), attendus)
         for pid, (status, error) in statuts.items():
             self.assertEqual(status, "actif", f"{pid} : {error}")
         page = c.get("/").get_data(as_text=True)
         for pid in statuts:
             self.assertIn(f'/plugins/{pid}/ui.js', page)
+
+    def test_reste_de_livraison_ne_cree_pas_de_plugin(self):
+        # Reproduit le cache laissé après retrait des fichiers d'une livraison.
+        d = self.pdir / "reste-livraison" / "__pycache__"
+        d.mkdir(parents=True)
+        (d / "ancien.pyc").write_bytes(b"cache")
+        self.test_tous_actifs()
 
     def test_routes_migrees(self):
         c = self.client()

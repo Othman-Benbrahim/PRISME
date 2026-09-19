@@ -1,5 +1,10 @@
 # Feuille de route
 
+**Correction de périmètre (0035)** : Constat s’utilise directement dans PRISME,
+sous forme de plugin. L’extension Firefox n’est pas requise. Calibration reste
+séparé, avec l’horloge du monde ; E11 ne contient PAS ses calculs.
+
+
 Chaque étape dépend des précédentes. Une étape = une branche = une pull request vers `main`.
 
 | Étape | Branche | Objet | État |
@@ -38,7 +43,7 @@ décidé, ou explicitement en attente.
 | Sujet | État |
 |---|---|
 | Plugin de calibration (Brier, log loss, courbes) | Reporté après E11 — [0025](decisions/0025-calibration-en-plugin.md). Le cœur fournira le type Prédiction, le plugin fera le calcul. |
-| Bouton « verser comme prédiction » dans Constat | Décidé — [0031](decisions/0031-constat-source-des-hypotheses.md). Après E11 : l'extension versera ses hypothèses ACH par `/api/v1/`, premier client extérieur de l'API des agents. |
+| Constat intégré dans PRISME | Décidé — [0031](decisions/0031-constat-source-des-hypotheses.md). Après E11 : plugin intégré, dossiers et ACH ; proposition interne en file, sans clé d’agent — voir [0035](decisions/0035-constat-integre.md). |
 | Horloge du monde active | S'activera avec ce plugin — [0026](decisions/0026-horloge-du-monde-activee.md). Les champs sont réservés depuis E3, aucune migration à prévoir. |
 | Mécanisme de gel des objets | Prévu dans le modèle (0017), non implémenté. |
 | Seuil d'entrée directe par type | Implémenté en E11 (0033). Aucun signal automatique défini pour les cinq nouveaux types. |
