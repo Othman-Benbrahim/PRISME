@@ -49,13 +49,13 @@ def verifier(executable, travail):
                 raise RuntimeError("La configuration MCP du binaire demande encore Python")
             mcp_env = {**env, **config["env"]}
             messages = [
-                {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "E9", "version": "1"}}},
+                {"jsonrpc": "2.0", "id": "été", "method": "initialize", "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "E9", "version": "1"}}},
                 {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
             ]
-            reponse = subprocess.run([config["command"], *config["args"]], input="".join(json.dumps(x) + "\n" for x in messages),
+            reponse = subprocess.run([config["command"], *config["args"]], input="".join(json.dumps(x, ensure_ascii=False) + "\n" for x in messages),
                                      text=True, encoding="utf-8", capture_output=True, cwd=travail, env=mcp_env, timeout=15, check=True)
             lignes = [json.loads(x) for x in reponse.stdout.splitlines() if x.strip()]
-            if len(lignes) != 2 or any("error" in x for x in lignes) or not lignes[1]["result"]["tools"]:
+            if len(lignes) != 2 or lignes[0].get("id") != "été" or any("error" in x for x in lignes) or not lignes[1]["result"]["tools"]:
                 raise RuntimeError("Protocole MCP invalide : " + reponse.stdout)
         finally:
             p.terminate()

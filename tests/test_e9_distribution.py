@@ -51,11 +51,11 @@ class TestDistribution(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             profil = Path(d) / "profil"
             r = subprocess.run([sys.executable, str(ROOT / "prisme.py"), "--mcp"],
-                               env={**os.environ, "PRISME_DATA_DIR": str(profil)},
-                               input=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "ping"}) + "\n",
+                               env={**os.environ, "PRISME_DATA_DIR": str(profil), "PYTHONIOENCODING": "cp1252"},
+                               input=json.dumps({"jsonrpc": "2.0", "id": "été", "method": "ping"}, ensure_ascii=False) + "\n",
                                capture_output=True, text=True, encoding="utf-8", timeout=10)
             self.assertEqual(r.returncode, 0, r.stderr)
-            self.assertEqual(json.loads(r.stdout), {"jsonrpc": "2.0", "id": 1, "result": {}})
+            self.assertEqual(json.loads(r.stdout), {"jsonrpc": "2.0", "id": "été", "result": {}})
             self.assertFalse(profil.exists())
 
     def test_osint_gele_ne_relance_pas_prisme_comme_python(self):

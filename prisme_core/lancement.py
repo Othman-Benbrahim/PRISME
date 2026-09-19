@@ -8,7 +8,7 @@ import tempfile
 
 
 def main():
-    for flux in (sys.stdout, sys.stderr):
+    for flux in (sys.stdin, sys.stdout, sys.stderr):
         if hasattr(flux, "reconfigure"):
             flux.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description="PRISME — mémoire locale")
