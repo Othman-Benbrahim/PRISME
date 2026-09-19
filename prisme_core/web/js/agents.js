@@ -13,12 +13,40 @@ function closeAgents(){ $('magents').classList.remove('on'); }
 
 function agOnglet(i){
   AG.onglet = i;
-  for(var k = 0; k < 2; k++){
+  for(var k = 0; k < 3; k++){
     $('agt' + k).classList.toggle('on', k === i);
     $('agp' + k).style.display = k === i ? '' : 'none';
   }
-  if(i === 0) agCharger(); else agJournal();
+  if(i === 0) agCharger();
+  else if(i === 1) agJournal();
+  // l'onglet MCP n'a rien a charger : il ne produit qu'a la demande
 }
+
+// ══════════════════════════════════════════════════
+//  MCP — connecter Claude Code (E10, decision 0032)
+// ══════════════════════════════════════════════════
+async function mcpGenerer(){
+  var nom = $('mcp-nom').value.trim();
+  if(!nom){ toast('Donnez un nom a l\'agent'); return; }
+  var d = await post('/api/agents/mcp', {nom: nom});
+  if(d.error){ toast('\u26a0 ' + d.error); return; }
+  // Indente ici, pas cote serveur : ce bloc est lu et colle par un humain.
+  $('mcp-json').textContent = JSON.stringify(d.configuration, null, 2);
+  $('mcp-aide').innerHTML =
+      'Dans Claude Code : <code>claude mcp add-json prisme</code>, ou collez ce bloc dans '
+    + 'votre fichier de configuration MCP. L\'adaptateur est '
+    + '<code>' + esc(d.adaptateur) + '</code>.<br>'
+    + 'PRISME doit tourner pour que l\'agent reponde : l\'adaptateur ne fait que lui parler.';
+  $('mcp-sortie').style.display = '';
+  agCharger();
+}
+
+function mcpCopier(){
+  navigator.clipboard.writeText($('mcp-json').textContent).then(
+    function(){ toast('Configuration copiee'); },
+    function(){ toast('Copie impossible \u2014 selectionnez le texte'); });
+}
+function mcpFermer(){ $('mcp-sortie').style.display = 'none'; $('mcp-json').textContent = ''; }
 
 async function agCharger(){
   var d = await fetch('/api/agents/cles').then(function(r){ return r.json(); });

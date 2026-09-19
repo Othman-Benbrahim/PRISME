@@ -3,6 +3,7 @@ import base64
 import os
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 TMP = Path(tempfile.mkdtemp(prefix="prisme-test-"))
@@ -15,6 +16,30 @@ VAULT = TMP / "vault"
 
 # Plafond des fichiers d'interface : un fichier plus long redevient monolithique.
 PLAFOND_FICHIER = 20_000
+
+
+def effacer(chemins, essais=5):
+    """Efface des fichiers, en tolérant qu'ils soient momentanément verrouillés.
+
+    Sous Linux, un fichier ouvert par un autre processus s'efface quand même. Sous
+    Windows, non : `unlink` lève `[WinError 32] fichier utilisé par un autre processus`,
+    et le test qui nettoyait son dossier échouait avant même d'avoir commencé.
+
+    Le verrou est transitoire — un serveur d'essai qui finit une requête, un
+    sous-processus qui n'a pas encore rendu la main. On réessaie donc brièvement, puis
+    on passe : un fichier résiduel gêne moins qu'un test qui ne s'exécute pas.
+    """
+    for chemin in list(chemins):
+        for essai in range(essais):
+            try:
+                Path(chemin).unlink()
+                break
+            except FileNotFoundError:
+                break
+            except OSError:
+                if essai == essais - 1:
+                    break
+                time.sleep(0.15)
 
 
 def taille_logique(chemin):

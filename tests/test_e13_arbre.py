@@ -14,7 +14,7 @@ Trois familles de tests, dans l'ordre de ce qui casse le plus cher :
 import unittest
 from pathlib import Path
 
-from commun import TMP, VAULT, reset_vault
+from commun import TMP, VAULT, effacer, reset_vault
 
 from prisme_core import config, index as idxmod, vault
 from prisme_core.app import create_app
@@ -35,8 +35,7 @@ def ecrire(nom, texte):
 class ArbreBase(unittest.TestCase):
     def setUp(self):
         reset_vault()
-        for f in list(VAULT.rglob("*.md")):
-            f.unlink()
+        effacer(VAULT.rglob("*.md"))
         # Structure de liens connue, avec un aller-retour Methode <-> Calibration :
         # c'est exactement la forme qui produisait un cycle.
         ecrire("Question.md", "# Question\n\nComment calibrer une prevision ? Voir [[Methode]].\n")
@@ -118,6 +117,50 @@ class FormeDeLArbre(ArbreBase):
         if n0 and n2:
             self.assertGreater(max(n0), max(n2))
 
+    def _vault_termes_separes(self):
+        """Un terme par note, et un lien entre les deux. Le fixture ordinaire ne sert pas :
+        `Methode.md` y contient « calibration » ET « Brier », donc la recherche plate
+        trouve, et le repli ne se declenche jamais."""
+        effacer(VAULT.rglob("*.md"))
+        ecrire("Calibration.md", "# Calibration\n\nLa calibration mesure l'ecart. Voir [[Score]].\n")
+        ecrire("Score.md", "# Score\n\nErreur quadratique moyenne.\n")
+        self.idx = fresh_index(VAULT)
+        self.idx.refresh()
+
+    def test_question_a_plusieurs_termes_repartis_sur_plusieurs_notes(self):
+        """La recherche lexicale exige TOUS les termes : sans repli, l'arbre sort vide.
+
+        Ici « calibration » est dans une note et « quadratique » dans une autre. La
+        recherche plate ne rend rien pour la question entiere — et c'est precisement le
+        cas que l'arbre devrait le mieux servir, puisque les deux notes sont reliees.
+
+        Trouve en ecrivant les tests d'E10, pas par ceux d'E13 : le banc de mesure d'E13
+        utilisait des notes ou tous les termes coexistaient.
+        """
+        from prisme_core.index import search as lexical
+        self._vault_termes_separes()
+        self.assertEqual(len(lexical.search(self.idx, "calibration quadratique", limit_files=40)), 0,
+                         "si la recherche plate trouve, ce test ne teste plus le repli")
+        a = self.arbre("calibration quadratique")
+        self.assertTrue(a["noeuds"], "l'arbre ne doit pas sortir vide")
+        self.assertTrue(a["recherche"].get("repli_par_terme"),
+                        "le repli doit etre signale, pas silencieux")
+        self.assertEqual({n["nom"] for n in a["noeuds"]}, {"Calibration.md", "Score.md"})
+
+    def test_le_repli_ne_sert_que_si_la_question_entiere_ne_rend_rien(self):
+        self._vault_termes_separes()
+        a = self.arbre("calibration")
+        self.assertTrue(a["noeuds"])
+        self.assertFalse(a["recherche"].get("repli_par_terme"))
+
+    def test_les_amorces_du_repli_pesent_moins(self):
+        """Une note qui satisfait un terme sur deux ne vaut pas une note qui les a tous."""
+        self._vault_termes_separes()
+        entiere = self.arbre("calibration")
+        partielle = self.arbre("calibration quadratique")
+        self.assertGreater(max(n["pertinence"] for n in entiere["noeuds"]),
+                           max(n["pertinence"] for n in partielle["noeuds"]))
+
     def test_note_ouverte_comme_amorce(self):
         a = parcours.construire(self.idx, "", depart=str(VAULT / "Calibration.md"))
         amorces = [n for n in a["noeuds"] if n["niveau"] == 0]
@@ -194,8 +237,7 @@ class Mesure(ArbreBase):
         econome parce qu'il ne trouvait rien.
         """
         import random
-        for f in list(VAULT.rglob("*.md")):
-            f.unlink()
+        effacer(VAULT.rglob("*.md"))
         corps = ("La prevision demande une discipline de mesure : hypothese, probabilite, "
                  "puis releve du resultat. " * 12)
         noms = ["%s-%02d" % (g, i)

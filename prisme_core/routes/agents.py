@@ -40,6 +40,46 @@ def creer():
                     "avertissement": "Copiez cette clé maintenant : elle ne sera plus affichée."}), 201
 
 
+@bp.route(PREFIX + "/mcp", methods=["POST"])
+def mcp():
+    """Crée une clé et rend la configuration MCP prête à coller (docs/decisions/0032).
+
+    Une clé, un chemin absolu et une URL, c'est trois choses à assembler sans se tromper,
+    et une erreur ne se voit qu'au moment où le client refuse de démarrer. Autant les
+    assembler ici : c'est PRISME qui sait où il tourne et où est son adaptateur.
+    """
+    from ..app import HOST, PORT
+    from ..paths import HOME
+
+    d = _corps()
+    nom = (d.get("nom") or "Claude Code").strip()
+    droits = d.get("droits") or list(cles.DROITS_DEFAUT)
+    adaptateur = HOME / "mcp" / "prisme_mcp.py"
+    if not adaptateur.is_file():
+        return jsonify({"error": "Adaptateur introuvable : %s. Il est livré dans le dossier "
+                                 "mcp/ du dépôt, ou à côté de PRISME.exe." % adaptateur}), 404
+    try:
+        ident, cle = cles.creer(nom, droits)
+    except cles.CleInvalide as e:
+        return _erreur(e)
+    journal.consigner(ident, nom, "CREATION", PREFIX + "/mcp", 201,
+                      "clé MCP ; droits : %s" % ", ".join(cles.par_id(ident)["droits"]))
+    config = {"mcpServers": {"prisme": {
+        "command": "python",
+        # Barres obliques même sous Windows : un antislash dans du JSON doit être
+        # échappé, et c'est la faute que tout le monde fait en recopiant un chemin.
+        "args": [adaptateur.as_posix()],
+        "env": {"PRISME_URL": "http://%s:%d" % (HOST, PORT), "PRISME_CLE": cle},
+    }}}
+    return jsonify({
+        "cle": cle, "info": cles.par_id(ident),
+        "adaptateur": adaptateur.as_posix(),
+        "configuration": config,
+        "avertissement": "Cette configuration contient la clé en clair : PRISME ne la "
+                         "réaffichera pas. Collez-la maintenant.",
+    }), 201
+
+
 @bp.route(PREFIX + "/cles/droits", methods=["POST"])
 def droits():
     d = _corps()

@@ -47,6 +47,8 @@ def ping():
             "GET /api/v1/notes": "lister les notes du vault (lecture)",
             "GET /api/v1/note?path=": "lire une note (lecture)",
             "GET /api/v1/recherche?q=": "chercher dans le vault (lecture)",
+            "GET /api/v1/arbre?q=": "chercher en suivant les liens : carte des relations "
+                                    "et notes retenues, sans appeler de modèle (lecture)",
             "GET /api/v1/objets": "lister les objets Source (lecture)",
             "POST /api/v1/proposer": "déposer une référence dans la file de validation (proposition)",
             "POST /api/v1/note": "écrire une note (ecriture, accordé au cas par cas)",
@@ -83,13 +85,63 @@ def lire_note():
                     "provenance": provenance.lire(p)})
 
 
+def _sans_marqueurs(valeur):
+    """Enlève les marqueurs de surlignage `\\x01`/`\\x02` posés pour le navigateur.
+
+    L'interface les remplace par `<mark>`. Un agent, lui, reçoit des caractères de
+    contrôle au milieu de son texte : illisibles, et bruyants dans un contexte de
+    modèle. Ils sont retirés ici, sur la seule surface qui sert aux agents.
+    """
+    if isinstance(valeur, str):
+        return valeur.replace("\x01", "").replace("\x02", "")
+    if isinstance(valeur, list):
+        return [_sans_marqueurs(v) for v in valeur]
+    if isinstance(valeur, dict):
+        return {k: _sans_marqueurs(v) for k, v in valeur.items()}
+    return valeur
+
+
 @bp.route(PREFIX + "/recherche", methods=["GET"])
 @exige("lecture")
 def recherche():
     texte = (request.args.get("q") or "").strip()
     if len(texte) < 2:
         return jsonify({"error": "Requête trop courte"}), 400
-    return jsonify({"resultats": query.search(fresh_index(), texte)})
+    return jsonify({"resultats": _sans_marqueurs(query.search(fresh_index(), texte))})
+
+
+@bp.route(PREFIX + "/arbre", methods=["GET"])
+@exige("lecture")
+def arbre():
+    """Recherche en arbre (E13), en lecture seule : la carte des relations et les notes
+    retenues, **sans jamais appeler de modèle**.
+
+    Ouvert aux agents parce que c'est précisément là que la mesure d'E13 a montré un
+    gain : sur 29 notes retenues, 12 n'étaient remontées par aucun score. Un agent qui
+    ne dispose que de la recherche plate paie le même nombre de jetons pour un contexte
+    moins bon, et ne voit aucune relation entre les notes.
+    """
+    from .. import arbre as arbre_mod
+
+    texte = (request.args.get("q") or "").strip()
+    depart = (request.args.get("depart") or "").strip()
+    if len(texte) < 2 and not depart:
+        return jsonify({"error": "Requête trop courte"}), 400
+    try:
+        depart = str(safe_path(depart)) if depart else None
+    except PermissionError as e:
+        return jsonify({"error": str(e)}), 403
+
+    racine = vault_root()
+    resultat = arbre_mod.construire(fresh_index(racine), texte, depart=depart, racine=racine)
+    return jsonify({
+        "carte": arbre_mod.carte(resultat["noeuds"]),
+        "noeuds": [{"chemin": _relatif(n["chemin"]), "motif": n["motif"],
+                    "niveau": n["niveau"], "retenu": n["retenu"]}
+                   for n in resultat["noeuds"]],
+        "retenus": [_relatif(c) for c in resultat["retenus"]],
+        "comptes": resultat["comptes"],
+    })
 
 
 @bp.route(PREFIX + "/objets", methods=["GET"])

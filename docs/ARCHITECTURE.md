@@ -47,6 +47,7 @@
 | `routes/racines.py` | Racines du vault : déclarer, retirer, promouvoir |
 | `routes/vecteurs.py` | Recherche sémantique : état, test, vectorisation, paramétrage |
 | `routes/arbre.py` | Recherche en arbre : construire (sans modèle), puis répondre sur les nœuds cochés |
+| `mcp/prisme_mcp.py` | **Hors du package** : adaptateur MCP, lancé par le client, traduit vers `/api/v1/`. Bibliothèque standard seule, n'importe jamais `prisme_core` |
 | `api.py` (embeddings) | `register_embeddings`, `EmbeddingProvider`, `EmbeddingUnavailable` : la porte par laquelle un plugin apporte ses propres vecteurs |
 
 ## Interface `prisme_core/web/`

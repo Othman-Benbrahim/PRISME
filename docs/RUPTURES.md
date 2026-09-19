@@ -5,6 +5,31 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E10 — Adaptateur MCP
+
+Étape additive : sans client MCP, rien ne change. Le cœur n'acquiert **aucune** route
+nouvelle hors `/api/v1/arbre`.
+
+| Nouveauté | Détail |
+|---|---|
+| Adaptateur | `mcp/prisme_mcp.py` — serveur MCP en entrée/sortie standard, bibliothèque standard seule, lancé par le client |
+| Route | `GET /api/v1/arbre` : recherche en arbre en lecture seule, sans appel de modèle |
+| Route | `POST /api/agents/mcp` : crée une clé et rend la configuration prête à coller |
+| Interface | Onglet « Claude Code (MCP) » dans la fenêtre Agents |
+| Variables | `PRISME_URL` et `PRISME_CLE`, lues par l'adaptateur seul |
+| Encodage | L'adaptateur force l'UTF-8 sur ses flux : le protocole MCP l'exige, et l'encodage système de Windows (`cp1252`) ne code pas les flèches des motifs de l'arbre |
+
+Les clés MCP sont des clés d'agent ordinaires : **lecture et proposition** par défaut,
+écriture directe accordée clé par clé. Aucune catégorie de clé nouvelle.
+
+`/api/v1/recherche` ne renvoie plus les marqueurs de surlignage `\x01`/`\x02` : ils
+étaient posés pour le navigateur, et n'ont aucun sens pour un agent.
+
+**Comportement de l'arbre modifié** : quand une question à plusieurs termes ne rend aucune
+amorce — la recherche lexicale les exige tous — l'arbre reprend terme par terme et réunit
+les résultats, avec un poids réduit et le drapeau `repli_par_terme`. `/api/search` est
+inchangée.
+
 ## E13 — Recherche en arbre
 
 Étape additive : la recherche ordinaire ne change pas.

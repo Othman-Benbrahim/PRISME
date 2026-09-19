@@ -94,6 +94,29 @@ def construire(index, question, depart=None, profondeur=PROFONDEUR, budget=BUDGE
         for rang, r in enumerate(resultats, start=1):
             pertinences[r["path"]] = 1.0 / (1 + rang)
 
+        # ── Repli par terme ────────────────────────────────────────────
+        # La recherche lexicale exige **tous** les termes. Sur un vault où
+        # « calibration » est dans une note et « Brier » dans une autre, la question
+        # « calibration Brier » ne rend rien : l'arbre sort vide alors que ses deux
+        # amorces existent, à un lien l'une de l'autre. C'est exactement le cas que
+        # l'arbre devrait servir le mieux.
+        #
+        # On ne touche pas à la recherche générale — ce serait changer le sens de
+        # `/api/search` pour tout le monde. Ici seulement, et seulement quand la
+        # question à plusieurs termes ne rend rien, on reprend terme par terme et on
+        # réunit. Les amorces ainsi trouvées pèsent moins : elles satisfont une partie
+        # de la question, pas la question.
+        mots = [m for m in question.split() if len(m) >= 2]
+        if not pertinences and len(mots) > 1:
+            for mot in mots[:6]:
+                partiels, _i = hybride(index, mot, limit_files=12, racine=racine, cfg=cfg)
+                for rang, r in enumerate(partiels, start=1):
+                    valeur = 0.5 / (1 + rang)
+                    if valeur > pertinences.get(r["path"], 0.0):
+                        pertinences[r["path"]] = valeur
+            if pertinences:
+                info = dict(info, repli_par_terme=True)
+
     noeuds, ordre = {}, []
 
     def ajouter(chemin, nom, niveau, parent, motif, score):
