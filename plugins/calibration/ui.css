@@ -1,0 +1,9 @@
+#m-calibration .cal-fenetre{width:900px;max-width:95vw;max-height:92vh;overflow-y:auto}
+.cal-entete,.cal-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cal-entete h2{flex:1}.cal-actions button{width:auto}
+#cal-predictions{margin:12px 0}#cal-predictions article{border-bottom:1px solid var(--bdr);padding:8px 0;overflow-wrap:anywhere}
+#cal-form{padding:12px;border:1px solid var(--acc);border-radius:8px;margin:12px 0}
+#cal-form label{display:block;margin:8px 0}#cal-form input,#cal-form select,#cal-jour{width:auto;max-width:100%;padding:6px;margin:3px;color:var(--tx);background:var(--bg3);border:1px solid var(--bdr)}
+.cal-table{overflow-x:auto;margin:10px 0}.cal-table table{border-collapse:collapse;width:100%;font-size:12px}
+.cal-table th,.cal-table td{text-align:left;padding:6px;border-bottom:1px solid var(--bdr);overflow-wrap:anywhere}
+#cal-etat.erreur{color:var(--yel)}#cal-resultats svg{display:block;width:360px;max-width:100%;height:auto;background:var(--bg3);color:var(--tx)}

@@ -4,7 +4,6 @@
 sous forme de plugin. L’extension Firefox n’est pas requise. Calibration reste
 séparé, avec l’horloge du monde ; E11 ne contient PAS ses calculs.
 
-
 Chaque étape dépend des précédentes. Une étape = une branche = une pull request vers `main`.
 
 | Étape | Branche | Objet | État |
@@ -26,8 +25,24 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E12 | `e12-racines` | Plusieurs racines de vault ; agents bornés à la principale | Fait |
 | E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | Fait |
 | E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | Fait |
-| E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | En revue — tests verts, vérification visuelle et Windows à faire |
+| E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type. **Ne contient PAS le calcul de calibration** | Fusionnée (PR #18) |
+| — | `plugin-calibration` | Calibration en plugin, copies de référence et horloge du monde | Implémenté — PR #19 |
+| — | `plugin-constat-integre` | Constat dans PRISME : dossiers, ACH et propositions de prédiction | Implémenté — PR #20 |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
+
+### La chaîne Prédiction — ne pas fusionner les trois pièces
+
+1. **E11** : le cœur fournit le type Prédiction (probabilité, horizon, condition de
+   résolution, résultat observé). **Aucun calcul de calibration dans E11.**
+2. **Plugin de calibration** ([0025](decisions/0025-calibration-en-plugin.md)), après
+   E11 : Brier, log loss et calibration par domaine/horizon dans `plugins/`, avec ses
+   éventuelles dépendances. Il active l'**horloge du monde** ([0026](decisions/0026-horloge-du-monde-activee.md)) :
+   champs réservés depuis E3, sans migration, mais branchement explicite.
+3. **Constat intégré** ([0035](decisions/0035-constat-integre.md)), après E11 :
+   dossiers et ACH dans un plugin PRISME, sans extension ni clé d’agent.
+   L’auteur formule le pari ; la file PRISME attend sa validation.
+
+E9 reste en attente des précisions de l'auteur.
 
 L'ordre est **E12 → E13 → E10 → E11 → E9**. E12 passe devant parce qu'elle touche `safe_path`,
 la fonction la plus sensible du projet : plus elle arrive tard, plus il y a de code à
@@ -42,9 +57,9 @@ décidé, ou explicitement en attente.
 
 | Sujet | État |
 |---|---|
-| Plugin de calibration (Brier, log loss, courbes) | Reporté après E11 — [0025](decisions/0025-calibration-en-plugin.md). Le cœur fournira le type Prédiction, le plugin fera le calcul. |
-| Constat intégré dans PRISME | Décidé — [0031](decisions/0031-constat-source-des-hypotheses.md). Après E11 : plugin intégré, dossiers et ACH ; proposition interne en file, sans clé d’agent — voir [0035](decisions/0035-constat-integre.md). |
-| Horloge du monde active | S'activera avec ce plugin — [0026](decisions/0026-horloge-du-monde-activee.md). Les champs sont réservés depuis E3, aucune migration à prévoir. |
+| Plugin de calibration (Brier, log loss, courbes) | Implémenté dans `plugin-calibration` (PR #19) — [0025](decisions/0025-calibration-en-plugin.md). E11 fournit le type, seul le plugin calcule. |
+| Constat intégré dans PRISME | Implémenté — [0031](decisions/0031-constat-source-des-hypotheses.md). Plugin intégré, dossiers et ACH ; proposition interne en file, sans clé d’agent (PR #20) — voir [0035](decisions/0035-constat-integre.md). |
+| Horloge du monde active | Branchée par le plugin (PR #19) — [0026](decisions/0026-horloge-du-monde-activee.md). Les champs sont réservés depuis E3, aucune migration à prévoir. |
 | Mécanisme de gel des objets | Prévu dans le modèle (0017), non implémenté. |
 | Seuil d'entrée directe par type | Implémenté en E11 (0033). Aucun signal automatique défini pour les cinq nouveaux types. |
 | Rejets synchronisés avec le vault | Décidé — [0024](decisions/0024-synchronisation-entre-machines.md) — reste à appliquer. |

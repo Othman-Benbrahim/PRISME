@@ -32,9 +32,10 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0022 | [Horloges des objets](0022-horloges-des-objets.md) | appliquée en E3 (horloge d'enregistrement) ; horloge du monde précisée par 0026 |
 | 0023 | [Clés et secrets chiffrés (DPAPI)](0023-cles-et-secrets-chiffres-dpapi.md) | appliquée en E1 |
 | 0024 | [Synchronisation entre machines](0024-synchronisation-entre-machines.md) | acceptée, non encore appliquée |
-| 0025 | [Calibration en plugin](0025-calibration-en-plugin.md) | acceptée, non encore appliquée |
-| 0026 | [Activation de l'horloge du monde](0026-horloge-du-monde-activee.md) | acceptée, non encore appliquée |
+| 0025 | [Calibration en plugin](0025-calibration-en-plugin.md) | implémentée, en revue |
+| 0026 | [Activation de l'horloge du monde](0026-horloge-du-monde-activee.md) | implémentée, en revue |
 | 0027 | [Découpage et ordre des étapes restantes](0027-ordre-des-etapes-restantes.md) | acceptée |
 | 0028 | [Plusieurs racines de vault](0028-plusieurs-racines-de-vault.md) | appliquée en E12 |
 | 0029 | [Recherche en arbre](0029-recherche-en-arbre.md) | acceptée, à appliquer (E13) |
 | 0033 | [Types d’objets et contrat des prédictions](0033-types-objets.md) | implémentée en E11, en revue |
+| 0034 | [Copies de référence de calibration](0034-copies-calibration.md) | implémentée, en revue |
