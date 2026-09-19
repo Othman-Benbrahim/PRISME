@@ -52,6 +52,10 @@ def ajouter(entree):
         return None
     enregistree = {
         "cle": cle,
+        "type": entree.get("type", "source"),
+        "champs": entree.get("champs", {}),
+        "cite_par": entree.get("cite_par", []),
+        "lot": entree.get("lot", ""),
         "brut": entree.get("brut", ""),
         "genre": entree.get("genre", "url"),
         "titre": entree.get("titre", ""),

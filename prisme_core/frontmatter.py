@@ -5,6 +5,7 @@ Proprietes est gere (scalaires et listes simples). Tout le reste est conserve te
 quel, ligne par ligne : PRISME ne reecrit que les cles qu'il touche, jamais le
 fichier entier. Les commentaires et l'ordre des cles sont preserves.
 """
+import json
 import re
 
 DELIM = "---"
@@ -29,6 +30,11 @@ def split(text):
 def _unquote(value):
     value = value.strip()
     if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        if value[0] == '"':
+            try:
+                return json.loads(value)
+            except ValueError:
+                pass  # tolérer les anciens scalaires YAML non JSON
         return value[1:-1].replace('\\"', '"')
     return value
 

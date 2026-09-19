@@ -28,3 +28,9 @@ journal des fusions réversible (`prisme_fusions` + alias).
 
 Reportés comme prévu : décision, hypothèse, prédiction, entité OSINT, tâche, et le
 mécanisme de gel.
+
+## Révision du 19 septembre 2026 — E11
+
+Voir [0033](0033-types-objets.md) : cinq types et paramètres par type implémentés,
+en revue. Aucun signal mécanique ne permet l’entrée directe des nouveaux types.
+Le gel et leur fusion réversible restent reportés ; la fusion Source reste disponible.

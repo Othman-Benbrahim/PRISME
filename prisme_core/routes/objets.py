@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify, request
 
 from .. import objets
-from ..objets import balayage, file as filedattente, sources
+from ..objets import balayage, file as filedattente, sources, registre
 
 bp = Blueprint("objets", __name__)
 PREFIX = "/api/objets"
@@ -118,6 +118,10 @@ def file_liste():
 def file_accepter():
     d = _corps()
     try:
+        entree = filedattente.par_cle(d.get("cle", ""))
+        if entree and entree.get("type", "source") != "source":
+            return jsonify(registre.accepter(d["cle"], titre=d.get("titre"),
+                                            champs=d.get("champs"), raison=d.get("raison", "")))
         return jsonify(balayage.accepter(d.get("cle", ""), titre=d.get("titre"),
                                          reference=d.get("reference"),
                                          raison=d.get("raison", "")))

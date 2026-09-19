@@ -285,3 +285,11 @@ Nouveaux fichiers dans le profil : `plugins.json`, `secrets.json`, `plugins/<id>
 
 Inchangé : les plugins V1 fonctionnent encore via la passerelle `second_brain`,
 retirée à l'étape E1.
+
+## E11 — types d’objets
+
+Extension sans migration du vault. Les Sources et propositions sans type conservent
+leur contrat. `/api/v1/objets` ajoute `objets` à côté de `sources`. Les objets E11
+portent `prisme_schema: 1` ; voir [OBJETS.md](OBJETS.md). Le seuil Source reste à
+100 avec entrée directe active par défaut ; le désactiver envoie les nouveaux
+objets mécaniques dans la file.
