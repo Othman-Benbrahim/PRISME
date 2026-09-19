@@ -20,7 +20,7 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | — | `plugin-embeddings-locaux` | Plugin ONNX : modèle e5 local, rien ne sort de la machine | Fait |
 | E12 | `e12-racines` | Plusieurs racines de vault ; agents bornés à la principale | Fait |
 | E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | Fait |
-| E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | En revue |
+| E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | Fait |
 | E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | À faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
 
