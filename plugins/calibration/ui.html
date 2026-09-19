@@ -1,0 +1,20 @@
+<div id="m-calibration" class="ov"><div class="mb cal-fenetre">
+  <div class="cal-entete"><h2>Calibration des prédictions</h2><button class="btn bs" type="button" onclick="calFermer()">Fermer</button></div>
+  <p class="eng-note">Les paris sont copiés avant leur échéance et leur résolution. Seuls les résultats « oui » et « non » sont scorés. Les copies locales ne sont pas un horodatage certifié.</p>
+  <div class="cal-actions"><button class="btn bs" type="button" onclick="calCharger()">Actualiser</button>
+    <label>Validité dans le monde à la date <input id="cal-jour" type="date"></label>
+    <button class="btn bs" type="button" onclick="calRapport()">Appliquer le filtre</button>
+    <button class="btn bs" type="button" onclick="calExporter()">Enregistrer le rapport Markdown</button></div>
+  <p class="eng-note">Date vide : tous les paris. Une borne inconnue n'est pas une borne ouverte. Ce filtre n'indique pas ce qui était connu dans le passé.</p>
+  <p id="cal-etat" role="status" aria-live="polite"></p>
+  <details open><summary>Inscrire un pari et renseigner l’horloge du monde</summary><div id="cal-predictions"></div></details>
+  <form id="cal-form" hidden><h3 id="cal-titre"></h3>
+    <p class="eng-note">Renseignez les bornes de validité de l’énoncé dans le monde, distinctes de la date butoir du pari. Si vous ne savez pas, gardez « inconnue ».</p>
+    <label>Début de validité <select id="cal-du-etat"><option value="inconnue">Inconnue</option><option value="ouverte">Sans borne de début</option><option value="date">Date connue</option></select><input id="cal-du" type="date" aria-label="Date de début de validité"></label>
+    <label>Fin de validité <select id="cal-au-etat"><option value="inconnue">Inconnue</option><option value="ouverte">Sans borne de fin</option><option value="date">Date connue</option></select><input id="cal-au" type="date" aria-label="Date de fin de validité"></label>
+    <p>La copie conserve la probabilité, l’énoncé, le critère de résolution, le domaine et l’échéance. Leur modification ultérieure exclura ce pari des scores.</p>
+    <button class="btn bp" type="submit">Confirmer les bornes et copier le pari</button>
+    <button class="btn bs" type="button" onclick="document.getElementById('cal-form').hidden=true">Annuler</button>
+  </form>
+  <div id="cal-resultats"></div>
+</div></div>

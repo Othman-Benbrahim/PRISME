@@ -1,6 +1,6 @@
 # 0025 · Calibration en plugin
 
-- **Statut** : acceptée, non encore appliquée (E11 pour le type, plugin ensuite)
+- **Statut** : implémentée après E11, en revue dans `plugin-calibration`
 - **Écrite** : 2026-09-19
 
 ## Décision

@@ -1,6 +1,6 @@
 # 0026 · Activation de l'horloge du monde
 
-- **Statut** : acceptée, non encore appliquée
+- **Statut** : implémentée, en revue dans `plugin-calibration`
 - **Écrite** : 2026-09-19
 
 Précise [0022](0022-horloges-des-objets.md).
