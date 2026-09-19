@@ -1,0 +1,61 @@
+/* Recherche en arbre (E13, décision 0029).
+   L'arbre est montré AVANT que le modèle parle : la mise en forme doit rendre
+   lisibles trois choses — la profondeur, le motif de présence, le coût. */
+
+#marbre .mb { width: 860px; max-width: 96vw; }
+
+#arb-form { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+#arb-q { flex: 1; }
+#arb-opts {
+  display: flex; gap: 12px; align-items: center;
+  font-size: 11px; color: var(--tx2); margin-bottom: 10px; flex-wrap: wrap;
+}
+#arb-opts input[type="number"] { width: 70px; padding: 3px 5px; font-size: 11px; }
+
+/* Bandeau de budget : le chiffre doit bouger quand on décoche, sinon l'élagage
+   ne veut rien dire. */
+#arb-budget {
+  display: none; align-items: center; gap: 10px; padding: 7px 10px;
+  border: 1px solid var(--bd); border-radius: 6px; background: var(--bg2);
+  font-size: 12px; margin-bottom: 8px;
+}
+#arb-jauge { flex: 1; height: 6px; background: var(--bd); border-radius: 3px; overflow: hidden; }
+#arb-jauge > i { display: block; height: 100%; background: var(--acc); width: 0; transition: width .15s; }
+#arb-jauge.plein > i { background: #d9534f; }
+#arb-cpt { white-space: nowrap; color: var(--tx2); }
+
+#arb-liste { max-height: 46vh; overflow: auto; border: 1px solid var(--bd); border-radius: 6px; }
+#arb-liste:empty { display: none; }
+
+.arb-n {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 6px 10px; border-bottom: 1px solid var(--bd); font-size: 12px;
+}
+.arb-n:last-child { border-bottom: 0; }
+.arb-n.off { opacity: .45; }
+/* core.css met `width:100%` sur les `input` (c'est fait pour les champs de formulaire
+   des fenêtres). Sans la largeur explicite ci-dessous, la case à cocher occupait les
+   794 px de la ligne et poussait le nom, le motif et le coût hors du cadre : la liste
+   n'affichait plus que des cases flottantes. Trouvé au navigateur, invisible aux tests. */
+.arb-n input[type="checkbox"],
+#arb-opts input[type="checkbox"] { width: 13px; min-width: 13px; flex: none; margin: 2px 0 0; }
+.arb-corps { flex: 1; min-width: 0; }
+.arb-nom { font-weight: 600; cursor: pointer; }
+.arb-nom:hover { color: var(--acc); text-decoration: underline; }
+/* Le motif est la justification du nœud : sans lui, l'élagage est aveugle. */
+.arb-motif { color: var(--tx2); font-size: 11px; margin-top: 1px; }
+.arb-motif .lien { color: var(--acc); }
+.arb-cout { color: var(--tx2); font-size: 11px; white-space: nowrap; flex: none; }
+.arb-niv { color: var(--tx2); font-size: 10px; border: 1px solid var(--bd);
+           border-radius: 3px; padding: 0 4px; flex: none; margin-top: 1px; }
+
+#arb-mesure {
+  display: none; margin-top: 8px; padding: 8px 10px; font-size: 11px;
+  border: 1px dashed var(--bd); border-radius: 6px; color: var(--tx2); line-height: 1.5;
+}
+#arb-mesure b { color: var(--tx); }
+
+#arb-reponse { display: none; margin-top: 10px; border-top: 1px solid var(--bd); padding-top: 10px; }
+#arb-reponse .rep { font-size: 13px; line-height: 1.6; }
+#arb-reponse .rep p { margin: 0 0 8px; }
+#arb-envoye { font-size: 11px; color: var(--tx2); margin-top: 8px; }

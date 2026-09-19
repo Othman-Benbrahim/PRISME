@@ -5,7 +5,7 @@ Lancement : python -m unittest discover -s tests -v
 import unittest
 from pathlib import Path
 
-from commun import ROOT, TMP, VAULT, reset_vault
+from commun import PLAFOND_FICHIER, ROOT, TMP, VAULT, reset_vault, taille_logique
 
 from prisme_core import config  # noqa: E402,F401
 from prisme_core.app import create_app  # noqa: E402
@@ -89,11 +89,29 @@ class TestPage(E8Base):
                 self.assertEqual(r.status_code, 200, src)
 
     def test_aucun_fichier_monolithique(self):
+        """Mesure le TEXTE, pas les octets : voir `taille_logique` (fins de ligne)."""
         web = ROOT / "prisme_core" / "web"
         for f in list((web / "js").glob("*.js")) + list((web / "css").glob("*.css")):
-            self.assertLess(f.stat().st_size, 20_000, f.name)
+            self.assertLess(taille_logique(f), PLAFOND_FICHIER, f.name)
         self.assertFalse((ROOT / "ui.html").exists())
         self.assertFalse((ROOT / "second_brain.py").exists())
+
+    def test_la_mesure_ignore_la_convention_de_fin_de_ligne(self):
+        """Le plafond doit tomber au meme endroit sous Windows et sous Linux.
+
+        Git en mode `autocrlf` ecrit `\r\n` au checkout : `core.css` pesait 19 801
+        octets sous Linux et 20 091 sous Windows — exactement ses 290 lignes d'ecart —
+        et le plafond de 20 000 sautait sur une machine et pas sur l'autre. Un fichier
+        ne devient pas monolithique parce que le systeme ecrit ses retours a la ligne
+        sur deux octets.
+        """
+        lf = TMP / "mesure-lf.css"
+        crlf = TMP / "mesure-crlf.css"
+        contenu = "a{color:red}\n" * 500
+        lf.write_bytes(contenu.encode("utf-8"))
+        crlf.write_bytes(contenu.replace("\n", "\r\n").encode("utf-8"))
+        self.assertNotEqual(lf.stat().st_size, crlf.stat().st_size)   # le disque differe
+        self.assertEqual(taille_logique(lf), taille_logique(crlf))    # la mesure, non
 
 
 if __name__ == "__main__":

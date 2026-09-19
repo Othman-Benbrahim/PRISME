@@ -15,12 +15,14 @@
 <link rel="stylesheet" href="/static/css/objets.css">
 <link rel="stylesheet" href="/static/css/agents.css">
 <link rel="stylesheet" href="/static/css/vecteurs.css">
+<link rel="stylesheet" href="/static/css/arbre.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
 <header>
   <div class="logo"><div class="dot"></div>PRISME</div>
   <button class="hbtn" onclick="openSearch()">🔍 Recherche <kbd style="opacity:.5;font-size:10px">Ctrl+Shift+F</kbd></button>
+  <button class="hbtn" onclick="openArbre()" title="Chercher en suivant les liens, élaguer, puis faire répondre l'IA">🌳 Arbre</button>
   <button class="hbtn" onclick="newFilePrompt()">＋ Nouveau</button>
   <button class="hbtn" onclick="saveFile()">💾 Sauvegarder</button>
   <button class="hbtn" id="btn-mm" onclick="toggleMM()">◀ Carte</button>
@@ -231,6 +233,10 @@
 <div id="msearch" class="ov"><div class="mb mb-wide">
   <input id="sq" type="text" placeholder="Rechercher dans tous les fichiers .md…" oninput="debouncedSearch()" autocomplete="off">
   <div id="sr-mode"></div>
+  <!-- Passerelle vers l'arbre : la recherche plate est le point de départ naturel. -->
+  <div style="margin:4px 0 6px"><button class="hbtn"
+    onclick="closeSearch();openArbre($('sq').value.trim())"
+    title="Repartir de ces résultats et suivre les liens">🌳 Poursuivre en arbre</button></div>
   <div id="sresults"><div class="s-empty">Tapez pour rechercher…</div></div>
 </div></div>
 
@@ -432,6 +438,45 @@
 <!-- PLUGIN_HTML -->
 
 <!-- ── Modal Synthèse ── -->
+<!-- ── Recherche en arbre (E13, décision 0029) ──
+     L'arbre se voit et s'élague AVANT que l'IA parle : c'est tout l'intérêt. -->
+<div id="marbre" class="ov"><div class="mb">
+  <div class="mt">🌳 Recherche en arbre</div>
+  <div class="minfo">On part de la pertinence ou de la note ouverte, puis on se propage par
+    les liens et les backlinks. Vous voyez pourquoi chaque note est là, vous décochez
+    ce qui ne sert pas, et l'IA ne lit que le reste.</div>
+
+  <div id="arb-form">
+    <input id="arb-q" type="text" placeholder="Votre question…" autocomplete="off"
+           onkeydown="if(event.key==='Enter')arbConstruire()">
+    <button class="btn bp" style="width:auto;padding:7px 14px" onclick="arbConstruire()">Construire</button>
+  </div>
+
+  <div id="arb-opts">
+    <label id="arb-depart-l" style="display:none"><input id="arb-depart" type="checkbox"> partir de la note ouverte</label>
+    <label>profondeur <input id="arb-prof" type="number" min="1" max="4" value="2"></label>
+    <label>budget <input id="arb-budget-max" type="number" min="1000" step="1000" value="40000"> car.</label>
+    <label><input id="arb-mesurer" type="checkbox" checked> mesurer le coût face à la recherche plate</label>
+  </div>
+
+  <div id="arb-budget">
+    <span id="arb-cpt"></span>
+    <div id="arb-jauge"><i></i></div>
+    <button class="hbtn" onclick="arbToutCocher(true)">Tout</button>
+    <button class="hbtn" onclick="arbToutCocher(false)">Rien</button>
+  </div>
+
+  <div id="arb-liste"></div>
+  <div id="arb-mesure"></div>
+  <div id="arb-reponse"></div>
+
+  <div class="mf">
+    <button class="btn bs" onclick="closeArbre()" style="width:auto;padding:7px 16px">Fermer</button>
+    <button class="btn bp" id="arb-repondre" onclick="arbRepondre()" disabled
+            style="width:auto;padding:7px 16px">Répondre à partir des notes cochées</button>
+  </div>
+</div></div>
+
 <div id="msyn" class="ov"><div class="mb">
   <div class="mt" id="syn-title">Synthèse IA du dossier</div>
   <div id="syn-ld" style="text-align:center;padding:24px"><span class="sp"></span>Analyse en cours…</div>
@@ -523,5 +568,6 @@
 <script src="/static/js/init.js"></script>
 <script src="/static/js/onboarding.js"></script>
 <script src="/static/js/ai-stream.js"></script>
+<script src="/static/js/arbre.js"></script>
 </body>
 </html>
