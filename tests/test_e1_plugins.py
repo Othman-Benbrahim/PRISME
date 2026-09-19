@@ -370,7 +370,7 @@ class TestGardesDuVault(unittest.TestCase):
 
 
 class TestPluginsLivres(PluginEnv):
-    """Les six plugins du depot se chargent avec l'API v1."""
+    """Les plugins livres avec le depot se chargent tous avec l'API v1."""
 
     def setUp(self):
         super().setUp()
@@ -381,7 +381,8 @@ class TestPluginsLivres(PluginEnv):
     def test_tous_actifs(self):
         c = self.client()
         statuts = {pid: (p.status, p.error) for pid, p in plugins.REGISTRY.items()}
-        self.assertEqual(set(statuts), {"arxiv", "context", "duckduckgo", "osint-cx", "prompts", "rss"})
+        self.assertEqual(set(statuts), {"arxiv", "context", "duckduckgo", "osint-cx",
+                                        "prompts", "rss", "embeddings-locaux"})
         for pid, (status, error) in statuts.items():
             self.assertEqual(status, "actif", f"{pid} : {error}")
         page = c.get("/").get_data(as_text=True)

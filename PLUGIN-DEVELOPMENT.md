@@ -119,11 +119,45 @@ Une provenance peut aussi être renseignée à la main par l'utilisateur depuis 
 | `ctx.secret(nom)` | Secret déclaré : coffre chiffré de PRISME, puis variable d'environnement |
 | `ctx.on(evenement)` | Abonne une fonction à un événement (décorateur) |
 | `ctx.log(message)` | Écrit dans la console de PRISME |
+| `ctx.register_embeddings(classe)` | Déclare un fournisseur d'embeddings (voir ci-dessous) |
 
 Fonctions utilitaires importables : `from prisme_core.api import extract_link_refs, resolve_ref, extract_tags`.
 
 **Tout chemin reçu du navigateur passe par `ctx.safe_path`.** Une `PermissionError`
 non rattrapée est convertie en réponse 403.
+
+### Fournir des embeddings
+
+Un plugin peut apporter sa propre source de vecteurs pour la recherche sémantique —
+c'est ainsi qu'un modèle local entre dans PRISME, le cœur ne pouvant pas embarquer une
+bibliothèque compilée (voir `plugins/embeddings-locaux`).
+
+```python
+def register(ctx):
+    class Local(ctx.EmbeddingProvider):
+        nom = "onnx"          # apparait dans Parametres > Recherche semantique
+        distant = False       # False : rien ne sort de la machine
+
+        def __init__(self, cfg):
+            self.cfg = cfg
+
+        def modele(self):     return "multilingual-e5-small"
+        def dimension(self):  return 384
+        def disponible(self): return True, ""          # (ok, raison)
+        def vectoriser(self, textes):
+            return [...]                               # un vecteur par texte
+
+    ctx.register_embeddings(Local)
+```
+
+`prefixe(role)` permet d'ajouter « query: » ou « passage: » selon que le texte est une
+requête ou un document : certains modèles, dont la famille e5, en dépendent fortement.
+`ctx.EmbeddingUnavailable` signale une panne — PRISME retombe alors sur la recherche par
+mots sans rien casser.
+
+Deux règles à respecter : la **signature** (`fournisseur:modèle:dimension`) doit changer
+si le modèle change, sinon les anciens vecteurs seront mélangés aux nouveaux ; et
+`disponible()` ne doit jamais lever, seulement renvoyer `(False, raison)`.
 
 ### Hooks
 

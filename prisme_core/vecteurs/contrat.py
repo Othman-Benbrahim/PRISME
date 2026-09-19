@@ -43,7 +43,25 @@ class Fournisseur:
         """[[float]] dans l'ordre des textes. Lève VecteurIndisponible en cas d'échec."""
         raise NotImplementedError
 
+    def prefixe(self, role):
+        """Préfixe à poser devant un texte selon son rôle : `requete` ou `passage`.
+
+        La famille e5 exige « query: » et « passage: » : sans eux, la qualité
+        s'effondre alors que tout semble fonctionner. Un fournisseur qui n'en a pas
+        besoin — une API, Ollama — ne redéfinit rien.
+        """
+        return ""
+
     # ── Commun ───────────────────────────────────────────────────────────
+    def vectoriser_role(self, textes, role="passage"):
+        """Point d'entrée du cœur. Applique le préfixe du rôle, puis délègue.
+
+        Le rôle existe parce qu'un modèle peut encoder différemment ce qu'on cherche et
+        ce dans quoi on cherche. Le cœur n'a pas à savoir lequel le fait.
+        """
+        p = self.prefixe(role)
+        return self.vectoriser([p + (t or "") for t in textes] if p else list(textes))
+
     def signature(self):
         """Ce qui doit rester identique d'un bout à l'autre d'un magasin de vecteurs."""
         return "%s:%s:%d" % (self.nom, self.modele(), self.dimension())

@@ -44,6 +44,7 @@
 | `routes/agent_api.py` | Surface `/api/v1/` des agents : lecture, proposition, écriture |
 | `routes/agents.py` | Gestion du trousseau depuis l'interface |
 | `routes/vecteurs.py` | Recherche sémantique : état, test, vectorisation, paramétrage |
+| `api.py` (embeddings) | `register_embeddings`, `EmbeddingProvider`, `EmbeddingUnavailable` : la porte par laquelle un plugin apporte ses propres vecteurs |
 
 ## Interface `prisme_core/web/`
 
