@@ -5,6 +5,23 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E7 — Recherche sémantique
+
+Étape additive : sans fournisseur configuré, la recherche se comporte exactement comme avant.
+
+| Nouveauté | Détail |
+|---|---|
+| Recherche | `/api/search` tente l'hybride et renvoie `recherche: {mode, semantique, repli}` ; `?mode=lexical` force les mots seuls |
+| Résultats | Chaque passage porte `origine` : `mots`, `sens` ou `les deux` |
+| Routes | `/api/vecteurs/etat`, `/tester`, `/vectoriser`, `/progression`, `/vider`, `/config` |
+| Configuration | `emb_actif` (**False** par défaut), `emb_fournisseur`, `emb_base_url`, `emb_modele`, `emb_api_key` (chiffrée), `emb_seuil` |
+| Profil | `~/.prisme/vecteurs/<empreinte>.db` — à part de l'index, pour survivre à ses reconstructions |
+| Plugins | `prisme_core.vecteurs.enregistrer` : un plugin peut fournir ses propres embeddings (porte prévue pour ONNX) |
+| Interface | Bloc « Recherche sémantique » dans les Paramètres ; mode et origine affichés à chaque recherche |
+
+Aucun changement de schéma d'index : rien n'est reconstruit. Le magasin de vecteurs a sa
+propre version de schéma, indépendante.
+
 ## Sources IA sur la note ouverte
 
 | Avant | Après |

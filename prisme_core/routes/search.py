@@ -20,8 +20,15 @@ def search_files():
     if len(text) < 2:
         return jsonify({"results": []})
     idx = fresh_index()
-    return jsonify({"results": query.search(idx, text, root_filter=scope),
-                    "index": {"state": idx.state, "progress": idx.progress}})
+    etat_index = {"state": idx.state, "progress": idx.progress}
+    # mode=lexical force la recherche par mots ; sinon on tente l'hybride, qui retombe
+    # tout seul sur FTS5 si les vecteurs manquent (docs/decisions/0019).
+    if request.args.get("mode") == "lexical":
+        return jsonify({"results": query.search(idx, text, root_filter=scope),
+                        "index": etat_index, "recherche": {"mode": "lexical", "semantique": False}})
+    from ..vecteurs.recherche import hybride
+    resultats, info = hybride(idx, text, root_filter=scope)
+    return jsonify({"results": resultats, "index": etat_index, "recherche": info})
 
 
 @bp.route("/api/tags", methods=["GET"])

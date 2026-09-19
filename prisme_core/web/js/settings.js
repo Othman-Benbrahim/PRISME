@@ -15,6 +15,7 @@ async function openCfg(){
   $('cmod').value=c.model||'';$('cws').value=c.workspace||'';$('curl').value=c.base_url||'';
   $('mcfg').classList.add('on');
   loadIndexStatus();
+  vecCharger();
 }
 function closeCfg(){$('mcfg').classList.remove('on');}
 // SB_SETTINGS_PATCH

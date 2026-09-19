@@ -21,6 +21,16 @@ DEF_CFG = {
     "base_url"  : "",
     "workspace" : str(DEFAULT_VAULT),
     "configured": False,
+    # Recherche semantique (docs/decisions/0019). Parametree separement du chat :
+    # on peut vouloir un modele local pour ecrire et une API pour vectoriser.
+    # emb_actif reste False par defaut : vectoriser, c'est parfois envoyer le texte
+    # de ses notes a un tiers, et ca ne s'active jamais sans un geste explicite.
+    "emb_actif"      : False,
+    "emb_fournisseur": "api",
+    "emb_base_url"   : "",
+    "emb_modele"     : "",
+    "emb_api_key"    : "",
+    "emb_seuil"      : 0.30,   # cosinus minimal pour qu'un resultat semantique compte
 }
 
 
@@ -52,6 +62,13 @@ def rd_cfg():
         state = "chiffree"
     cfg["api_key"] = key
     cfg["key_state"] = state
+    cle_emb, etat_emb = secrets.reveal(stored.get("emb_api_key", ""))
+    if etat_emb == "clair" and secrets.available() and cle_emb:
+        stored["emb_api_key"] = secrets.protect(cle_emb)
+        _write_raw(stored)
+        etat_emb = "chiffree"
+    cfg["emb_api_key"] = cle_emb
+    cfg["emb_key_state"] = etat_emb
     return cfg
 
 
@@ -59,7 +76,10 @@ def wr_cfg(data):
     stored = _read_raw()
     data = dict(data or {})
     data.pop("key_state", None)
+    data.pop("emb_key_state", None)
     if "api_key" in data:
         data["api_key"] = secrets.protect((data["api_key"] or "").strip())
+    if "emb_api_key" in data:
+        data["emb_api_key"] = secrets.protect((data["emb_api_key"] or "").strip())
     stored.update(data)
     _write_raw(stored)

@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="/static/css/engram.css">
 <link rel="stylesheet" href="/static/css/objets.css">
 <link rel="stylesheet" href="/static/css/agents.css">
+<link rel="stylesheet" href="/static/css/vecteurs.css">
 <!-- PLUGIN_STYLES -->
 </head>
 <body>
@@ -178,6 +179,29 @@
   <button class="btn bs" id="lmobtn" onclick="loadMods()" style="width:auto;padding:5px 12px;font-size:11px">↺ Charger les modèles</button>
   <div><label>Dossier de notes</label><input id="cws" type="text"></div>
   <div><label>URL API</label><input id="curl" type="text"></div>
+  <div class="vec-bloc">
+    <label style="display:flex;align-items:center;gap:7px">
+      <input type="checkbox" id="vec-actif" style="width:auto;margin:0"> Recherche sémantique
+    </label>
+    <div class="vec-note">Trouve par le sens, pas seulement par les mots — « anticipation » retrouve
+      « prédiction ». Désactivée par défaut : selon le fournisseur choisi, le texte de vos notes
+      peut être envoyé à un service distant.</div>
+    <div id="vec-etat" class="vec-etat off">…</div>
+    <div class="vec-ligne">
+      <select id="vec-fournisseur"></select>
+      <input id="vec-modele" type="text" placeholder="modèle d'embeddings (ex. text-embedding-3-small)">
+    </div>
+    <div class="vec-ligne">
+      <input id="vec-url" type="text" placeholder="URL du service (vide = Ollama local)">
+      <input id="vec-cle" type="password" placeholder="clé API (inutile en local)">
+      <button class="btn bs" id="vec-tester" onclick="vecTester()">Tester</button>
+    </div>
+    <div class="vec-ligne">
+      <button class="btn bs" onclick="vecEnregistrer()">Enregistrer</button>
+      <button class="btn bp" onclick="vecVectoriser()">Vectoriser le vault</button>
+      <button class="btn bs" onclick="vecVider()">Effacer les vecteurs</button>
+    </div>
+  </div>
   <div><label>Index de recherche</label>
     <div id="cidx" style="font-size:11px;color:var(--tx2);line-height:1.5">…</div>
     <button class="btn bs" onclick="rebuildIndex()" style="width:auto;padding:5px 12px;font-size:11px;margin-top:4px">↻ Reconstruire l'index</button>
@@ -191,6 +215,7 @@
 <!-- ── Modal Recherche ── -->
 <div id="msearch" class="ov"><div class="mb mb-wide">
   <input id="sq" type="text" placeholder="Rechercher dans tous les fichiers .md…" oninput="debouncedSearch()" autocomplete="off">
+  <div id="sr-mode"></div>
   <div id="sresults"><div class="s-empty">Tapez pour rechercher…</div></div>
 </div></div>
 
@@ -463,6 +488,7 @@
 <script src="/static/js/engram.js"></script>
 <script src="/static/js/objets.js"></script>
 <script src="/static/js/agents.js"></script>
+<script src="/static/js/vecteurs.js"></script>
 <script src="/static/js/explorer.js"></script>
 <script src="/static/js/tags.js"></script>
 <script src="/static/js/backlinks.js"></script>

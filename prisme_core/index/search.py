@@ -26,31 +26,40 @@ def fts_query(text):
     return " AND ".join('"%s"*' % t.replace('"', "") for t in tokens)
 
 
-def search(index, text, limit_files=40, per_file=4, root_filter=None):
+def segments_lexicaux(index, text, limite=600, root_filter=None):
+    """Segments correspondants, classes par BM25, du meilleur au moins bon.
+
+    Extrait de `search()` pour que la fusion hybride d'E7 puisse travailler au niveau du
+    segment : le RRF compare des rangs, il lui faut donc un classement, pas un
+    regroupement par fichier.
+    """
     query = fts_query(text)
     if not query:
         return []
     scope_sql, scope_args = _scope(root_filter)
     with index.read() as conn:
         if fts5_available() and index.fts:
-            rows = conn.execute(
-                "SELECT s.file_id, s.start_line, f.path, f.name, f.rel, "
+            return conn.execute(
+                "SELECT s.sha256, s.file_id, s.start_line, f.path, f.name, f.rel, "
                 f"highlight(segments_fts, 1, '{MARK_OPEN}', '{MARK_CLOSE}') AS heading, "
                 f"snippet(segments_fts, 2, '{MARK_OPEN}', '{MARK_CLOSE}', '…', 14) AS extrait, "
                 "bm25(segments_fts, 4.0, 2.0, 1.0) AS score "
                 "FROM segments_fts JOIN segments s ON s.id = segments_fts.rowid "
                 "JOIN files f ON f.id = s.file_id "
-                "WHERE segments_fts MATCH ?" + scope_sql + " ORDER BY score LIMIT 600",
-                [query] + scope_args).fetchall()
-        else:
-            tokens = _TOKEN.findall(text)
-            cond = " AND ".join("(s.text LIKE ? OR s.heading LIKE ? OR f.stem LIKE ?)" for _ in tokens)
-            args = [a for t in tokens for a in (f"%{t}%",) * 3]
-            rows = conn.execute(
-                "SELECT s.file_id, s.heading, s.start_line, f.path, f.name, f.rel, "
-                "substr(s.text, 1, 160) AS extrait, 0 AS score FROM segments s "
-                "JOIN files f ON f.id = s.file_id WHERE " + cond + scope_sql + " LIMIT 600",
-                args + scope_args).fetchall()
+                "WHERE segments_fts MATCH ?" + scope_sql + " ORDER BY score LIMIT ?",
+                [query] + scope_args + [limite]).fetchall()
+        tokens = _TOKEN.findall(text)
+        cond = " AND ".join("(s.text LIKE ? OR s.heading LIKE ? OR f.stem LIKE ?)" for _ in tokens)
+        args = [a for t in tokens for a in (f"%{t}%",) * 3]
+        return conn.execute(
+            "SELECT s.sha256, s.file_id, s.heading, s.start_line, f.path, f.name, f.rel, "
+            "substr(s.text, 1, 160) AS extrait, 0 AS score FROM segments s "
+            "JOIN files f ON f.id = s.file_id WHERE " + cond + scope_sql + " LIMIT ?",
+            args + scope_args + [limite]).fetchall()
+
+
+def search(index, text, limit_files=40, per_file=4, root_filter=None):
+    rows = segments_lexicaux(index, text, limite=600, root_filter=root_filter)
     results, by_file = [], {}
     for r in rows:
         entry = by_file.get(r["file_id"])

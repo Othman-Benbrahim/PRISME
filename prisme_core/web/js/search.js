@@ -14,6 +14,7 @@ async function doSearch(){
   var d=await fetch('/api/search?q='+eu(q)).then(function(r){return r.json();});
   if(d.error){$('sresults').innerHTML='<div class="s-empty">⚠ '+esc(d.error)+'</div>';return;}
   var res=d.results||[];
+  vecRendreModeRecherche(d.recherche);
   var building=d.index&&d.index.state==='construction'
     ?'<div class="s-empty">Index en construction ('+d.index.progress.done+' / '+d.index.progress.total+') : résultats partiels.</div>':'';
   if(!res.length){$('sresults').innerHTML=building+'<div class="s-empty">Aucun résultat pour « '+esc(q)+' »</div>';return;}
@@ -23,7 +24,13 @@ async function doSearch(){
       var mark=function(t){ return esc(t).replace(/\x01/g,'<mark>').replace(/\x02/g,'</mark>'); };
       var text=mark(m.text);
       var head=m.heading?'<span class="sr-head">'+mark(m.heading)+'</span> ':'';
-      return '<div class="sr-match">'+head+text+'</div>';
+      // Un passage trouvé par le sens seul ne doit pas passer pour une correspondance de mots.
+      // Le badge vient AVANT l'extrait : place en fin de ligne, il disparaissait
+      // sous la coupure des extraits longs.
+      var org=m.origine&&m.origine!=='mots'
+        ?'<span class="sr-origine '+(m.origine==='sens'?'sens':'les-deux')+'">'
+          +(m.origine==='sens'?'sens':'mots + sens')+'</span> ':'';
+      return '<div class="sr-match">'+org+head+text+'</div>';
     }).join('');
     return '<div class="sr-item" onclick="openResult(\''+eu(r.path)+'\',\''+eu(q)+'\')">'
       +'<div class="sr-name">📄 '+esc(r.name)+'</div>'
@@ -40,3 +47,12 @@ async function openResult(encoded,encodedQuery){
   if(query) setTimeout(function(){ openFind(query); },120);
 }
 
+// Le mode réellement utilisé est affiché à chaque recherche : si les vecteurs manquent
+// ou que le service est en panne, on cherche quand même, mais on le dit (décision 0019).
+function vecRendreModeRecherche(info){
+  var e=$('sr-mode'); if(!e) return;
+  if(!info){ e.innerHTML=''; return; }
+  if(info.semantique){ e.innerHTML='Recherche par les mots et par le sens'; return; }
+  e.innerHTML='Recherche par les mots'
+    +(info.repli?' <span class="repli">— sens indisponible : '+esc(info.repli)+'</span>':'');
+}
