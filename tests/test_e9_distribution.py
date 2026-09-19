@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-from commun import ROOT, reset_vault
+from commun import ROOT, VAULT, reset_vault
 from prisme_core.app import create_app
 from prisme_core.routes import security
 
@@ -67,6 +67,31 @@ class TestDistribution(unittest.TestCase):
                 mock.patch.object(module.sysconfig, "get_path", side_effect=AssertionError("Scripts Python consulté")), \
                 mock.patch.object(module.importlib.util, "find_spec", side_effect=AssertionError("Module externe consulté")):
             self.assertEqual(module._social_cli_candidates("auto"), [])
+
+
+class TestCheminsWindows(unittest.TestCase):
+    @unittest.skipUnless(sys.platform == "win32", "alias Windows 8.3")
+    def test_recherche_et_arbre_acceptent_un_chemin_court(self):
+        import ctypes
+        from ctypes import wintypes
+        from prisme_core.index import fresh_index
+        from prisme_core.index import search
+        from prisme_core.arbre import parcours
+        reset_vault()
+        fn = ctypes.WinDLL("kernel32", use_last_error=True).GetShortPathNameW
+        fn.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
+        fn.restype = wintypes.DWORD
+        buf = ctypes.create_unicode_buffer(32768)
+        n = fn(str(VAULT), buf, len(buf))
+        self.assertGreater(n, 0)
+        court = Path(buf.value)
+        if str(court).casefold() == str(VAULT).casefold():
+            self.skipTest("Les noms courts ne sont pas disponibles sur ce volume")
+        idx = fresh_index(VAULT)
+        resultats = search.search(idx, "Beta", root_filter=str(court / "sous"))
+        self.assertEqual([x["name"] for x in resultats], ["Beta.md"])
+        arbre = parcours.construire(idx, "", depart=str(court / "Alpha.md"))
+        self.assertIn("Beta.md", [x["nom"] for x in arbre["noeuds"]])
 
 
 if __name__ == "__main__":

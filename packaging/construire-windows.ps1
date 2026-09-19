@@ -23,17 +23,17 @@ try {
         & py -3.12 -m venv (Join-Path $Atelier "venv")
         if ($LASTEXITCODE -ne 0) { throw "Création du venv impossible." }
         $Python = Join-Path $Atelier "venv\Scripts\python.exe"
-        & $Python -m pip install --disable-pip-version-check -r packaging/requirements-build.txt
+        & $Python -X utf8 -m pip install --disable-pip-version-check -r packaging/requirements-build.txt
         if ($LASTEXITCODE -ne 0) { throw "Installation des dépendances de construction impossible." }
-        & $Python -m pip check
+        & $Python -X utf8 -m pip check
         if ($LASTEXITCODE -ne 0) { throw "Dépendances incompatibles." }
-        & $Python -m unittest discover -s tests
+        & $Python -X utf8 -m unittest discover -s tests
         if ($LASTEXITCODE -ne 0) { throw "Tests Python échoués : aucune archive de release créée." }
         & npm.cmd ci --prefix plugins/constat
         if ($LASTEXITCODE -ne 0) { throw "Installation des dépendances de test Constat impossible." }
         & npm.cmd test --prefix plugins/constat
         if ($LASTEXITCODE -ne 0) { throw "Tests Constat échoués : aucune archive de release créée." }
-        & $Python packaging/construire.py --sortie $Sortie
+        & $Python -X utf8 packaging/construire.py --sortie $Sortie
         if ($LASTEXITCODE -ne 0) { throw "Construction ou contrôle du binaire échoué." }
         Write-Host "Archive et empreintes : $Sortie"
         Write-Host "Vérification visuelle : docs/branches/e9-publication.md"

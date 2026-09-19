@@ -88,6 +88,10 @@ def construire(index, question, depart=None, profondeur=PROFONDEUR, budget=BUDGE
     """
     from ..vecteurs.recherche import hybride
 
+    # L’index stocke les chemins complets, y compris face aux alias Windows 8.3.
+    if depart:
+        depart = str(Path(depart).resolve())
+
     pertinences, info = {}, {"mode": "lexical", "semantique": False, "repli": ""}
     if question:
         resultats, info = hybride(index, question, limit_files=40, racine=racine, cfg=cfg)
