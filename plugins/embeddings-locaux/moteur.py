@@ -15,6 +15,7 @@ C'est l'exception assumée par la décision 0019 : elles vivent dans ce plugin, 
 dans le cœur, et leur absence n'empêche ni PRISME de démarrer, ni ce plugin de se
 charger — seul le fournisseur se déclare indisponible.
 """
+import sys
 import threading
 from pathlib import Path
 
@@ -34,6 +35,8 @@ def dependances():
             __import__(module)
         except ImportError:
             manquantes.append(paquet)
+    if manquantes and getattr(sys, "frozen", False):
+        return False, "Distribution incomplète : réextrayez toute l’archive, avec son dossier _internal/."
     if manquantes:
         return False, ("Bibliothèques manquantes : %s. Installez-les avec "
                        "« pip install %s »." % (", ".join(manquantes), " ".join(manquantes)))

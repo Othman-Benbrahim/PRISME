@@ -8,7 +8,7 @@ Son objectif est de conserver le chemin entre une information et son utilisation
 
 > **L'IA propose, l'auteur valide.** Les sources, les hypothèses et les résultats observés gardent des rôles distincts.
 
-**État du projet :** version de développement utilisable depuis les sources. Les neuf plugins et leurs guides sont intégrés. La distribution Windows avec `PRISME.exe` correspond à l'étape **E9**, qui n'a pas encore commencé.
+**État du projet :** version de développement utilisable depuis les sources. Les neuf plugins et leurs guides sont intégrés. La distribution Windows avec `PRISME.exe` correspond à l'étape **E9**, qui est en cours de préparation et de validation.
 
 [Prise en main](#installation-depuis-les-sources) · [Plugins et guides](#les-neuf-plugins) · [Constat et Calibration](#de-lanalyse-à-la-prédiction) · [Feuille de route](docs/FEUILLE-DE-ROUTE.md)
 
@@ -265,7 +265,7 @@ Pour signaler un problème, indiquez les étapes permettant de le reproduire, le
 
 Les fonctions du cœur, les objets typés, les neuf plugins et leurs guides sont présents dans le dépôt. PRISME reste en développement ; une validation sur votre propre corpus est nécessaire avant de tirer des conclusions sur la qualité de ses analyses.
 
-La prochaine étape prévue est **E9 : distribution Windows et publication d'une release**. Le périmètre retenu est :
+L'étape en cours est **E9 : distribution Windows et publication d'une release**. Le périmètre retenu est :
 
 - une application lancée par `PRISME.exe`, sans installation manuelle de Python pour l'utilisateur final ;
 - un dossier `plugins/` externe, contenant les plugins fournis ;
@@ -274,7 +274,7 @@ La prochaine étape prévue est **E9 : distribution Windows et publication d'une
 - le fonctionnement du cœur lorsque le dossier des plugins est absent ;
 - une archive de release après vérification sous Windows.
 
-**Cette distribution n'est pas encore livrée.** L'installation documentée dans ce README utilise les sources. L'amélioration du passage direct de Constat vers Calibration est prévue pour être étudiée après E9.
+**Cette distribution n'est pas encore publiée.** Le [parcours de vérification E9](docs/branches/e9-publication.md) décrit le contrôle avant release. L'installation documentée dans ce README utilise les sources. L'amélioration du passage direct de Constat vers Calibration est prévue pour être étudiée après E9.
 
 Le détail des étapes et des points en attente figure dans la [feuille de route](docs/FEUILLE-DE-ROUTE.md).
 
@@ -294,4 +294,3 @@ Le détail des étapes et des points en attente figure dans la [feuille de route
 PRISME est développé par **Othman Ben Brahim**. Il est issu d'une refonte de Second Brain V1, dont la base historique est conservée sous l'étiquette Git `base-v1`.
 
 Le fichier [`LICENSE`](LICENSE) à la racine indique la **licence MIT**. Le plugin Constat reprend des composants du [projet Constat](https://github.com/Othman-Benbrahim/constat) et conserve sa **licence AGPL-3.0**, disponible dans [`plugins/constat/LICENSE`](plugins/constat/LICENSE). Les dépendances et les modèles conservent leurs licences respectives.
-

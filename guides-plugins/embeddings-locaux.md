@@ -14,7 +14,7 @@ son utilisation dans **Paramètres → Recherche sémantique**.
 
 ## Installer les dépendances dans la version source
 
-Dans le même environnement Python que celui qui lance PRISME :
+**Version source :** dans le même environnement Python que celui qui lance PRISME :
 
 ```powershell
 Set-Location "D:\Documents\PRISME\PRISME-depot"
@@ -24,7 +24,9 @@ python -m pip install -r plugins/embeddings-locaux/requirements.txt
 Arrêtez et relancez PRISME. Le panneau doit confirmer que **onnxruntime** et
 **tokenizers** sont installés. Si elles manquent, le plugin peut rester visible,
 mais son fournisseur est indisponible : visible ne signifie pas prêt à vectoriser.
-Les modalités pour l'exécutable seront vérifiées pendant E9.
+**Distribution Windows E9 :** ONNX Runtime et tokenizers sont livrés dans `_internal/`.
+Aucune commande pip n'est nécessaire. Si le panneau signale leur absence, réextraire
+l'archive entière avec `_internal/`, puis relancer. Le modèle reste à préparer ci-dessous.
 
 ## Préparer un modèle
 

@@ -39,10 +39,11 @@ sources se lancent depuis la racine du dépôt :
 python prisme.py
 ```
 
-La distribution Windows `.exe` est l'étape E9 suivante : ces guides ne supposent
-pas qu'un exécutable soit déjà disponible. La distribution prévue réunira
-l'application, ses plugins externes et ce dossier de guides. PRISME devra rester
-utilisable sans `plugins/`, avec les seules fonctions du cœur.
+La distribution Windows est en cours de validation à l'étape E9. Dans son archive,
+`PRISME.exe`, `_internal/`, `plugins/` et ce dossier de guides restent côte à côte.
+Double-cliquer sur l'exécutable lance l'application sans installation de Python.
+Sans `plugins/`, seules les fonctions du cœur sont disponibles. Consulter le
+[parcours de vérification E9](../docs/branches/e9-publication.md) avant publication.
 
 ## Comprendre les données utilisées
 

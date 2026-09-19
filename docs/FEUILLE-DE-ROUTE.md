@@ -29,7 +29,7 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | — | `plugin-calibration` | Calibration en plugin, copies de référence et horloge du monde | Implémenté — PR #19 |
 | — | `plugin-constat-integre` | Constat dans PRISME : dossiers, ACH et propositions de prédiction | Implémenté — PR #20 |
 | — | `docs-guides-plugins` | Guides Markdown des neuf plugins dans un dossier séparé | Étape préalable à E9 |
-| E9 | `e9-publication` | Application Windows `.exe`, plugins externes et guides réunis dans une archive de release | À faire après les guides |
+| E9 | `e9-publication` | Application Windows `.exe`, plugins externes et guides réunis dans une archive de release | En cours — build et contrôles, publication après validation Windows |
 
 ### La chaîne Prédiction — ne pas fusionner les trois pièces
 

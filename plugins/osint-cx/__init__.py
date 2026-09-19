@@ -1088,7 +1088,7 @@ def _script_command_candidates(command_name):
     if direct:
         candidates.append([direct])
 
-    scripts_dir = sysconfig.get_path("scripts")
+    scripts_dir = None if getattr(sys, "frozen", False) else sysconfig.get_path("scripts")
     if scripts_dir:
         possible_names = [
             command_name,
@@ -1123,16 +1123,16 @@ def _social_cli_candidates(tool):
     if tool in ("auto", "maigret"):
         for base in _script_command_candidates("maigret"):
             candidates.append({"tool": "maigret", "base": base, "how": "script"})
-        if importlib.util.find_spec("maigret") is not None:
+        if not getattr(sys, "frozen", False) and importlib.util.find_spec("maigret") is not None:
             candidates.append({"tool": "maigret", "base": [sys.executable, "-m", "maigret"], "how": "python -m"})
 
     if tool in ("auto", "sherlock"):
         for base in _script_command_candidates("sherlock"):
             candidates.append({"tool": "sherlock", "base": base, "how": "script"})
         # Selon les installations, le module peut s'appeler sherlock ou sherlock_project.
-        if importlib.util.find_spec("sherlock") is not None:
+        if not getattr(sys, "frozen", False) and importlib.util.find_spec("sherlock") is not None:
             candidates.append({"tool": "sherlock", "base": [sys.executable, "-m", "sherlock"], "how": "python -m"})
-        elif importlib.util.find_spec("sherlock_project") is not None:
+        elif not getattr(sys, "frozen", False) and importlib.util.find_spec("sherlock_project") is not None:
             candidates.append({"tool": "sherlock", "base": [sys.executable, "-m", "sherlock_project"], "how": "python -m"})
 
     deduped = []
@@ -1163,6 +1163,12 @@ def search_social_cli(username, tool="auto"):
 
     candidates = _social_cli_candidates(tool)
     if not candidates:
+        if getattr(sys, "frozen", False):
+            return _set_cache(cache_key, {
+                "ok": False, "type": "social_cli", "query": username,
+                "error": "Maigret/Sherlock est un outil externe facultatif, absent du PATH.",
+                "install_help": ["Installez séparément cet outil, rendez sa commande accessible dans PATH, puis relancez PRISME."],
+            })
         scripts_dir = sysconfig.get_path("scripts") or ""
         return _set_cache(cache_key, {
             "ok": False,

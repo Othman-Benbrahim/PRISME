@@ -3,6 +3,8 @@
 À ne pas confondre avec `agent_api.py`, qui est la surface utilisée PAR les agents.
 Ici, c'est toi qui crées, révoques et relis.
 """
+import sys
+
 from flask import Blueprint, jsonify, request
 
 from ..agents import cles, journal
@@ -65,10 +67,10 @@ def mcp():
     journal.consigner(ident, nom, "CREATION", PREFIX + "/mcp", 201,
                       "clé MCP ; droits : %s" % ", ".join(cles.par_id(ident)["droits"]))
     config = {"mcpServers": {"prisme": {
-        "command": "python",
+        "command": sys.executable if getattr(sys, "frozen", False) else "python",
         # Barres obliques même sous Windows : un antislash dans du JSON doit être
         # échappé, et c'est la faute que tout le monde fait en recopiant un chemin.
-        "args": [adaptateur.as_posix()],
+        "args": ["--mcp"] if getattr(sys, "frozen", False) else [adaptateur.as_posix()],
         "env": {"PRISME_URL": "http://%s:%d" % (HOST, PORT), "PRISME_CLE": cle},
     }}}
     return jsonify({
