@@ -9,7 +9,7 @@ from .config import rd_cfg
 from .envfile import load_env_file
 from .paths import HOME, WEB_DIR, import_legacy_config
 from .plugin_install import MAX_ZIP
-from .routes import (agent_api, agents, ai, engram, files, objets, pages,
+from .routes import (agent_api, agents, ai, arbre, engram, files, objets, pages,
                      plugin_manager, racines, search, security, setup, vecteurs)
 
 HOST = "127.0.0.1"
@@ -20,7 +20,7 @@ def create_app(with_plugins=True):
     app = Flask(__name__, static_folder=str(WEB_DIR), static_url_path="/static")
     app.config["MAX_CONTENT_LENGTH"] = MAX_ZIP + 1024 * 1024
     for module in (security, pages, setup, ai, files, search, plugin_manager, engram,
-                   objets, agents, agent_api, vecteurs, racines):
+                   objets, agents, agent_api, vecteurs, racines, arbre):
         app.register_blueprint(module.bp)
     app.register_blueprint(plugins.bp)
 

@@ -17,9 +17,9 @@ Chaque étape dépend des précédentes. Une étape = une branche = une pull req
 | E6 | `e6-api-agents` | API HTTP locale à clés, droits par clé, journal | Fait |
 | — | `sources-ia-note` | Bouton « Sources IA » : analyse de la note ouverte seule | Fait |
 | E7 | `e7-embeddings` | Fournisseurs API et Ollama dans le cœur, fusion RRF, plancher de pertinence | Fait |
-| — | `plugin-embeddings-locaux` | Plugin ONNX : modèle e5 local, rien ne sort de la machine | En revue |
-| E12 | `e12-racines` | Plusieurs racines de vault ; agents bornés à la principale | En revue |
-| E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | À faire |
+| — | `plugin-embeddings-locaux` | Plugin ONNX : modèle e5 local, rien ne sort de la machine | Fait |
+| E12 | `e12-racines` | Plusieurs racines de vault ; agents bornés à la principale | Fait |
+| E13 | `e13-arbre` | Recherche en arbre : propagation par les liens, élagage avant réponse | En revue |
 | E10 | `e10-mcp` | Adaptateur MCP au-dessus de `/api/v1/` | À faire |
 | E11 | `e11-types-objets` | Décision, hypothèse, prédiction, entité, tâche ; paramétrage par type | À faire |
 | E9 | `e9-publication` | Import d'un vault V1, guide des ruptures, première version publique | À faire |
@@ -46,4 +46,5 @@ décidé, ou explicitement en attente.
 | Modèle de décision hébergé (type Jev) | Examiné, écarté : cloud obligatoire, poids fermés, calibration annoncée moindre hors anglais. Les principes sont reproductibles sans dépendance payante. |
 | Verrouillage réparti, écritures concurrentes | Assumé : le dernier qui écrit gagne, `.trash/versions/` sert de filet (0024). |
 | Chiffrement des secrets hors Windows | DPAPI est Windows seul (0023). À traiter en E9 si la publication vise macOS et Linux. |
+| Découpage de `core.css` | **Pressant.** 19 707 caractères sur un plafond de 20 000 : il reste 293 caractères de marge. La prochaine étape qui y touche fera sauter le garde-fou d'E8. À découper par zone (mise en page, éditeur, fenêtres) au prochain passage dans ce fichier. |
 | Épreuve du réel : vault de l'auteur, build PyInstaller | Jamais faits. Le plugin ONNX rend la question du `--onefile` avec bibliothèque compilée plus pressante. À planifier avant E9. |

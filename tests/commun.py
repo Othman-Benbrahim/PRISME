@@ -13,6 +13,23 @@ if str(ROOT) not in sys.path:
 
 VAULT = TMP / "vault"
 
+# Plafond des fichiers d'interface : un fichier plus long redevient monolithique.
+PLAFOND_FICHIER = 20_000
+
+
+def taille_logique(chemin):
+    """Taille d'un fichier texte **indépendante de la convention de fin de ligne**.
+
+    `stat().st_size` compte les octets du disque. Git en mode `autocrlf` écrit `\\r\\n`
+    sous Windows, ce qui ajoute un octet par ligne : `core.css` pesait 19 801 octets
+    sous Linux et 20 091 sous Windows — exactement ses 290 lignes d'écart — et le
+    plafond de 20 000 sautait sur une machine et pas sur l'autre.
+
+    Un fichier ne devient pas monolithique parce que le système écrit ses retours à la
+    ligne sur deux octets. On mesure donc le texte, retours à la ligne normalisés.
+    """
+    return len(Path(chemin).read_text(encoding="utf-8"))
+
 
 class FakeCipher:
     """Remplace DPAPI hors Windows : reversible, mais jamais en clair dans le fichier."""

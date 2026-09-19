@@ -14,3 +14,10 @@ dist/
 # ── Profils et données locales ──────────────────────────────
 .prisme/
 .secondbrain/
+
+# ── Résidus de livraison ────────────────────────────────────
+# Les zips d'étape sont parfois dézippés ou téléchargés dans le dépôt lui-même,
+# et `tests.log` naît d'un diagnostic. Ni l'un ni l'autre n'a sa place dans l'historique.
+PRISME-*.zip
+PRISME-*/
+tests.log

@@ -5,6 +5,27 @@ Chaque étape ajoute sa section. Ce fichier servira de base au guide de passage.
 
 <!-- Les étapes ajoutent leurs sections ci-dessous, la plus récente en haut. -->
 
+## E13 — Recherche en arbre
+
+Étape additive : la recherche ordinaire ne change pas.
+
+| Nouveauté | Détail |
+|---|---|
+| Routes | `POST /api/arbre/construire` (n'appelle **pas** le modèle) et `POST /api/arbre/repondre` |
+| Interface | Bouton `🌳 Arbre`, et « Poursuivre en arbre » depuis la fenêtre de recherche |
+| Module | `prisme_core/arbre/` — propagation par les liens, carte des relations, mesure |
+| Contexte envoyé au modèle | Une **carte** des relations plus les seules notes cochées, au lieu d'une liste d'extraits |
+| Garde | La liste `retenus` venue du navigateur est filtrée contre les nœuds de l'arbre : un chemin absent de l'arbre n'est jamais lu |
+
+Ni le schéma d'index ni le format des notes ne changent. Profondeur plafonnée à 4,
+budget à 200 000 caractères.
+
+**Ce que la mesure a corrigé** : l'arbre ne fait pas économiser de jetons — à budget égal,
+il coûte le même prix que la recherche plate tronquée. L'économie vient du plafond de
+budget. Ce que l'arbre apporte est le rappel par les liens (12 notes retenues sur 29
+qu'aucun score n'avait remontées) et la lisibilité des relations. Détail et banc rejouable
+dans [0029](decisions/0029-recherche-en-arbre.md).
+
 ## E12 — Plusieurs racines de vault
 
 | Avant | Après |

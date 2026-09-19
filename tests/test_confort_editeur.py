@@ -5,7 +5,7 @@ que les fichiers sont bien servis et branchés dans la page.
 """
 import unittest
 
-from commun import ROOT, reset_vault
+from commun import PLAFOND_FICHIER, ROOT, reset_vault, taille_logique
 
 from prisme_core.app import create_app
 from prisme_core.routes import security
@@ -38,9 +38,10 @@ class TestConfortEditeur(unittest.TestCase):
         self.assertLess(html.index("/static/js/editor.js"), html.index("/static/js/gutter.js"))
 
     def test_fichiers_courts(self):
+        """Mesure le TEXTE, pas les octets : voir `taille_logique` (fins de ligne)."""
         web = ROOT / "prisme_core" / "web"
         for f in list((web / "js").glob("*.js")) + list((web / "css").glob("*.css")):
-            self.assertLess(f.stat().st_size, 20_000, f.name)
+            self.assertLess(taille_logique(f), PLAFOND_FICHIER, f.name)
 
 
 if __name__ == "__main__":
