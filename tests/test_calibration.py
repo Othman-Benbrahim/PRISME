@@ -197,3 +197,34 @@ class TestCopiesEtRapports(unittest.TestCase):
             with self.app.test_request_context(method='POST',json=[]):
                 _,code=self.ctx._dispatch(route)
                 self.assertEqual(code,400)
+
+class TestPiecesConstat(unittest.TestCase):
+    """Pièces copiées avant résolution, indépendantes des dossiers du plugin."""
+    def setUp(self):
+        TestCopiesEtRapports.setUp(self)
+        self.origine=VAULT/'pieces-constat.md'
+        self.origine.write_text('# Preuves\n\n> Citation exacte.\n\nP1 contredit P2.', encoding='utf-8')
+        self.p.write_text(frontmatter.update(self.p.read_text(encoding='utf-8'),
+            {'prisme_origine':'constat:interface','prisme_note_origine':'pieces-constat.md'}),encoding='utf-8')
+
+    def inscrire(self,h=OUVERTE):
+        o=registre.inventaire(self.ctx)[0][0]
+        return registre.inscrire(self.ctx,o['chemin'],h,o['version'],o['pieces']['sha256'])
+
+    resoudre = TestCopiesEtRapports.resoudre
+
+    def test_pieces_survivent_a_la_suppression_de_la_note_origine(self):
+        o=registre.inventaire(self.ctx)[0][0];texte=o['pieces']['texte']
+        copie=self.inscrire();self.origine.unlink();self.resoudre()
+        archive=registre.lire_copie(self.ctx,VAULT/copie['copie'])
+        self.assertEqual(archive['pieces_constat']['texte'],texte)
+        self.assertAlmostEqual(registre.rapport(self.ctx)['global_']['brier'],.04)
+        self.assertEqual(registre.inventaire(self.ctx)[0][0]['pieces']['texte'],texte)
+
+    def test_pieces_modifiees_depuis_la_relecture_refusees(self):
+        o=registre.inventaire(self.ctx)[0][0];avant=self.p.read_bytes()
+        self.origine.write_text('Modifié',encoding='utf-8')
+        with self.assertRaisesRegex(ValueError,'pièces ont changé'):
+            registre.inscrire(self.ctx,o['chemin'],OUVERTE,o['version'],o['pieces']['sha256'])
+        self.assertEqual(self.p.read_bytes(),avant)
+        self.assertFalse((VAULT/registre.DOSSIER).exists())

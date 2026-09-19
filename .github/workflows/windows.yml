@@ -2,7 +2,7 @@ name: Distribution Windows E9
 on:
   pull_request:
   push:
-    branches: [e9-publication, main]
+    branches: [e9-publication, constat-suite, main]
   workflow_dispatch:
 env:
   PYTHONUTF8: '1'

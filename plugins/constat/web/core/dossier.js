@@ -22,7 +22,11 @@
 // l'état — un dossier en corbeille possède encore ses textes, et les retirer
 // de l'index ferait purger à tort des corps qu'il référence encore.
 
-import { empreinteExacte } from './empreinte.js';
+// Le corps conservé se hache sans normalisation : les positions de citation doivent rester exactes.
+async function empreinteCorps(texte){
+ const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(texte));
+ return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 
 /** Adaptateur de test. L'extension passera un objet équivalent adossé à
  *  browser.storage.local. */
@@ -111,7 +115,7 @@ export class Dossiers {
    */
   async verser(id, page) {
     const texte = page.texte || '';
-    const hash = texte ? await empreinteExacte(texte) : null;
+    const hash = texte ? await empreinteCorps(texte) : null;
     if (hash && !(await this.s.get(cleTexte(hash)))) {
       await this.s.set(cleTexte(hash), texte);
     }

@@ -74,6 +74,15 @@ def enregistrer(ctx, revision, donnees):
     texte=valider(donnees)
     with connexion(ctx) as c:
         c.execute('BEGIN IMMEDIATE')
+        precedent_rev, precedent = c.execute('SELECT revision, donnees FROM etat WHERE id=1').fetchone()
+        if precedent_rev != revision:
+            raise Conflit('Un autre panneau a modifié les dossiers. Rechargez avant de reprendre.')
+        precedent = json.loads(precedent)
+        for ident in precedent.get('dossiers', []):
+            cle = 'j:' + ident
+            ancien = precedent[cle]
+            if ident not in donnees.get('dossiers', []) or donnees.get(cle, [])[:len(ancien)] != ancien:
+                raise ValueError('Le journal est conservé : ajoutez une révision ou clôturez le dossier')
         n=c.execute('UPDATE etat SET revision=revision+1, donnees=? WHERE id=1 AND revision=?',(texte,revision)).rowcount
         if n != 1:
             c.rollback()

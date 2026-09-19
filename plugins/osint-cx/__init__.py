@@ -14,16 +14,6 @@ Routes :
   GET /api/plugins/osint-cx/ip?q=<ip>
   GET /api/plugins/osint-cx/domain?q=<domain>
   GET /api/plugins/osint-cx/crossref?q=<term>&type=<auto|username|email|phone|ip|domain>
-  GET /api/plugins/osint-cx/brixhub?q=<term>&type=<auto|username|email|phone|ip|domain>
-
-BrixHub est optionnel et se configure côté serveur avec des variables d'environnement :
-  BRIXHUB_API_KEY       clé API BrixHub, obligatoire pour interroger le service
-  BRIXHUB_BASE_URL      domaine API, défaut https://brixhub.net
-  BRIXHUB_SEARCH_PATH   chemin de recherche, défaut /api/v1/search
-  BRIXHUB_DOCS_PATH     chemin OpenAPI, défaut /api/v1/docs
-  BRIXHUB_AUTH_HEADER   nom du header d'auth, défaut X-API-Key
-  BRIXHUB_AUTH_SCHEME   préfixe éventuel, vide par défaut
-  BRIXHUB_USER_AGENT    User-Agent obligatoire envoyé à BrixHub
 """
 
 import hashlib
@@ -51,22 +41,9 @@ GITHUB_API_URL = "https://api.github.com/users"
 WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php"
 ENTREPRISE_API_URL = "https://recherche-entreprises.api.gouv.fr/search"
 
-# BrixHub v1 — d'après la documentation fournie :
-#   base API : /api/v1
-#   auth : header X-API-Key: brix_...
-#   User-Agent obligatoire
-#   JSON uniquement
-BRIXHUB_BASE_URL = os.getenv("BRIXHUB_BASE_URL", "https://brixhub.net").rstrip("/")
-BRIXHUB_FALLBACK_BASE_URL = os.getenv("BRIXHUB_FALLBACK_BASE_URL", "https://brixhub.site").rstrip("/")
-BRIXHUB_SEARCH_PATH = os.getenv("BRIXHUB_SEARCH_PATH", "/api/v1/search")
-BRIXHUB_DOCS_PATH = os.getenv("BRIXHUB_DOCS_PATH", "/api/v1/docs")
 # Secrets : lus a chaque appel. register() branche la lecture sur ctx.secret
 # (coffre chiffre de PRISME, puis variables d'environnement / .env).
 _read_secret = lambda name: os.getenv(name, "").strip()
-
-
-def _brixhub_key():
-    return _read_secret("BRIXHUB_API_KEY")
 
 
 def _x_token():
@@ -76,10 +53,6 @@ def _x_token():
 def _rapidapi_key():
     return _read_secret("RAPIDAPI_KEY")
 
-
-BRIXHUB_AUTH_HEADER = os.getenv("BRIXHUB_AUTH_HEADER", "X-API-Key").strip() or "X-API-Key"
-BRIXHUB_AUTH_SCHEME = os.getenv("BRIXHUB_AUTH_SCHEME", "").strip()
-BRIXHUB_USER_AGENT = os.getenv("BRIXHUB_USER_AGENT", UA).strip() or UA
 
 # X API v2 — lecture de profil public par username.
 # Configurez uniquement côté serveur dans .env :
@@ -706,22 +679,6 @@ def _signals_from_crossref(data):
                 elif k in ("company", "role"):
                     _add_signal(signals, "organization", v, r.get("site") or "Maigret", 1, r.get("url"))
 
-    bx = data.get("brixhub") if isinstance(data, dict) else None
-    if isinstance(bx, dict) and bx.get("ok"):
-        payload = bx.get("results") or {}
-        payload_data = payload.get("data") if isinstance(payload, dict) else {}
-        profiles = payload_data.get("results") if isinstance(payload_data, dict) else payload.get("results", []) if isinstance(payload, dict) else []
-        for p in (profiles or [])[:5]:
-            if not isinstance(p, dict):
-                continue
-            _add_signal(signals, "display_name", " ".join([str(p.get("prenom") or ""), str(p.get("nom_famille") or "")]).strip(), "BrixHub", 3)
-            _add_signal(signals, "username", p.get("nom_utilisateur"), "BrixHub", 2)
-            _add_signal(signals, "location", p.get("ville"), "BrixHub", 2)
-            _add_signal(signals, "organization", p.get("societe"), "BrixHub", 2)
-            _add_signal(signals, "email", p.get("email"), "BrixHub", 3)
-            if p.get("_confidence") is not None:
-                _add_signal(signals, "confidence", p.get("_confidence"), "BrixHub", 1)
-
     ent = data.get("entreprise") if isinstance(data, dict) else None
     if isinstance(ent, dict) and ent.get("ok"):
         for e in (ent.get("results") or [])[:5]:
@@ -823,20 +780,6 @@ def compute_correlation_score(data):
         add = min(12, 5 + 4 * len(best[1]))
         score += add
         reasons.append({"label": "Site/domaine recoupé", "points": add, "detail": f"Même domaine externe repéré via {', '.join(sorted(best[1]))}."})
-
-    # BrixHub expose déjà un score interne ; on l'intègre faiblement pour ne pas dominer.
-    conf_values = []
-    for s in signals:
-        if s["kind"] == "confidence":
-            try:
-                conf_values.append(float(s["value"]))
-            except Exception:
-                pass
-    if conf_values:
-        conf = max(conf_values)
-        add = int(min(10, max(0, conf) / 10))
-        score += add
-        reasons.append({"label": "Confiance source externe", "points": add, "detail": f"Score interne maximal observé : {int(conf)}/100."})
 
     score = max(0, min(100, int(score)))
     if score < 35:
@@ -1392,228 +1335,6 @@ def search_x_profile(username):
         "notice": "Lecture seule du profil public via X API v2. Aucun post, follower ou donnée privée n'est récupéré.",
     })
 
-def _brixhub_headers(content_type=False):
-    headers = {
-        "User-Agent": BRIXHUB_USER_AGENT,
-        "Accept": "application/json",
-    }
-    if content_type:
-        headers["Content-Type"] = "application/json"
-    if _brixhub_key():
-        value = f"{BRIXHUB_AUTH_SCHEME} {_brixhub_key()}".strip() if BRIXHUB_AUTH_SCHEME else _brixhub_key()
-        headers[BRIXHUB_AUTH_HEADER] = value
-    return headers
-
-
-def _brixhub_url(base, path):
-    return urljoin(base.rstrip("/") + "/", path.lstrip("/"))
-
-
-def brixhub_openapi_spec():
-    """Récupère la spec OpenAPI brute si BrixHub la sert en JSON."""
-    cache_key = ("brixhub_spec", BRIXHUB_BASE_URL, BRIXHUB_DOCS_PATH)
-    cached = _cached(cache_key)
-    if cached is not None:
-        return cached
-    if not _brixhub_key():
-        return {"ok": False, "enabled": False, "error": "BRIXHUB_API_KEY manquante."}
-
-    url = _brixhub_url(BRIXHUB_BASE_URL, BRIXHUB_DOCS_PATH)
-    try:
-        r = http.get(url, headers=_brixhub_headers(), timeout=TIMEOUT)
-        if 200 <= r.status_code < 300:
-            try:
-                payload = r.json()
-            except Exception:
-                payload = {"raw": r.text[:4000]}
-            return _set_cache(cache_key, {"ok": True, "endpoint": url, "spec": _compact_brixhub_payload(payload)})
-        return _set_cache(cache_key, {"ok": False, "error": "Spec OpenAPI BrixHub indisponible.", "attempts": [{"url": url, "status_code": r.status_code}]})
-    except http.exceptions.RequestException as exc:
-        return _set_cache(cache_key, {"ok": False, "error": "Spec OpenAPI BrixHub indisponible.", "attempts": [{"url": url, "error": type(exc).__name__}]})
-
-
-def _compact_brixhub_payload(payload):
-    """Renvoie un aperçu borné pour éviter d'injecter des réponses énormes dans l'UI."""
-    if isinstance(payload, dict):
-        data = payload.get("data")
-        if isinstance(data, dict) and isinstance(data.get("results"), list):
-            payload = {**payload, "data": {**data, "results": data.get("results", [])[:20]}}
-        else:
-            for key in ("results", "items", "documents", "hits"):
-                val = payload.get(key)
-                if isinstance(val, list):
-                    payload = {**payload, key: val[:20]}
-                    break
-        return payload
-    if isinstance(payload, list):
-        return payload[:20]
-    return payload
-
-
-BRIXHUB_ALLOWED_FIELDS = {
-    # Identité
-    "nom_famille", "prenom", "nom_naissance", "nom_affichage", "nom_utilisateur",
-    "date_naissance", "annee_naissance", "jour_naissance", "mois_naissance", "genre", "civilite",
-    # Contact
-    "email", "telephone", "mobile", "adresse_ip",
-    # Adresse
-    "adresse", "complement_adresse", "code_postal", "ville", "ville_naissance",
-    "lieu_naissance", "pays", "region", "departement",
-    # Identifiants uniques
-    "nir", "iban", "bic", "siret", "siren",
-    # Véhicule
-    "vin_plaque", "immatriculation", "numero_serie", "marque", "modele",
-    # Professionnel
-    "societe", "profession", "fonction",
-    # Gaming / FiveM
-    "steam_id", "fivem_license", "fivem_license2", "fivem_id", "xbox_live_id", "live_id", "discord_id",
-    # Options
-    "page", "per_page", "flexible",
-}
-
-
-def _clean_brixhub_criteria(criteria):
-    """Garde uniquement les champs documentés pour POST /api/v1/search."""
-    if not isinstance(criteria, dict):
-        return {}
-    cleaned = {}
-    for key, value in criteria.items():
-        if key not in BRIXHUB_ALLOWED_FIELDS:
-            continue
-        if value is None:
-            continue
-        if isinstance(value, str):
-            value = value.strip()
-            if value == "":
-                continue
-        if key in ("page", "per_page", "jour_naissance", "mois_naissance"):
-            try:
-                value = int(value)
-            except Exception:
-                continue
-        if key == "flexible":
-            if isinstance(value, str):
-                value = value.lower() in ("1", "true", "yes", "on", "oui")
-            else:
-                value = bool(value)
-        cleaned[key] = value
-    return cleaned
-
-
-def _criteria_from_query(q, typ="auto"):
-    """Compatibilité avec la recherche simple du plugin : mapping uniquement vers des champs documentés."""
-    q = (q or "").strip()
-    typ = (typ or "auto").strip().lower()
-    if typ == "auto":
-        typ = detect_type(q)
-    if typ == "email":
-        return {"email": q}
-    if typ == "phone":
-        return {"telephone": q}
-    if typ == "ip":
-        return {"adresse_ip": q}
-    if typ == "username":
-        return {"nom_utilisateur": q.lstrip("@")}
-    return {}
-
-
-def search_brixhub_payload(criteria):
-    """Appelle strictement l'endpoint documenté : POST /api/v1/search en JSON."""
-    criteria = _clean_brixhub_criteria(criteria)
-    if not criteria:
-        return {"ok": False, "type": "brixhub", "error": "Aucun critère BrixHub documenté n'a été fourni."}
-    if not _brixhub_key():
-        return {
-            "ok": False,
-            "type": "brixhub",
-            "enabled": False,
-            "error": "BrixHub non configuré : renseignez BRIXHUB_API_KEY dans PRISME : Plugins > OSINT > secrets.",
-            "config_help": {
-                "BRIXHUB_API_KEY": "clé API fournie par BrixHub",
-                "BRIXHUB_BASE_URL": BRIXHUB_BASE_URL,
-                "BRIXHUB_SEARCH_PATH": BRIXHUB_SEARCH_PATH,
-                "BRIXHUB_AUTH_HEADER": BRIXHUB_AUTH_HEADER,
-                "BRIXHUB_USER_AGENT": BRIXHUB_USER_AGENT,
-            },
-        }
-
-    url = _brixhub_url(BRIXHUB_BASE_URL, BRIXHUB_SEARCH_PATH)
-    cache_key = ("brixhub_post", url, tuple(sorted(criteria.items())))
-    cached = _cached(cache_key)
-    if cached is not None:
-        return cached
-
-    try:
-        r = http.post(url, json=criteria, headers=_brixhub_headers(content_type=True), timeout=TIMEOUT)
-    except http.exceptions.RequestException as exc:
-        return _set_cache(cache_key, {
-            "ok": False,
-            "type": "brixhub",
-            "enabled": True,
-            "method": "POST",
-            "endpoint": url,
-            "criteria_sent": criteria,
-            "error": f"Erreur réseau BrixHub : {type(exc).__name__}",
-        })
-
-    attempt = {"method": "POST", "url": url, "json_keys": list(criteria.keys()), "status_code": r.status_code}
-    if r.status_code in (401, 403):
-        return _set_cache(cache_key, {
-            "ok": False, "type": "brixhub", "enabled": True,
-            "method": "POST", "endpoint": url, "criteria_sent": criteria,
-            "error": "Accès BrixHub refusé : vérifiez BRIXHUB_API_KEY et le header X-API-Key.",
-            "attempts": [attempt],
-        })
-    if r.status_code == 429:
-        return _set_cache(cache_key, {
-            "ok": False, "type": "brixhub", "enabled": True,
-            "method": "POST", "endpoint": url, "criteria_sent": criteria,
-            "error": "Limite de requêtes BrixHub atteinte.", "attempts": [attempt],
-        })
-    if not (200 <= r.status_code < 300):
-        preview = r.text[:1200] if getattr(r, "text", None) else ""
-        return _set_cache(cache_key, {
-            "ok": False,
-            "type": "brixhub",
-            "enabled": True,
-            "method": "POST",
-            "endpoint": url,
-            "criteria_sent": criteria,
-            "error": f"BrixHub a répondu avec le code HTTP {r.status_code}.",
-            "response_preview": preview,
-            "attempts": [attempt],
-        })
-
-    try:
-        payload_out = r.json()
-    except Exception:
-        payload_out = {"raw": r.text[:4000]}
-
-    meta = payload_out.get("meta") if isinstance(payload_out, dict) else None
-    return _set_cache(cache_key, {
-        "ok": True,
-        "type": "brixhub",
-        "enabled": True,
-        "method": "POST",
-        "endpoint": url,
-        "criteria_sent": criteria,
-        "results": _compact_brixhub_payload(payload_out),
-        "meta": meta,
-        "rate_limits": {k: v for k, v in r.headers.items() if k.lower().startswith("x-ratelimit")},
-        "notice": "Endpoint utilisé strictement selon la documentation fournie : POST /api/v1/search avec JSON et header X-API-Key.",
-    })
-
-
-def search_brixhub(q, typ="auto"):
-    """Wrapper pour la recherche simple depuis la barre OSINT."""
-    q = (q or "").strip()
-    if not q:
-        return {"ok": False, "type": "brixhub", "error": "Requête vide."}
-    criteria = _criteria_from_query(q, typ)
-    if not criteria:
-        return {"ok": False, "type": "brixhub", "query": q, "error": "Ce type n'est pas mappé à un champ BrixHub documenté."}
-    return search_brixhub_payload(criteria)
-
 def crossref(q, typ="auto"):
     q = (q or "").strip()
     typ = (typ or "auto").strip().lower()
@@ -1636,8 +1357,6 @@ def crossref(q, typ="auto"):
 
     data = {"ok": res.get("ok", True), "query": q, "type": typ, "results": res}
     truthy = ("1", "true", "yes", "on")
-    if request.args.get("brixhub", "0").lower() in truthy:
-        data["brixhub"] = search_brixhub(q, typ)
     if request.args.get("entreprise", "0").lower() in truthy:
         data["entreprise"] = search_entreprise(q)
     if request.args.get("wikidata", "0").lower() in truthy:
@@ -1735,22 +1454,6 @@ def register(ctx):
     @ctx.route("/social-cli", methods=["GET"])
     def osintcx_social_cli():
         data = search_social_cli(request.args.get("q", ""), request.args.get("tool", "auto"))
-        status = 200 if data.get("ok", True) else 400
-        return jsonify(data), status
-
-    @ctx.route("/brixhub", methods=["GET", "POST"])
-    def osintcx_brixhub():
-        if request.method == "POST":
-            payload = request.get_json(silent=True) or {}
-            data = search_brixhub_payload(payload)
-        else:
-            data = search_brixhub(request.args.get("q", ""), request.args.get("type", "auto"))
-        status = 200 if data.get("ok", True) else 400
-        return jsonify(data), status
-
-    @ctx.route("/brixhub/spec", methods=["GET"])
-    def osintcx_brixhub_spec():
-        data = brixhub_openapi_spec()
         status = 200 if data.get("ok", True) else 400
         return jsonify(data), status
 

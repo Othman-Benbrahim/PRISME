@@ -54,12 +54,28 @@ def noyau(o):
     return {k:o['champs'].get(k, '') for k in FIGES}
 
 
+def lire_pieces(ctx, meta):
+    """Instantané lisible du rapport d'origine ; pas de dépendance à Constat."""
+    origine = str(meta.get('prisme_origine', ''))
+    chemin = meta.get('prisme_note_origine', '')
+    if not origine.startswith('constat:') or not chemin:
+        return None  # Les anciennes prédictions restent utilisables, sans inventer leurs pièces.
+    p = principal(ctx, chemin)
+    if p.suffix.lower() != '.md' or not p.is_file():
+        raise ValueError('Pièces Constat absentes : restaurez la note avant de copier le pari')
+    if p.stat().st_size > 210_000:
+        raise ValueError('Pièces trop volumineuses (210 ko avec provenance)')
+    texte = ctx.read_note(p)
+    return dict(chemin=p.relative_to(ctx.vault_root()).as_posix(), texte=texte,
+                sha256=hashlib.sha256(texte.encode('utf-8')).hexdigest())
+
+
 def lire_copie(ctx, p):
     meta = ctx.note_meta(principal(ctx, p))
     if meta.get('prisme_type') != 'calibration_archive':
         raise ValueError('Copie de référence invalide')
     brut = meta.get('prisme_calibration_donnees', '')
-    if not isinstance(brut, str) or len(brut) > 100_000:
+    if not isinstance(brut, str) or len(brut) > 400_000:
         raise ValueError('Copie trop volumineuse ou invalide')
     try:
         d = json.loads(base64.b64decode(brut, validate=True).decode('utf-8'))
@@ -71,6 +87,10 @@ def lire_copie(ctx, p):
         raise ValueError('Identifiant de copie invalide')
     if not isinstance(d.get('pari'), dict) or set(d['pari']) != set(FIGES):
         raise ValueError('Pari archivé incomplet')
+    pieces = d.get('pieces_constat')
+    if pieces is not None and (not isinstance(pieces, dict) or not isinstance(pieces.get('texte'), str)
+            or hashlib.sha256(pieces['texte'].encode('utf-8')).hexdigest() != pieces.get('sha256')):
+        raise ValueError('Empreinte des pièces modifiée')
     scores(d['pari']['probabilite'], 'oui')
     horodatage = datetime.fromisoformat(d['capture_le'])
     if not horodatage.tzinfo or horodatage > maintenant():
@@ -80,7 +100,7 @@ def lire_copie(ctx, p):
     return d
 
 
-def inscrire(ctx, chemin, horloge, version):
+def inscrire(ctx, chemin, horloge, version, version_pieces=None):
     with VERROU:
         o, meta = objet(ctx, chemin)
         ident = o['id']
@@ -101,12 +121,19 @@ def inscrire(ctx, chemin, horloge, version):
         memes = [n for n in ctx.iter_notes() if ctx.note_meta(principal(ctx, n)).get('prisme_id') == ident]
         if len(memes) != 1:
             raise ValueError('Identifiant dupliqué dans le vault')
+        pieces = lire_pieces(ctx, meta)
+        if pieces and pieces['sha256'] != version_pieces:
+            raise ValueError('Les pièces ont changé ou n’ont pas été relues : actualisez avant de confirmer')
         ctx.set_world_clock(p, horloge)
         m = ctx.note_meta(p)
         d = dict(version=1, id=ident, titre=o['titre'], chemin=o['chemin'], pari=noyau(o),
                  capture_le=instant.isoformat(), enregistre_le=o['enregistre_le'],
                  horloge={k:m.get(k, '') for k in horloge})
+        if pieces:
+            d['pieces_constat'] = pieces
         payload = base64.b64encode(canon(d).encode('utf-8')).decode('ascii')
+        if len(payload) > 400_000:
+            raise ValueError('Copie trop volumineuse : réduisez les pièces explicitement')
         corps = '# Copie de référence — ' + o['titre'] + '\n\n'
         corps += 'Copie locale datée ; pas un horodatage certifié. Ne pas modifier.\n\n'
         corps += '```json\n' + json.dumps(d, ensure_ascii=False, indent=2) + '\n```\n'
@@ -129,6 +156,7 @@ def inventaire(ctx):
                              'prisme_valide_du_etat','prisme_valide_au_etat')}
             o['version'] = hashlib.sha256(ctx.read_note(p).encode('utf-8')).hexdigest()
             o['inscrite'] = principal(ctx, f"{DOSSIER}/{o['id']}.md").exists()
+            o['pieces'] = lire_copie(ctx, principal(ctx, f"{DOSSIER}/{o['id']}.md")).get('pieces_constat') if o['inscrite'] else lire_pieces(ctx, m)
             objets.append(o)
         except (OSError, ValueError) as e:
             problemes.append({'chemin':str(p), 'raison':str(e)})

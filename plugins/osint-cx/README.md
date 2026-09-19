@@ -27,7 +27,6 @@ Le plugin permet de lancer des recherches sur plusieurs sources :
 * GitHub public ;
 * Wikidata ;
 * Maigret / Sherlock en local si installé ;
-* BrixHub API si une clé API est configurée ;
 * LinkedIn via RapidAPI si une API compatible est configurée ;
 * score de corrélation multi-sources.
 
@@ -79,7 +78,7 @@ python second_brain.py
 
 ## Variables d’environnement
 
-> **PRISME** : les clés `BRIXHUB_API_KEY`, `X_BEARER_TOKEN` et `RAPIDAPI_KEY` se saisissent de préférence dans PRISME (bouton 🧩 Plugins > OSINT Cross-Reference > Secrets), où elles sont chiffrées sous Windows. Le fichier `.env` reste lu en secours ; les autres réglages (URL, hôte RapidAPI…) restent dans `.env`.
+> **PRISME** : les clés `X_BEARER_TOKEN` et `RAPIDAPI_KEY` se saisissent de préférence dans PRISME (bouton 🧩 Plugins > OSINT Cross-Reference > Secrets), où elles sont chiffrées sous Windows. Le fichier `.env` reste lu en secours ; les autres réglages (URL, hôte RapidAPI…) restent dans `.env`.
 
 
 Le plugin fonctionne en grande partie sans clé API.
@@ -89,10 +88,6 @@ Certaines fonctionnalités avancées nécessitent cependant des variables dans l
 Exemple :
 
 ```env
-# BrixHub API
-BRIXHUB_API_KEY=brix_votre_cle
-BRIXHUB_BASE_URL=https://brixhub.net
-BRIXHUB_SEARCH_PATH=/api/v1/search
 
 # X API, optionnel
 X_BEARER_TOKEN=votre_bearer_token_x
@@ -116,40 +111,6 @@ Ajouter dans `.gitignore` :
 ```gitignore
 .env
 ```
-
----
-
-## Configuration BrixHub
-
-BrixHub est appelé uniquement si `BRIXHUB_API_KEY` est configurée.
-
-Endpoint utilisé :
-
-```txt
-POST /api/v1/search
-```
-
-Le plugin envoie une requête JSON avec les champs documentés par BrixHub, par exemple :
-
-```json
-{
-  "nom_famille": "Dupont",
-  "prenom": "Jean",
-  "ville": "Paris",
-  "flexible": true
-}
-```
-
-Les résultats sont affichés sous forme de cartes structurées :
-
-* nom ;
-* prénom ;
-* email ;
-* téléphone ;
-* ville ;
-* sources ;
-* score de confiance ;
-* métadonnées de recherche.
 
 ---
 
@@ -304,7 +265,6 @@ GET  /api/plugins/osint-cx/social-cli?q=<username>&tool=auto
 GET  /api/plugins/osint-cx/linkedin?q=<username>&url=<url_linkedin>
 POST /api/plugins/osint-cx/linkedin
 
-POST /api/plugins/osint-cx/brixhub
 POST /api/plugins/osint-cx/score
 ```
 
@@ -325,7 +285,6 @@ Il prend en compte, selon les données disponibles :
 * signaux GitHub ;
 * signaux Wikidata ;
 * signaux LinkedIn ;
-* confiance retournée par certaines sources comme BrixHub.
 
 Le score est affiché comme un **indice**, pas comme une preuve.
 

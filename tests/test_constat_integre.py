@@ -44,6 +44,36 @@ class TestConstat(unittest.TestCase):
         _,code=self.appel('etat',{'revision':0,'donnees':{}});self.assertEqual(code,409)
         self.assertEqual(stockage.charger(self.ctx)['donnees'],self.donnees())
 
+    def test_journal_ajouts_uniquement_et_historique_intact(self):
+        d=self.donnees();stockage.enregistrer(self.ctx,0,d)
+        d['j:d-1'].append({'t':'etape','ts':'avant','sortie':{'texte':'Initiale'}})
+        stockage.enregistrer(self.ctx,1,d)
+        d['j:d-1'][1]['sortie']['texte']='Écrasée'
+        with self.assertRaisesRegex(ValueError,'journal'):
+            stockage.enregistrer(self.ctx,2,d)
+        self.assertEqual(stockage.charger(self.ctx)['donnees']['j:d-1'][1]['sortie']['texte'],'Initiale')
+        with self.assertRaises(ValueError):stockage.enregistrer(self.ctx,2,{})
+
+    def test_acceptation_refuse_un_autre_vault_et_une_proposition_modifiee(self):
+        p=registre.proposer('prediction','Test',{'enonce':'X','probabilite':.7,
+            'echeance':'2099-01-01','critere_resolution':'Observation'},origine='constat:interface')
+        r=self.client.post('/api/objets/file/accepter',json={'cle':p['cle'],'attendue':dict(p,titre='Autre')},headers=self.h)
+        self.assertEqual(r.status_code,409)
+        r=self.client.post('/api/objets/file/accepter',json={'cle':p['cle']},headers=dict(self.h,**{'X-Constat-Espace':'autre'}))
+        self.assertEqual(r.status_code,409)
+        self.assertEqual(len(file.lister()),1)
+        r=self.client.post('/api/objets/file/accepter',json={'cle':p['cle'],'attendue':p},headers=self.h)
+        self.assertEqual(r.status_code,200)
+
+    def test_proposition_transmet_la_note_des_pieces(self):
+        d={'type':'prediction','titre':'Avec preuves','note':'Alpha.md','champs':{'enonce':'X',
+            'probabilite':.8,'echeance':'2099-01-01','critere_resolution':'Observation'}}
+        r=self.client.post('/api/objets/proposer',json=d,headers=self.h)
+        self.assertEqual(r.status_code,201)
+        entree=r.get_json()['entree'];self.assertEqual(entree['note'],'Alpha.md')
+        o=registre.accepter(entree['cle'])['objet']
+        self.assertEqual(self.ctx.note_meta(VAULT/o['chemin'])['prisme_note_origine'],'Alpha.md')
+
     def test_vaults_separes_et_panneau_perime_refuse(self):
         self.appel('etat',{'revision':0,'donnees':self.donnees()})
         autre=TMP/'constat-autre';autre.mkdir(exist_ok=True);config.wr_cfg({'workspace':str(autre)})

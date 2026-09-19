@@ -8,7 +8,7 @@ Son objectif est de conserver le chemin entre une information et son utilisation
 
 > **L'IA propose, l'auteur valide.** Les sources, les hypothèses et les résultats observés gardent des rôles distincts.
 
-**État du projet :** version de développement utilisable depuis les sources. Les neuf plugins et leurs guides sont intégrés. La distribution Windows avec `PRISME.exe` correspond à l'étape **E9**, qui est en cours de préparation et de validation.
+**État du projet :** version de développement utilisable depuis les sources. Les neuf plugins et leurs guides sont intégrés. La distribution Windows avec `PRISME.exe` a été construite et intégrée en **E9** (PR #22). Cette branche poursuit Constat ; la publication des releases reste une opération distincte.
 
 [Prise en main](#installation-depuis-les-sources) · [Plugins et guides](#les-neuf-plugins) · [Constat et Calibration](#de-lanalyse-à-la-prédiction) · [Feuille de route](docs/FEUILLE-DE-ROUTE.md)
 
@@ -123,8 +123,8 @@ Le parcours disponible est le suivant :
 
 1. Dans Constat, valider une ACH puis choisir une hypothèse à **verser comme prédiction dans PRISME**.
 2. Renseigner l'événement, sa probabilité entre 0 et 1, son échéance et son critère de résolution.
-3. Relire et accepter la proposition dans la file PRISME.
-4. Dans Calibration, **copier le pari avant le jour de l'échéance et avant de connaître son résultat**.
+3. Dans Constat, ouvrir **Prédictions et Calibration**, relire et accepter la proposition.
+4. Relire ses pièces puis **confirmer la copie dans Calibration avant le jour de l'échéance et avant de connaître son résultat**, depuis ce panneau ou depuis Calibration.
 5. Après observation, résoudre la prédiction avec une date, un résultat et une preuve.
 6. Actualiser Calibration pour consulter les scores et les éventuelles exclusions.
 
@@ -134,7 +134,7 @@ Pour un pari à `0,8` dont le résultat est « oui », le Brier vaut `0,04` et l
 
 **Les responsabilités restent séparées :** Constat prépare l'analyse, le cœur conserve la fiche Prédiction, Calibration calcule les mesures. Le plugin active aussi les champs de validité de l'**horloge du monde**, distincts de l'échéance du pari.
 
-Une simplification du transfert entre Constat et Calibration est envisagée **après E9**. Pour l'instant, l'acceptation de la prédiction et sa copie dans Calibration restent deux actions distinctes.
+Constat conserve les passages exacts des sources, les corrections motivées, les validations et les contradictions déclarées. Ces pièces accompagnent désormais le pari dans Calibration. L'acceptation de la prédiction et sa copie restent deux actions distinctes et explicites.
 
 ## Installation depuis les sources
 

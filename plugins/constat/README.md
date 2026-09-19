@@ -35,8 +35,9 @@ intégrée ; son document HTML isolé évite les conflits de styles avec l’éd
 6. Depuis une ACH complète validée, « Verser comme prédiction dans PRISME ».
    L’auteur saisit probabilité, date butoir, condition de résolution ; ces champs
    commencent vides. La proposition rejoint la file de validation PRISME.
-7. Revenir au vault, accepter la proposition dans la file, puis utiliser le plugin
-   Calibration séparé pour copier le pari avant échéance et le scorer après résolution.
+7. Dans « Prédictions et Calibration », relire et accepter la proposition, puis
+   confirmer séparément sa copie avec ses pièces. Calibration reste facultatif et
+   calcule les scores après résolution observée.
 8. Exporter le rapport Markdown dans `Rapports/`, ou télécharger le dossier JSON
    complet avec les textes, les prompts, les révisions et les validations.
 
@@ -85,3 +86,13 @@ ne doit apparaître dans le vault avant acceptation dans la file PRISME.
 Tests : `npm ci --prefix plugins/constat --ignore-scripts --no-audit --no-fund`,
 puis `npm test --prefix plugins/constat` ; Python : `python -m unittest discover -s tests`.
 Le plafond de taille inclut tous les fichiers HTML, JS et CSS de cet espace.
+
+## Passages et révisions
+
+Les preuves ACH et la lecture factuelle peuvent porter des citations exactes,
+attachées à une version du corps de source. Les contradictions entre preuves
+sont déclarées, expliquées et relues. Une correction motivée ajoute une révision
+non validée ; l'historique complet reste consultable. Le serveur impose les ajouts
+au journal, sans prétendre protéger la base contre une modification manuelle.
+Le [guide complet](../../guides-plugins/constat.md) décrit les formulaires, le JSON
+et le parcours de transfert avec conservation des pièces.

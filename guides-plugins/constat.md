@@ -30,11 +30,14 @@ Utilisez un vault d'essai pour conserver les données fictives à part.
 5. Remplissez le pari : événement observable, probabilité entre 0 et 1, date
    butoir future et condition permettant de décider oui ou non. Le domaine est facultatif.
 6. Cliquez sur **Déposer dans la file de validation PRISME**.
-7. Revenez au vault. Dans la file, choisissez **Relire et compléter**, puis
-   **Valider et créer la note**. Avant cette acceptation, aucune fiche Prédiction
-   ne doit être créée dans le vault.
-8. Pour mesurer ce pari, poursuivez avec [le guide Calibration](calibration.md),
-   en créant sa copie **avant** de le résoudre.
+7. Dans **Prédictions et Calibration**, cliquez sur **Actualiser les prédictions de
+   ce dossier**. Relisez l'énoncé, la probabilité, l'échéance et les conditions,
+   puis **J’ai relu : accepter cette prédiction**. Cette action crée la fiche E11.
+8. Dépliez **Relire les pièces qui accompagneront le pari**, indiquez les bornes
+   de l'horloge du monde si elles sont connues, puis **Confirmer la copie du pari
+   et de ses pièces dans Calibration**. Cette seconde action fige la référence.
+9. Après une observation réelle, résolvez la fiche Prédiction dans PRISME puis
+   actualisez Calibration. [Son guide](calibration.md) explique les scores.
 
 La validation de l'ACH ne vaut pas acceptation automatique de la prédiction.
 Les champs de probabilité, d'échéance et de condition commencent volontairement vides.
@@ -114,7 +117,7 @@ Pour chaque analyse :
 3. Cliquez sur **Lancer cette analyse** pour un appel explicite.
 4. Examinez la sortie, les éléments écartés et la réponse brute. Une sortie JSON
    invalide ou incomplète ne doit pas être considérée comme validée.
-5. Si nécessaire, modifiez la **Révision JSON de l'analyse** et cliquez sur
+5. Si nécessaire, modifiez la **Révision JSON de l'analyse**, expliquez le motif, puis cliquez sur
    **Enregistrer ma révision**. Cela conserve l'ancienne trace et crée une nouvelle
    révision, encore à valider.
 6. Validez seulement une sortie complète que vous avez relue.
@@ -128,6 +131,67 @@ arbitrairement des champs du JSON pour faire disparaître un avertissement.
 Si vous ajoutez une source ou changez sa cotation, le relevé devient historique :
 recalculez-le et réexaminez les analyses. Une nouvelle révision d'une étape parent
 rend aussi ses descendants obsolètes. Leur ancienne validation ne suffit plus.
+
+## Relier les affirmations aux passages sources
+
+Sous l'ACH, **Passages sources et contradictions** montre les extraits cités,
+leur source, leur empreinte SHA-256 et leur position dans le texte conservé.
+La lecture factuelle de l'étape 4 peut également porter des passages. Un extrait
+atteste ce que dit le document ; il ne prouve pas à lui seul que cela est vrai.
+Les anciennes analyses sans extraits restent lisibles avec un avertissement explicite.
+
+1. Ouvrez **Relier une preuve à un passage exact**.
+2. Choisissez la preuve ACH et sa source. Copiez l'extrait depuis le texte affiché.
+3. Collez-le sans reformulation. Si le même extrait apparaît plusieurs fois,
+   précisez sa position de début (unités UTF-16, à partir de zéro) ou choisissez
+   un passage plus long et unique.
+4. Expliquez pourquoi vous ajoutez ce passage, puis enregistrez.
+5. Relisez et validez la **nouvelle** révision avant de proposer une prédiction.
+
+Un passage inexistant ou tiré d'une autre version de la source rend la sortie
+incomplète. Le texte brut du modèle reste visible dans la trace. Pour retirer ou
+remplacer un passage erroné, utilisez la révision JSON de l'étape, avec un motif.
+Exemple d'ajout dans une preuve :
+
+```json
+"passages": [{"source": "s-001", "extrait": "Phrase copiée exactement."}]
+```
+
+**Signaler une contradiction entre deux preuves** conserve leurs identifiants et
+votre explication dans une nouvelle révision. Cela ne tranche pas automatiquement
+le désaccord. Dans le JSON, la liste `contradictions` contient des objets
+`{"a":"P1","b":"P2","motif":"Explication"}`. Retirer un signalement exige aussi une
+correction motivée. La matrice ACH conserve séparément ses cases incompatibles
+avec une hypothèse : ces deux notions ne sont pas interchangeables.
+
+**Historique complet des analyses, corrections et validations** permet de revoir
+les anciennes sorties, leurs auteurs ou modèles, les motifs et les dates de
+validation. Le serveur refuse de réécrire le journal par l'interface. Une personne
+qui modifie directement le fichier SQLite peut toujours l'altérer : ce n'est pas
+un journal certifié.
+
+## Transférer les preuves avec le pari
+
+Le dépôt de la proposition crée aussi une note de pièces dans `Rapports/` :
+hypothèse, éléments compatibles et incompatibles, citations, versions des sources,
+contradictions et historique des validations. La fiche Prédiction garde le lien.
+Calibration copie ensuite le contenu de cette note dans sa référence datée.
+Après copie, déplacer ou supprimer la note d'origine n'efface pas ces pièces.
+
+Si le pari ou ses pièces changent depuis votre relecture, l'inscription est refusée :
+actualisez et relisez avant de confirmer. Une limite de 200 ko s'applique au rapport
+de pièces (210 ko avec sa provenance) ; aucun extrait n'est tronqué silencieusement.
+
+Constat reste utilisable si Calibration est désactivé ou absent. Le panneau indique
+alors comment poursuivre après activation. Les anciennes propositions sans note de
+pièces peuvent être copiées, mais leurs preuves manquantes ne sont pas reconstituées.
+Une restauration JSON crée un nouveau dossier : ses anciens transferts restent des
+traces historiques et ne déclenchent aucune nouvelle inscription.
+
+Après une coupure, **Actualiser les prédictions de ce dossier** retrouve les
+propositions et fiches existantes même si leur dernière trace locale a échoué.
+Vérifiez aussi `Rapports/` : une note de pièces peut avoir été créée avant un échec
+de dépôt. Aucun renvoi ni résolution automatique n'est effectué.
 
 ## Exporter, sauvegarder et reprendre
 

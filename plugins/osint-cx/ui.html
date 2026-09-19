@@ -63,11 +63,6 @@
         <span>Maigret/Sherlock local</span>
         <em>sans clé · nécessite installation CLI</em>
       </label>
-      <label class="oscx-toggle">
-        <input id="oscx-brixhub" type="checkbox" onchange="toggleBrixHubBox()">
-        <span>Inclure BrixHub API</span>
-        <em>POST <code>/api/v1/search</code>, JSON, header <code>X-API-Key</code></em>
-      </label>
     </div>
 
 
@@ -80,21 +75,7 @@
       <div class="oscx-note">Optionnel : si le champ est vide, le plugin construit une URL LinkedIn à partir du pseudo saisi. La clé RapidAPI reste côté serveur dans <code>.env</code>.</div>
     </div>
 
-    <div id="oscx-brixhub-box" class="oscx-card" style="display:none;margin-top:10px">
-      <div class="oscx-card-title">🧩 Critères BrixHub documentés</div>
-      <div class="oscx-grid">
-        <div class="oscx-k">Nom</div><div class="oscx-v"><input id="oscx-bx-nom" class="oscx-mini-input" placeholder="nom_famille"></div>
-        <div class="oscx-k">Prénom</div><div class="oscx-v"><input id="oscx-bx-prenom" class="oscx-mini-input" placeholder="prenom"></div>
-        <div class="oscx-k">Ville</div><div class="oscx-v"><input id="oscx-bx-ville" class="oscx-mini-input" placeholder="ville"></div>
-        <div class="oscx-k">Email</div><div class="oscx-v"><input id="oscx-bx-email" class="oscx-mini-input" placeholder="email"></div>
-        <div class="oscx-k">Téléphone</div><div class="oscx-v"><input id="oscx-bx-tel" class="oscx-mini-input" placeholder="telephone"></div>
-        <div class="oscx-k">Utilisateur</div><div class="oscx-v"><input id="oscx-bx-user" class="oscx-mini-input" placeholder="nom_utilisateur"></div>
-        <div class="oscx-k">Flexible</div><div class="oscx-v"><label><input id="oscx-bx-flex" type="checkbox"> recherche approximative</label></div>
-      </div>
-      <div class="oscx-note">Optionnel : colle ici un JSON complet BrixHub. Il sera envoyé tel quel après filtrage des champs documentés.</div>
-      <textarea id="oscx-bx-json" placeholder='{"nom_famille":"Dupont","prenom":"Jean","ville":"Paris","flexible":true}' style="width:100%;min-height:74px;margin-top:6px;padding:8px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg3);color:var(--tx);font-family:var(--mono);font-size:12px"></textarea>
-    </div>
-    <div class="oscx-note">⚖️ Mode audit défensif : utilisez ces modules uniquement pour vos propres comptes, vos domaines, votre organisation, ou une cible ayant donné son accord. Le plugin n'appelle plus d'autres endpoints BrixHub que celui fourni : <code>POST /api/v1/search</code>. Le score de corrélation reste indicatif : il aide à prioriser les vérifications, mais ne constitue jamais une preuve d’identité. La lecture X utilise seulement le profil public fourni par l'API officielle, si <code>X_BEARER_TOKEN</code> est configuré côté serveur. LinkedIn/RapidAPI est optionnel et doit rester limité à un usage consenti ou défensif.</div>
+    <div class="oscx-note">⚖️ Mode audit défensif : utilisez ces modules uniquement pour vos propres comptes, vos domaines, votre organisation, ou une cible ayant donné son accord. Le score de corrélation reste indicatif : il aide à prioriser les vérifications, mais ne constitue jamais une preuve d’identité. La lecture X utilise seulement le profil public fourni par l'API officielle, si <code>X_BEARER_TOKEN</code> est configuré côté serveur. LinkedIn/RapidAPI est optionnel et doit rester limité à un usage consenti ou défensif.</div>
   </div>
 
   <div id="oscx-progress" style="display:none">

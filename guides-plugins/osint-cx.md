@@ -43,7 +43,6 @@ l'URL complète d'un profil LinkedIn dispose d'un champ séparé dans son module
 | Profil X API | Profil renvoyé par l'API X | Jeton et droits adaptés |
 | LinkedIn via RapidAPI | Données renvoyées par le fournisseur choisi | Clé et configuration compatibles |
 | Maigret/Sherlock local | Recherche de pseudos via un outil installé | Commande locale disponible ; ses recherches utilisent le réseau |
-| BrixHub | Résultats selon les critères envoyés | Clé et service configuré |
 
 Ne cochez que les modules utiles. Leur présence dans le formulaire ne garantit
 pas que vos droits d'accès, le service distant ou un outil local soient disponibles.
@@ -55,7 +54,6 @@ nécessaires :
 
 | Module | Nom du secret |
 |---|---|
-| BrixHub | `BRIXHUB_API_KEY` |
 | X | `X_BEARER_TOKEN` |
 | LinkedIn via RapidAPI | `RAPIDAPI_KEY` |
 
@@ -64,10 +62,6 @@ Les URL et paramètres non secrets peuvent être placés dans
 les réglages sont `LINKEDIN_RAPIDAPI_HOST`, `LINKEDIN_RAPIDAPI_ENDPOINT`,
 `LINKEDIN_RAPIDAPI_METHOD` et `LINKEDIN_RAPIDAPI_PARAM`. Recopiez les valeurs de
 **votre fournisseur** ; une clé seule ne suffit pas et les offres ne sont pas interchangeables.
-
-Pour BrixHub, l'interface permet de remplir les critères ou un JSON. Les clés
-acceptées sont filtrées par le plugin. Utilisez les champs nécessaires à l'audit,
-pas l'ensemble des données disponibles par défaut.
 
 Maigret et Sherlock ne sont pas fournis comme fonctions internes de PRISME. Dans
 la version source, si vous choisissez de les installer dans votre environnement :

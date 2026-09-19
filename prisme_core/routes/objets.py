@@ -119,6 +119,8 @@ def file_accepter():
     d = _corps()
     try:
         entree = filedattente.par_cle(d.get("cle", ""))
+        if "attendue" in d and d["attendue"] != entree:
+            return _erreur("La proposition a changé. Actualisez avant de confirmer.", 409)
         if entree and entree.get("type", "source") != "source":
             return jsonify(registre.accepter(d["cle"], titre=d.get("titre"),
                                             champs=d.get("champs"), raison=d.get("raison", "")))

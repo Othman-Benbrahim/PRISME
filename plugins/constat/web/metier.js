@@ -1,3 +1,4 @@
+import {enrichirPreuves} from './preuves.js';
 import { empreinteExacte } from './core/empreinte.js';
 import { ETAPES, valider } from './core/etapes.js';
 import { extraireCitations } from './core/extraction.js';
@@ -15,7 +16,8 @@ export function etapesCourantes(journal,releve){
  return out;
 }
 export function verifierSortie(numero,brut,sources,courantes){
- return valider(numero,brut,{idsSources:sources.map(s=>s.id),idsHypotheses:courantes[5]?.sortie.hypotheses.map(h=>h.id)||[],idsScenarios:courantes[7]?.sortie.scenarios.map(s=>s.id)||[]});
+ const resultat=valider(numero,brut,{idsSources:sources.map(s=>s.id),idsHypotheses:courantes[5]?.sortie.hypotheses.map(h=>h.id)||[],idsScenarios:courantes[7]?.sortie.scenarios.map(s=>s.id)||[]});
+ return enrichirPreuves(numero,brut,resultat,sources);
 }
 export function jsonModele(texte){
  const s=texte.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
