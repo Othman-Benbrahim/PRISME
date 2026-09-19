@@ -21,6 +21,7 @@ from werkzeug.exceptions import HTTPException
 from flask import jsonify, request
 
 from . import hooks, secrets
+from .frontmatter import update as update_frontmatter
 from .config import rd_cfg
 from .markdown import extract_link_refs, extract_tags, resolve_ref   # reexportes (voir __all__)
 from .paths import DATA_DIR, LEGACY_DATA_DIR
@@ -32,7 +33,7 @@ from .vecteurs.contrat import VecteurIndisponible as EmbeddingUnavailable
 __all__ = [
     "API_VERSION", "EVENTS", "PERMISSIONS", "PluginContext", "PluginPermissionError",
     "extract_link_refs", "extract_tags", "resolve_ref",
-    "EmbeddingProvider", "EmbeddingUnavailable",
+    "EmbeddingProvider", "EmbeddingUnavailable", "update_frontmatter",
 ]
 
 API_VERSION = 1
@@ -154,7 +155,7 @@ class PluginContext:
     def read_note(self, path):
         return self.safe_path(path, must_exist=True).read_text(encoding="utf-8", errors="replace")
 
-    def write_note(self, path, content, provenance=None):
+    def write_note(self, path, content, provenance=None, *, exclusive=False):
         """Ecrit une note et declenche note_saved (ou note_created).
 
         provenance : dict facultatif pour une note produite par le plugin, par ex.
@@ -164,6 +165,8 @@ class PluginContext:
         self._require("vault_write")
         p = self.safe_path(path)
         created = not p.exists()
+        if exclusive and not created:
+            raise FileExistsError(str(p))
         if created and provenance is not None:
             from . import provenance as prov
             content = prov.estampiller(
@@ -176,11 +179,34 @@ class PluginContext:
                 parent=str(provenance.get("parent") or ""))
         p.parent.mkdir(parents=True, exist_ok=True)
         snapshot(p)
-        p.write_text(content, encoding="utf-8")
+        with p.open("x" if exclusive else "w", encoding="utf-8", newline="\n") as sortie:
+            sortie.write(content)
         from .index import notify_changed        # import tardif : l'index importe vault/markdown
         notify_changed(p)
         hooks.emit("note_created" if created else "note_saved", path=str(p), origin=self.id)
         return p
+
+    def typed_object(self, path):
+        """Lit et valide une fiche E11 ; une édition Markdown brute n'est pas certifiée."""
+        from .objets import registre, types
+        obj = registre._lire(self.safe_path(path, must_exist=True))
+        if obj is None:
+            raise ValueError("Note sans type E11")
+        titre, champs = types.valider(obj["type"], obj["titre"], obj["champs"])
+        return {**obj, "titre": titre, "champs": champs}
+
+    def set_world_clock(self, path, fields):
+        """Active les bornes du monde ; le plugin doit demander le geste de l'auteur."""
+        self._require("vault_write")
+        from . import horloge, provenance
+        p = self.safe_path(path, must_exist=True)
+        meta = self.note_meta(p)
+        if meta.get("prisme_type") not in ("prediction", "decision"):
+            raise ValueError("L'horloge du monde concerne les décisions et prédictions")
+        propres = horloge.valider(fields)
+        self.safe_path(vault_root() / ".trash" / "versions")
+        provenance.ecrire(p, propres)
+        return self.note_meta(p)
 
     # ── Donnees et secrets ────────────────────────────────────────────
     def data_dir(self):

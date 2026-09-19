@@ -6,7 +6,7 @@ Regles appliquees :
 - une note produite par une machine en recoit un des sa creation, avec sa source,
   l'outil et le modele qui l'ont produite ;
 - horloge d'enregistrement active (prisme_enregistre_le / prisme_invalide_le) ;
-- horloge du monde reservee mais inactive (prisme_valide_du / prisme_valide_au),
+- horloge du monde activee explicitement par le plugin de calibration (prisme_valide_du / prisme_valide_au),
   chaque date ayant un champ d'etat compagnon : date | inconnue | ouverte.
 Seul l'en-tete est ecrit : le corps d'une note n'est jamais modifie ici.
 """
@@ -34,8 +34,8 @@ CHAMPS = {
     "prisme_sources": "identifiants ou chemins des notes et sources utilisees",
     "prisme_parent": "note dont celle-ci derive",
     "prisme_publie_le": "date de publication de la source (metadonnee)",
-    "prisme_valide_du": "reserve : debut de validite dans le monde",
-    "prisme_valide_au": "reserve : fin de validite dans le monde",
+    "prisme_valide_du": "debut de validite dans le monde",
+    "prisme_valide_au": "fin de validite dans le monde",
     "prisme_valide_du_etat": "date | inconnue | ouverte",
     "prisme_valide_au_etat": "date | inconnue | ouverte",
 }

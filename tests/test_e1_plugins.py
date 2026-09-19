@@ -382,7 +382,7 @@ class TestPluginsLivres(PluginEnv):
         c = self.client()
         statuts = {pid: (p.status, p.error) for pid, p in plugins.REGISTRY.items()}
         self.assertEqual(set(statuts), {"arxiv", "context", "duckduckgo", "osint-cx",
-                                        "prompts", "rss", "embeddings-locaux"})
+                                        "prompts", "rss", "embeddings-locaux", "calibration"})
         for pid, (status, error) in statuts.items():
             self.assertEqual(status, "actif", f"{pid} : {error}")
         page = c.get("/").get_data(as_text=True)
