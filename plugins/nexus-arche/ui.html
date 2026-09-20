@@ -31,6 +31,37 @@
       déclarer la carte inactive. C'est le mode le plus rigoureux.</p>
     <p id="arche-etat" role="status" aria-live="polite"></p>
     <div id="arche-lecture"></div>
+
+    <details id="arche-archive" class="arche-archive" hidden>
+      <summary>Archiver cette lecture dans le vault</summary>
+      <p class="eng-note">Les ancrages sont revérifiés au moment d'écrire, et les
+        configurations recalculées : une fiche ne peut pas contenir une citation qui n'en
+        est pas une.</p>
+      <div class="arche-actions">
+        <label>Format
+          <select id="arche-format">
+            <option value="longue">Fiche complète</option>
+            <option value="bloc">Bloc condensé</option>
+          </select>
+        </label>
+        <label>Statut épistémique
+          <select id="arche-statut">
+            <option value="">— non déclaré —</option>
+            <option value="descriptif">Descriptif</option>
+            <option value="speculatif">Spéculatif</option>
+            <option value="performatif">Performatif</option>
+          </select>
+        </label>
+      </div>
+      <div class="arche-actions">
+        <input id="arche-signature" type="text" placeholder="Signature MÉMOIRE-Σ de la séance (facultative) — ⟦⊙∿◯⊜⟧ Clos"
+               aria-label="Signature MÉMOIRE-Σ de la séance">
+        <button class="btn bp" type="button" onclick="archeArchiver()" id="arche-ecrire">Écrire la fiche</button>
+      </div>
+      <p class="eng-note">La signature décrit la <strong>séance</strong>, la chaîne NEXUS
+        décrit la <strong>situation</strong> : deux alphabets, jamais mêlés. Une signature
+        invalide bloque l'écriture plutôt que d'être archivée telle quelle.</p>
+    </details>
   </div>
 
   <!-- ── Catalogue ── -->

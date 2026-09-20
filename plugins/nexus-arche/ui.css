@@ -47,6 +47,19 @@
 /* L'ancrage est une citation : il doit se voir comme telle. */
 .arche-ancrage { border-left: 3px solid var(--acc); padding-left: 8px; font-style: italic; }
 .arche-motif { color: #d9534f; font-size: 12px; }
+/* Un signal de configuration n'est pas un verdict : il est encadré, pas alarmant. */
+.arche-config { border: 1px solid var(--acc); border-radius: 6px; padding: 10px 12px;
+                margin-top: 10px; font-size: 12px; line-height: 1.5; }
+.arche-config h4 { margin: 0 0 6px; }
+.arche-config p { margin: 4px 0; }
+.arche-fondement { color: var(--tx2); font-style: italic; }
+.arche-question { border-left: 3px solid var(--acc); padding-left: 8px; }
+
+.arche-archive { margin-top: 12px; }
+.arche-archive select { flex: none; }
+.arche-archive .btn { width: auto; flex: none; padding: 6px 14px; }
+.arche-archive input { flex: 1; min-width: 0; width: auto; }
+
 .arche-questions { margin-top: 10px; }
 .arche-questions li { margin: 4px 0; font-size: 12px; }
 .arche-avert { color: var(--tx2); font-size: 12px; margin-top: 8px; }

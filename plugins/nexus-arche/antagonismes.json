@@ -1,0 +1,87 @@
+{
+ "version": "1",
+ "source": "NEXUS-ARCHÊ v0.3.1 — references/antagonismes.md",
+ "paires": [
+  {
+   "a": "emergence",
+   "b": "transformation",
+   "a_nom": "ÉMERGENCE",
+   "b_nom": "TRANSFORMATION",
+   "statut": "explicite",
+   "axe": "Préexistence de l'entité",
+   "fondement": "« L'émergence fait apparaître quelque chose de fondamentalement nouveau à partir de règles locales simples ; la transformation mute une entité existante en conservant son essence. » Une même entité préexiste ou ne préexiste pas."
+  },
+  {
+   "a": "emergence",
+   "b": "croissance",
+   "a_nom": "ÉMERGENCE",
+   "b_nom": "CROISSANCE",
+   "statut": "explicite",
+   "axe": "Préexistence de l'entité",
+   "fondement": "« La croissance amplifie quelque chose d'existant ; l'émergence fait apparaître quelque chose de fondamentalement nouveau. » Même exclusion."
+  },
+  {
+   "a": "emergence",
+   "b": "recursivite",
+   "a_nom": "ÉMERGENCE",
+   "b_nom": "RÉCURSIVITÉ",
+   "statut": "explicite",
+   "axe": "Auto-référence",
+   "fondement": "« L'émergence est un ordre global non planifié sans auto-référence ; la récursivité implique une boucle explicite. » La négation est dans le texte."
+  },
+  {
+   "a": "incertitude",
+   "b": "contrainte",
+   "a_nom": "INCERTITUDE",
+   "b_nom": "CONTRAINTE",
+   "statut": "explicite",
+   "axe": "Détermination",
+   "fondement": "« Le vide est ouvert, la contrainte est fermée. » Un même possible est indéterminé ou exclu, pas les deux."
+  },
+  {
+   "a": "incertitude",
+   "b": "emergence",
+   "a_nom": "INCERTITUDE",
+   "b_nom": "ÉMERGENCE",
+   "statut": "explicite",
+   "axe": "Détermination",
+   "fondement": "« L'incertitude est l'état d'indétermination avant qu'un pattern n'apparaisse ; l'émergence est l'apparition effective d'un ordre nouveau. » Exclusion temporelle sur une même forme."
+  },
+  {
+   "a": "periodicite",
+   "b": "trace-memoire",
+   "a_nom": "PÉRIODICITÉ",
+   "b_nom": "TRACE · MÉMOIRE",
+   "statut": "explicite",
+   "axe": "Retour",
+   "fondement": "« La trace est ce qui reste après une transformation et ne revient pas ; la périodicité est ce qui revient régulièrement. »"
+  },
+  {
+   "a": "periodicite",
+   "b": "seuil",
+   "a_nom": "PÉRIODICITÉ",
+   "b_nom": "SEUIL",
+   "statut": "déduit",
+   "axe": "Retour",
+   "fondement": "SEUIL : « Le seuil ne se franchit qu'une fois. » PÉRIODICITÉ : « retour régulier d'un état ». Un même état ne peut pas revenir régulièrement et être hors de retour. *Absente de la matrice de confusion : personne ne confond ces deux cartes, elles n'en sont pas moins incompatibles.*"
+  },
+  {
+   "a": "seuil",
+   "b": "transformation",
+   "a_nom": "SEUIL",
+   "b_nom": "TRANSFORMATION",
+   "statut": "déduit",
+   "axe": "Continuité du changement",
+   "fondement": "SEUIL : « un instant discret et irréversible après lequel rien ne peut reprendre sa forme précédente ». TRANSFORMATION : « changement continu avec conservation d'un invariant ». Un même changement est discret-irréversible ou continu-conservatif. Objection connue : un processus long peut contenir un point de non-retour (la chrysalide). L'antagonisme vaut pour *le même changement*, pas pour un processus et l'un de ses instants — voir §4."
+  },
+  {
+   "a": "reciprocite",
+   "b": "hierarchie",
+   "a_nom": "RÉCIPROCITÉ",
+   "b_nom": "HIÉRARCHIE",
+   "statut": "déduit",
+   "axe": "Symétrie du rapport",
+   "fondement": "RÉCIPROCITÉ : « échange symétrique avec conservation ». HIÉRARCHIE : « distribution inégale mais structurante selon des lois de puissance ». Un même rapport est symétrique ou inégal."
+  }
+ ]
+}

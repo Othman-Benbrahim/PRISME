@@ -8,7 +8,7 @@ import json
 
 from flask import Response, jsonify, request
 
-from . import catalogue, lecture, sigma, tirage
+from . import catalogue, configurations, fiche, lecture, sigma, tirage
 
 
 def _json(charge, code=200):
@@ -49,7 +49,9 @@ def register(ctx):
         """Ce que l'interface doit savoir avant d'offrir la lecture assistée."""
         return _json({'ia_indisponible': ctx.ai_unavailable(),
                       'modes': {str(k): v['nom'] for k, v in tirage.MODES.items()},
-                      'max_cartes': lecture.MAX_CARTES})
+                      'max_cartes': lecture.MAX_CARTES,
+                      'formats': fiche.FORMATS, 'statuts': fiche.STATUTS,
+                      'dossier_fiches': fiche.DOSSIER})
 
     @ctx.route('/tirage', methods=['POST'])
     def faire_tirage():
@@ -75,4 +77,39 @@ def register(ctx):
         if erreur:
             return jsonify(error=erreur), 400
         resultat['distinctions'] = lecture.questions_de_distinction(resultat['retenues'])
+
+        # Les positions viennent du tirage ; une carte écartée n'en occupe aucune.
+        positions = d.get('positions') or {}
+        if isinstance(positions, dict):
+            for c in resultat['retenues']:
+                c['position'] = str(positions.get(c['id']) or '')
+            actives, inactives = configurations.positions_actives(
+                resultat['retenues'],
+                [{'id': i, 'position': p} for i, p in positions.items()])
+            resultat['configurations'] = configurations.detecter(actives)
+            resultat['positions_inactives'] = inactives
         return _json(resultat)
+
+    @ctx.route('/fiche', methods=['POST'])
+    def ecrire_fiche():
+        """Archive la lecture dans le vault. L'auteur choisit le format ; le code
+        revérifie les ancrages et recalcule les configurations avant d'écrire."""
+        d = request.get_json(silent=True)
+        if not isinstance(d, dict):
+            return jsonify(error='Objet JSON attendu'), 400
+        propres, erreur = fiche.consolider(d)
+        if erreur:
+            return jsonify(error=erreur), 400
+        try:
+            texte = fiche.markdown(propres, d.get('format') or 'longue')
+        except ValueError as e:
+            return jsonify(error=str(e)), 400
+        chemin = ctx.safe_path(fiche.nom_fichier())
+        try:
+            ecrit = ctx.write_note(chemin, texte,
+                                   provenance={'type': 'lecture_nexus'}, exclusive=True)
+        except (FileExistsError, PermissionError) as e:
+            return jsonify(error=str(e)), 400
+        return _json({'chemin': ecrit.relative_to(ctx.vault_root()).as_posix(),
+                      'format': d.get('format') or 'longue',
+                      'configurations': propres['configurations']}, 201)

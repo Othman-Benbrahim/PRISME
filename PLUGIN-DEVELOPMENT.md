@@ -204,6 +204,23 @@ module : il peut être saisi après le démarrage.
 - Un attribut `data-sys-prompt-target` sur un `<textarea>` y ajoute le sélecteur de
   prompts du plugin Prompts, s'il est actif.
 
+### Toute rangée horizontale doit brider ses boutons
+
+`core.css` met `width: 100%` sur `button` et sur `input` — c'est voulu pour les
+formulaires empilés des fenêtres. Dans une rangée en `display: flex`, un bouton non bridé
+prend toute la ligne et écrase ses voisins. Le motif a mordu quatre fois dans ce dépôt :
+
+```css
+.mon-plugin-rangee { display: flex; gap: 8px; align-items: center; }
+.mon-plugin-rangee .btn { width: auto; flex: none; padding: 6px 14px; }
+.mon-plugin-rangee input { flex: 1; min-width: 0; width: auto; }
+.mon-plugin-rangee select { flex: none; }
+```
+
+La règle vaut aussi pour une case à cocher, dont l'étiquette se retrouve sinon rejetée à
+la ligne suivante. Vérifiez la largeur rendue, pas la feuille de style : un `flex: none`
+oublié ne se voit qu'à l'écran.
+
 ## Installer, activer, distribuer
 
 - **Pendant le développement** : posez le dossier dans `plugins/` et redémarrez PRISME.

@@ -4,9 +4,10 @@ Lecture structurelle d'une situation complexe par seize cartes invariantes, en d
 registre : mathématique (systèmes dynamiques, topologie, théorie des graphes) et
 anthropologique (universaux comportementaux documentés par Donald Brown).
 
-Décision de conception : [`docs/decisions/0039`](../../docs/decisions/0039-nexus-arche-en-plugin.md).
-Source des cartes : [NEXUS-ARCHE](https://github.com/Othman-Benbrahim/NEXUS-ARCHE),
-`references/cards.md`.
+Décisions de conception : [`0039`](../../docs/decisions/0039-nexus-arche-en-plugin.md) et
+[`0040`](../../docs/decisions/0040-antagonismes-et-configurations.md).
+Source des cartes et des antagonismes : [NEXUS-ARCHE](https://github.com/Othman-Benbrahim/NEXUS-ARCHE),
+`references/cards.md` et `references/antagonismes.md` (v0.3.1).
 
 ## Ce que cet outil n'est pas
 
@@ -19,7 +20,7 @@ psychologiquement, ni juridiquement. C'est un dispositif de discipline, pas un o
 - « La coïncidence lexicale n'est pas un ancrage » : un « réseau » nommé ne prouve pas
   RÉSEAU.
 
-## État : lots 1 et 2
+## État : lots 1 à 3
 
 **Hors ligne, sans modèle :**
 
@@ -30,6 +31,9 @@ psychologiquement, ni juridiquement. C'est un dispositif de discipline, pas un o
   comptes, statut, transcription en mots-codes.
 - **Tirage** — 1, 2 ou 3 cartes par hasard cryptographique, avec les positions
   *tient / bouge / manque* pour la constellation.
+- **Configurations pathologiques du Mode 3** — les quatre, calculées sur la table des
+  antagonismes. Aucun modèle n'intervient : c'est une question de catalogue.
+- **Fiche dans le vault** — la lecture archivée en Markdown, au format de votre choix.
 
 **Avec un modèle configuré :**
 
@@ -60,8 +64,37 @@ Contre-intuitivement. C'est **le seul où le modèle ne choisit pas ce qu'il va
 justifier** : les cartes sortent d'abord, il doit ensuite trouver un ancrage ou déclarer
 la carte inactive.
 
-À venir : configurations pathologiques du Mode 3, registre et calibration des erreurs de
-distinction, fiche Markdown dans le vault.
+### Un antagonisme n'est pas une contradiction
+
+Les configurations 3 et 4 reposent sur une relation d'**antagonisme** entre cartes : deux
+structures dont les définitions ne peuvent pas être vraies du même objet. Neuf paires sur
+120, chacune fondée sur une citation des références.
+
+Mais deux structures incompatibles portant sur deux objets distincts ne se contredisent
+pas : une équipe peut connaître une CROISSANCE d'effectif pendant qu'une ÉMERGENCE se
+produit dans ses pratiques. Le code ne voit pas la situation et ne peut pas trancher. Il
+affiche donc un **signal** avec la question qui le tranche — *ces deux structures
+portent-elles sur la même chose ?* — et vous laisse répondre.
+
+Une carte déclarée inactive n'entre dans aucune configuration : sa position reste vide.
+
+**La confusion n'est pas l'antagonisme.** HIÉRARCHIE et RÉSEAU sont parmi les cartes les
+plus confondues, et une hiérarchie *est* un graphe : elles ne s'excluent pas. Les deux
+relations sont tenues séparées, et le plugin le vérifie par un test.
+
+### La fiche est vérifiée avant d'être écrite
+
+Au moment d'archiver, les ancrages repassent le test littéral, les noms de cartes sont
+relus depuis le catalogue, les configurations sont recalculées et la signature Σ validée.
+Une fiche est ce qui survit à la séance : elle ne doit pas pouvoir contenir une citation
+qui n'en est pas une, même si l'écran l'affichait.
+
+Deux formats, au choix : la **fiche complète** garde la situation, les anti-résonances et
+les questions restées ouvertes ; le **bloc condensé** garde les ancrages, les
+configurations et les réserves. Aucun des deux ne se passe des réserves — une fiche
+archivée sans elles finirait par se lire comme un verdict.
+
+À venir : registre et calibration des erreurs de distinction.
 
 ## Les deux alphabets
 
@@ -86,11 +119,11 @@ qui empêche les deux notations de se mélanger.
 | `/api/plugins/nexus-arche/valider_signature` | POST | `{chaine}` → `{ok, raison, transcription, statut}` |
 | `/api/plugins/nexus-arche/etat` | GET | Disponibilité du modèle, modes de tirage |
 | `/api/plugins/nexus-arche/tirage` | POST | `{mode: 1\|2\|3}` → cartes tirées (CSPRNG) |
-| `/api/plugins/nexus-arche/lire` | POST | `{situation, imposees?}` → `{retenues, ecartees, distinctions}` |
+| `/api/plugins/nexus-arche/lire` | POST | `{situation, imposees?, positions?}` → `{retenues, ecartees, distinctions, configurations}` |
+| `/api/plugins/nexus-arche/fiche` | POST | `{situation, retenues, format, statut?, signature?}` → note écrite dans le vault |
 
 Aucun secret, aucune permission réseau. Seule `/lire` consulte le modèle configuré dans
-PRISME — votre clé, votre fournisseur. Permission : `vault_write` seulement, pour les
-fiches à venir.
+PRISME — votre clé, votre fournisseur. Permission : `vault_write`, pour les fiches.
 
 **Sans modèle configuré**, le catalogue, le valideur et le tirage restent utilisables :
 l'ancrage est alors à votre charge, ce qui était de toute façon la forme d'origine du
@@ -98,11 +131,11 @@ protocole.
 
 ## Limites connues
 
-- Rien n'est encore écrit dans le vault : aucune fiche n'est produite, aucune lecture
-  n'est conservée.
-- Les **configurations pathologiques 3 et 4** du Mode 3 ne sont pas détectées : elles
-  supposent une relation d'*antagonisme* entre cartes que `references/calibration.md` ne
-  documente pas — il n'y décrit que des *confusions*, ce qui est une autre relation.
+- La **configuration 2** repose sur un « voisinage documenté » — la paire figure dans les
+  rubriques « À ne pas confondre avec » et n'est pas antagoniste. C'est une relation
+  écrite pour un autre usage, réemployée faute d'axe de *nature* dans le corpus. Seize
+  paires sur 120, 13 % des constellations : plus fréquent qu'une pathologie ne devrait
+  l'être. Signal indicatif, à réviser sur données réelles.
 - L'ancrage littéral empêche la fabrication, pas le mauvais choix : le modèle reste libre
   de citer un passage hors sujet. Le tirage aléatoire et votre propre jugement à la
   validation restent les garde-fous principaux.

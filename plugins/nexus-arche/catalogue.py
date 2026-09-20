@@ -18,8 +18,14 @@ def _charge():
         # est Windows. Sans ce paramètre, la lecture dépend de la locale.
         d = json.loads(FICHIER.read_text(encoding="utf-8"))
         _CACHE["cartes"] = d["cartes"]
+        _CACHE["source"] = d.get("source", "")
         _CACHE["par_id"] = {c["id"]: c for c in d["cartes"]}
     return _CACHE
+
+
+def source():
+    """D'où viennent les cartes — repris tel quel dans les fiches archivées."""
+    return _charge()["source"]
 
 
 def toutes():
