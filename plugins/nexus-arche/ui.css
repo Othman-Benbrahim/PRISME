@@ -31,3 +31,22 @@
 .arche-sigma { margin-top: 12px; }
 #arche-verdict.ok { color: var(--acc); }
 #arche-verdict.refus { color: #d9534f; }
+
+/* ── Écran Analyser ── */
+#arche-situation { width: 100%; resize: vertical; font-family: inherit; }
+.arche-actions select { flex: none; }
+#arche-etat.erreur { color: #d9534f; }
+.arche-t-actif { background: var(--acc) !important; color: #fff !important; }
+
+.arche-lue { border: 1px solid var(--bd); border-radius: 6px; padding: 10px 12px; margin-top: 8px; }
+.arche-lue.ecartee { opacity: .62; border-style: dashed; }
+.arche-lue h4 { margin: 0 0 6px; display: flex; align-items: baseline; gap: 8px; }
+.arche-lue h4 .arche-glyphe { font-size: 22px; width: 28px; }
+.arche-lue dt { color: var(--tx2); font-size: 11px; margin-top: 6px; }
+.arche-lue dd { margin: 2px 0 0; font-size: 12px; line-height: 1.5; }
+/* L'ancrage est une citation : il doit se voir comme telle. */
+.arche-ancrage { border-left: 3px solid var(--acc); padding-left: 8px; font-style: italic; }
+.arche-motif { color: #d9534f; font-size: 12px; }
+.arche-questions { margin-top: 10px; }
+.arche-questions li { margin: 4px 0; font-size: 12px; }
+.arche-avert { color: var(--tx2); font-size: 12px; margin-top: 8px; }

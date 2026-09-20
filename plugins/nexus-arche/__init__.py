@@ -1,13 +1,14 @@
-"""NEXUS-ARCHÊ — lot 1 : catalogue et valideur de signature.
+"""NEXUS-ARCHÊ — catalogue, valideur de signature, tirage et lecture assistée.
 
-Rien ici n'appelle de modèle ni le réseau. Les deux routes sont déterministes et
-répondent hors ligne.
+Seule `/lire` appelle un modèle. Tout le reste — catalogue, distinctions, signature,
+tirage — répond hors ligne. Et ce que le modèle rend passe par les garde-fous de
+`lecture.py` avant d'atteindre l'auteur.
 """
 import json
 
 from flask import Response, jsonify, request
 
-from . import catalogue, sigma
+from . import catalogue, lecture, sigma, tirage
 
 
 def _json(charge, code=200):
@@ -42,3 +43,36 @@ def register(ctx):
             return jsonify(error='Objet JSON attendu'), 400
         return _json(sigma.valider(d.get('chaine', ''),
                                    exiger_statut=d.get('exiger_statut', True)))
+
+    @ctx.route('/etat')
+    def etat():
+        """Ce que l'interface doit savoir avant d'offrir la lecture assistée."""
+        return _json({'ia_indisponible': ctx.ai_unavailable(),
+                      'modes': {str(k): v['nom'] for k, v in tirage.MODES.items()},
+                      'max_cartes': lecture.MAX_CARTES})
+
+    @ctx.route('/tirage', methods=['POST'])
+    def faire_tirage():
+        d = request.get_json(silent=True)
+        if not isinstance(d, dict):
+            return jsonify(error='Objet JSON attendu'), 400
+        try:
+            return _json(tirage.tirer(int(d.get('mode') or 0)))
+        except (TypeError, ValueError) as e:
+            return jsonify(error=str(e)), 400
+
+    @ctx.route('/lire', methods=['POST'])
+    def lire():
+        d = request.get_json(silent=True)
+        if not isinstance(d, dict):
+            return jsonify(error='Objet JSON attendu'), 400
+        imposees = d.get('imposees') or None
+        if imposees is not None:
+            if not isinstance(imposees, list) or not all(catalogue.existe(str(i)) for i in imposees):
+                return jsonify(error='Cartes imposées inconnues du catalogue'), 400
+            imposees = [str(i) for i in imposees]
+        resultat, erreur = lecture.proposer(ctx, d.get('situation', ''), imposees)
+        if erreur:
+            return jsonify(error=erreur), 400
+        resultat['distinctions'] = lecture.questions_de_distinction(resultat['retenues'])
+        return _json(resultat)

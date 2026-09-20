@@ -1,34 +1,57 @@
 <div id="m-nexus-arche" class="ov"><div class="mb arche-fenetre">
   <div class="arche-entete">
     <h2>NEXUS-ARCHÊ</h2>
+    <button class="btn bs" type="button" onclick="archeOnglet('analyse')" id="arche-t-analyse">Analyser</button>
+    <button class="btn bs" type="button" onclick="archeOnglet('catalogue')" id="arche-t-catalogue">Catalogue</button>
     <button class="btn bs" type="button" onclick="archeFermer()">Fermer</button>
   </div>
 
-  <p class="eng-note">Seize structures invariantes, en double registre : mathématique et
-    anthropologique. Cet outil <strong>ne prédit pas, ne prescrit pas, ne diagnostique
+  <p class="eng-note">Cet outil <strong>ne prédit pas, ne prescrit pas, ne diagnostique
     pas</strong>. Une carte sans ancrage observable est une carte inactive — elle ne
     disparaît pas, elle attend une situation qui lui corresponde. La coïncidence lexicale
     n'est pas un ancrage : un « réseau » nommé ne prouve pas RÉSEAU.</p>
 
-  <div class="arche-actions">
-    <input id="arche-filtre" type="search" placeholder="Filtrer les cartes…"
-           oninput="archeRendre()" aria-label="Filtrer les cartes">
-    <span id="arche-compte" class="eng-note"></span>
+  <!-- ── Analyser ── -->
+  <div id="arche-p-analyse">
+    <p id="arche-ia" class="eng-note"></p>
+    <textarea id="arche-situation" rows="5" placeholder="Décrivez la situation, en quelques phrases, avec des faits."></textarea>
+    <div class="arche-actions">
+      <label>Mode
+        <select id="arche-mode">
+          <option value="0">Le modèle propose les cartes</option>
+          <option value="1">Tirage — 1 carte</option>
+          <option value="2">Tirage — 2 cartes, en tension</option>
+          <option value="3">Tirage — 3 cartes : tient / bouge / manque</option>
+        </select>
+      </label>
+      <button class="btn bp" type="button" onclick="archeLire()" id="arche-lire">Lire</button>
+    </div>
+    <p class="eng-note">Au tirage, les cartes sortent <strong>avant</strong> l'analyse :
+      le modèle ne choisit pas ce qu'il va justifier, il doit trouver un ancrage ou
+      déclarer la carte inactive. C'est le mode le plus rigoureux.</p>
+    <p id="arche-etat" role="status" aria-live="polite"></p>
+    <div id="arche-lecture"></div>
   </div>
 
-  <div id="arche-cartes"></div>
-
-  <details class="arche-sigma">
-    <summary>Vérifier une signature MÉMOIRE-Σ</summary>
-    <p class="eng-note">La signature décrit la <strong>séance</strong> d'analyse, pas la
-      situation analysée. Son alphabet est celui de MÉMOIRE-Σ — 20 primitives — et non
-      celui des cartes ci-dessus : <code>⊥</code> y vaut LIMITE, ici SEUIL. Ne jamais
-      mêler les deux dans une même chaîne.</p>
+  <!-- ── Catalogue ── -->
+  <div id="arche-p-catalogue" hidden>
     <div class="arche-actions">
-      <input id="arche-chaine" type="text" placeholder="⟦⊙∿◯⊜⟧ Clos"
-             aria-label="Chaîne à vérifier" onkeydown="if(event.key==='Enter')archeValider()">
-      <button class="btn bs" type="button" onclick="archeValider()">Vérifier</button>
+      <input id="arche-filtre" type="search" placeholder="Filtrer les cartes…"
+             oninput="archeRendre()" aria-label="Filtrer les cartes">
+      <span id="arche-compte" class="eng-note"></span>
     </div>
-    <p id="arche-verdict" role="status" aria-live="polite"></p>
-  </details>
+    <div id="arche-cartes"></div>
+    <details class="arche-sigma">
+      <summary>Vérifier une signature MÉMOIRE-Σ</summary>
+      <p class="eng-note">La signature décrit la <strong>séance</strong> d'analyse, pas la
+        situation analysée. Son alphabet est celui de MÉMOIRE-Σ — 20 primitives — et non
+        celui des cartes : <code>⊥</code> y vaut LIMITE, ici SEUIL.</p>
+      <div class="arche-actions">
+        <input id="arche-chaine" type="text" placeholder="⟦⊙∿◯⊜⟧ Clos"
+               aria-label="Chaîne à vérifier" onkeydown="if(event.key==='Enter')archeValider()">
+        <button class="btn bs" type="button" onclick="archeValider()">Vérifier</button>
+      </div>
+      <p id="arche-verdict" role="status" aria-live="polite"></p>
+    </details>
+  </div>
 </div></div>
