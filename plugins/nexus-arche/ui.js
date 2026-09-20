@@ -101,8 +101,12 @@ async function archeLire(){
   $('arche-lecture').innerHTML = '';
   $('arche-archive').hidden = true;
   ARCHE.derniere = null;
+  // Le tirage est affiché dès qu'il est fait, avant l'appel au modèle. S'il échoue,
+  // les cartes restent à l'écran : elles ne devaient rien à personne, et le protocole
+  // d'origine voulait que l'ancrage soit à la charge de l'auteur.
+  var entete = '';
   try{
-    var imposees = null, positions = {}, entete = '', nomMode = '';
+    var imposees = null, positions = {}, nomMode = '';
     if(mode > 0){
       archeMessage('Tirage…');
       var t = await post('/api/plugins/nexus-arche/tirage', {mode: mode});
@@ -114,6 +118,7 @@ async function archeLire(){
         + t.cartes.map(function(c){
             return esc(c.glyphe) + ' ' + esc(c.nom) + (c.position ? ' <em>(' + esc(c.position) + ')</em>' : '');
           }).join(' · ') + '<br>' + esc(t.question) + '</p>';
+      $('arche-lecture').innerHTML = entete;
     }
     archeMessage('Recherche des ancrages…');
     var d = await post('/api/plugins/nexus-arche/lire',
@@ -124,7 +129,14 @@ async function archeLire(){
     ARCHE.derniere = {situation: situation, mode_nom: nomMode,
                       retenues: d.retenues || [], ecartees: d.ecartees || []};
     $('arche-archive').hidden = !(d.retenues || []).length;
-  }catch(e){ archeMessage(e.message, true); }
+  }catch(e){
+    archeMessage(e.message, true);
+    if(entete){
+      $('arche-lecture').innerHTML = entete + '<p class="arche-avert">Les cartes sont '
+        + 'tirées : la lecture assistée a échoué, l\'ancrage vous revient. Cherchez dans '
+        + 'la situation un fait que chaque carte nomme — sinon la carte est inactive.</p>';
+    }
+  }
   finally{ $('arche-lire').disabled = false; }
 }
 
