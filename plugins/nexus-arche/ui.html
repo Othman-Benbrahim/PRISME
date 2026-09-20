@@ -1,0 +1,34 @@
+<div id="m-nexus-arche" class="ov"><div class="mb arche-fenetre">
+  <div class="arche-entete">
+    <h2>NEXUS-ARCHÊ</h2>
+    <button class="btn bs" type="button" onclick="archeFermer()">Fermer</button>
+  </div>
+
+  <p class="eng-note">Seize structures invariantes, en double registre : mathématique et
+    anthropologique. Cet outil <strong>ne prédit pas, ne prescrit pas, ne diagnostique
+    pas</strong>. Une carte sans ancrage observable est une carte inactive — elle ne
+    disparaît pas, elle attend une situation qui lui corresponde. La coïncidence lexicale
+    n'est pas un ancrage : un « réseau » nommé ne prouve pas RÉSEAU.</p>
+
+  <div class="arche-actions">
+    <input id="arche-filtre" type="search" placeholder="Filtrer les cartes…"
+           oninput="archeRendre()" aria-label="Filtrer les cartes">
+    <span id="arche-compte" class="eng-note"></span>
+  </div>
+
+  <div id="arche-cartes"></div>
+
+  <details class="arche-sigma">
+    <summary>Vérifier une signature MÉMOIRE-Σ</summary>
+    <p class="eng-note">La signature décrit la <strong>séance</strong> d'analyse, pas la
+      situation analysée. Son alphabet est celui de MÉMOIRE-Σ — 20 primitives — et non
+      celui des cartes ci-dessus : <code>⊥</code> y vaut LIMITE, ici SEUIL. Ne jamais
+      mêler les deux dans une même chaîne.</p>
+    <div class="arche-actions">
+      <input id="arche-chaine" type="text" placeholder="⟦⊙∿◯⊜⟧ Clos"
+             aria-label="Chaîne à vérifier" onkeydown="if(event.key==='Enter')archeValider()">
+      <button class="btn bs" type="button" onclick="archeValider()">Vérifier</button>
+    </div>
+    <p id="arche-verdict" role="status" aria-live="polite"></p>
+  </details>
+</div></div>

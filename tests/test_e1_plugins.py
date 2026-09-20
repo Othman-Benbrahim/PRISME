@@ -401,7 +401,7 @@ class TestPluginsLivres(PluginEnv):
         c = self.client()
         statuts = {pid: (p.status, p.error) for pid, p in plugins.REGISTRY.items()}
         attendus = {"arxiv", "context", "duckduckgo", "osint-cx",
-                    "prompts", "rss", "embeddings-locaux", "constat"}
+                    "prompts", "rss", "embeddings-locaux", "constat", "nexus-arche"}
         # Calibration est une livraison séparée, éventuellement déjà installée.
         if (self.pdir / "calibration" / "manifest.json").is_file():
             attendus.add("calibration")

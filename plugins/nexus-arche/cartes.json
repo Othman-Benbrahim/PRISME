@@ -1,0 +1,424 @@
+{
+  "version": 1,
+  "source": "NEXUS-ARCHE references/cards.md",
+  "cartes": [
+    {
+      "id": "seuil",
+      "nom": "SEUIL",
+      "glyphe": "⊥",
+      "mot": "LIMITE",
+      "registre_rationnel": "point de bifurcation où un système bascule irrémédiablement dans un nouvel état — ce qui ne peut pas être défait.",
+      "registre_symbolique": "rite de passage — toutes les cultures marquent les moments de non-retour. Le seuil ne se franchit qu'une fois.",
+      "branche_math": "Systèmes dynamiques — points de bifurcation, attracteurs, irréversibilité.",
+      "question_iris": "Quel passage est en train de s'effectuer — et qu'est-ce qui ne peut plus être défait ?",
+      "stele": "`⊥` LIMITE — frontière, fin de domaine, ce qui sépare.",
+      "distinctions": [
+        {
+          "autre": "transformation",
+          "autre_nom": "TRANSFORMATION",
+          "explication": "La transformation est un processus continu qui change la forme d'une entité tout en conservant son essence ; le seuil est un instant discret et irréversible après lequel rien ne peut reprendre sa forme précédente",
+          "critere": "s'agit-il d'un basculement ponctuel (→ SEUIL) ou d'une mutation progressive (→ TRANSFORMATION) ?"
+        },
+        {
+          "autre": "contrainte",
+          "autre_nom": "CONTRAINTE",
+          "explication": "La contrainte réduit l'espace des possibles sans nécessairement entraîner de changement d'état ; le seuil marque le basculement réel dans un nouvel état",
+          "critere": "y a-t-il passage effectif vers un nouvel état (→ SEUIL) ou seulement limitation du champ d'action (→ CONTRAINTE) ?"
+        }
+      ]
+    },
+    {
+      "id": "reciprocite",
+      "nom": "RÉCIPROCITÉ",
+      "glyphe": "⊗",
+      "mot": "LIER",
+      "registre_rationnel": "échange symétrique avec conservation — ce qui est donné appelle un retour structurellement équivalent.",
+      "registre_symbolique": "don, dette, alliance — toutes les cultures organisent l'obligation réciproque et la circulation des biens et services.",
+      "branche_math": "Théorie des jeux coopératifs — échanges symétriques, conservation, équilibres de réciprocité.",
+      "question_iris": "Qu'est-ce qui circule ici — et ce circuit est-il équilibré ?",
+      "stele": "`⊗` LIER — connecter, tisser, ponter.",
+      "distinctions": [
+        {
+          "autre": "communaute",
+          "autre_nom": "COMMUNAUTÉ",
+          "explication": "La réciprocité est un échange bilatéral entre deux parties ; la communauté est une coopération multi-acteurs autour d'un bien ou d'un projet commun",
+          "critere": "la relation est-elle entre deux parties (→ RÉCIPROCITÉ) ou entre un collectif et son projet commun (→ COMMUNAUTÉ) ?"
+        },
+        {
+          "autre": "reseau",
+          "autre_nom": "RÉSEAU",
+          "explication": "Le réseau décrit la topologie des liens (qui est connecté à qui) ; la réciprocité décrit la nature qualitative de l'échange (symétrie, obligation)",
+          "critere": "ce qui importe est-il la structure des connexions (→ RÉSEAU) ou la qualité et l'équilibre de ce qui circule (→ RÉCIPROCITÉ) ?"
+        }
+      ]
+    },
+    {
+      "id": "periodicite",
+      "nom": "PÉRIODICITÉ",
+      "glyphe": "↻",
+      "mot": "CYCLE",
+      "registre_rationnel": "retour régulier d'un état — oscillation, rythme, fréquence dans un système dynamique.",
+      "registre_symbolique": "rituels calendaires, célébrations — toutes les cultures marquent les retours du temps et les cycles naturels.",
+      "branche_math": "Systèmes dynamiques — oscillateurs, cycles limites, orbites périodiques.",
+      "question_iris": "Quel cycle se rejoue — et à quel point du cycle es-tu ?",
+      "stele": "`↻` CYCLE — répétition, retour, circularité temporelle.",
+      "distinctions": [
+        {
+          "autre": "recursivite",
+          "autre_nom": "RÉCURSIVITÉ",
+          "explication": "La périodicité est externe : le temps revient, un état se répète dans le temps. La récursivité est structurelle : la forme se produit elle-même, la sortie devient l'entrée",
+          "critere": "ce qui se répète est-il dans le temps (→ PÉRIODICITÉ) ou dans la forme (→ RÉCURSIVITÉ) ?"
+        },
+        {
+          "autre": "trace-memoire",
+          "autre_nom": "TRACE · MÉMOIRE",
+          "explication": "La trace est ce qui reste après une transformation et ne revient pas ; la périodicité est ce qui revient régulièrement",
+          "critere": "le passé est-il présent comme empreinte résiduelle (→ TRACE) ou comme retour cyclique (→ PÉRIODICITÉ) ?"
+        }
+      ]
+    },
+    {
+      "id": "recursivite",
+      "nom": "RÉCURSIVITÉ",
+      "glyphe": "↺",
+      "mot": "RÉFLEXIVITÉ",
+      "registre_rationnel": "structure qui se contient elle-même — boucle, auto-référence, fractal. La sortie devient l'entrée.",
+      "registre_symbolique": "conscience de soi, méta-cognition — toutes les cultures ont des pratiques d'auto-observation et des concepts du « moi qui se regarde ».",
+      "branche_math": "Théorie de la computation / fractals — fonctions auto-référentielles, fractals de Mandelbrot, récursion formelle.",
+      "question_iris": "Qu'est-ce qui se répète parce que ça se regarde se répéter ?",
+      "stele": "`↺` RÉFLEXIVITÉ — auto-référence, s'applique à lui-même.",
+      "distinctions": [
+        {
+          "autre": "periodicite",
+          "autre_nom": "PÉRIODICITÉ",
+          "explication": "La périodicité est un retour régulier dans le temps ; la récursivité est une structure qui se contient elle-même, indépendamment du temps",
+          "critere": "ce qui se répète est-il dans le temps (→ PÉRIODICITÉ) ou dans la forme (→ RÉCURSIVITÉ) ?"
+        },
+        {
+          "autre": "emergence",
+          "autre_nom": "ÉMERGENCE",
+          "explication": "L'émergence est un ordre global naissant de règles locales sans auto-observation ; la récursivité implique que la structure se produit elle-même par boucle",
+          "critere": "y a-t-il auto-référence explicite (→ RÉCURSIVITÉ) ou apparition imprévisible depuis des règles locales simples (→ ÉMERGENCE) ?"
+        }
+      ]
+    },
+    {
+      "id": "emergence",
+      "nom": "ÉMERGENCE",
+      "glyphe": "⊙",
+      "mot": "SOURCE",
+      "registre_rationnel": "ordre global né de règles locales simples — ce qui n'était prévu nulle part apparaît comme propriété du système.",
+      "registre_symbolique": "langage, culture, institution — aucune culture n'a été conçue par un architecte central. Toutes ont émergé.",
+      "branche_math": "Systèmes complexes — auto-organisation, propriétés émergentes, modèles ABM (Agent-Based Modeling).",
+      "question_iris": "Qu'est-ce qui est en train d'apparaître sans qu'on l'ait décidé ?",
+      "stele": "`⊙` SOURCE — origine, point d'émergence, ce d'où une dynamique procède.",
+      "distinctions": [
+        {
+          "autre": "transformation",
+          "autre_nom": "TRANSFORMATION",
+          "explication": "L'émergence fait apparaître quelque chose de fondamentalement nouveau à partir de règles locales simples ; la transformation mute une entité existante en conservant son essence",
+          "critere": "y a-t-il apparition de quelque chose de nouveau (→ ÉMERGENCE) ou mutation d'une entité déjà existante (→ TRANSFORMATION) ?"
+        },
+        {
+          "autre": "recursivite",
+          "autre_nom": "RÉCURSIVITÉ",
+          "explication": "L'émergence est un ordre global non planifié sans auto-référence ; la récursivité implique une boucle explicite",
+          "critere": "y a-t-il auto-référence explicite (→ RÉCURSIVITÉ) ou apparition imprévisible depuis des règles locales simples (→ ÉMERGENCE) ?"
+        }
+      ]
+    },
+    {
+      "id": "hierarchie",
+      "nom": "HIÉRARCHIE",
+      "glyphe": "✦",
+      "mot": "AXE",
+      "registre_rationnel": "ordonnancement par position relative — distribution inégale mais structurante selon des lois de puissance.",
+      "registre_symbolique": "dominance sociale, statut — toutes les cultures organisent des rangs et des rôles différenciés.",
+      "branche_math": "Théorie des graphes / lois de puissance — arbres dirigés, réseaux scale-free, distributions de Pareto.",
+      "question_iris": "Quelle structure tient tout en place ici — et est-ce qu'elle tient encore ?",
+      "stele": "`✦` AXE — structure portante, pivot autour duquel tout s'organise.",
+      "distinctions": [
+        {
+          "autre": "reseau",
+          "autre_nom": "RÉSEAU",
+          "explication": "La hiérarchie définit des positions relatives ordonnées verticalement ; le réseau décrit une topologie de connexions sans ordre intrinsèque nécessaire",
+          "critere": "la structure définit-elle des niveaux et des rangs (→ HIÉRARCHIE) ou seulement des connexions (→ RÉSEAU) ?"
+        },
+        {
+          "autre": "contrainte",
+          "autre_nom": "CONTRAINTE",
+          "explication": "La hiérarchie est une structure de positions ; la contrainte est une règle qui réduit le champ des possibles, indépendamment de qui est où",
+          "critere": "s'agit-il d'un ordre de positions (→ HIÉRARCHIE) ou d'une règle d'interdiction (→ CONTRAINTE) ?"
+        }
+      ]
+    },
+    {
+      "id": "reseau",
+      "nom": "RÉSEAU",
+      "glyphe": "⊛",
+      "mot": "NOEUD",
+      "registre_rationnel": "topologie de connexions — nœuds et liens définissant qui est relié à qui, et selon quelles règles de transmission.",
+      "registre_symbolique": "kinship, coalition, alliance — toutes les cultures cartographient les obligations de lien et les réseaux d'appartenance.",
+      "branche_math": "Théorie des graphes / topologie — graphes orientés et non orientés, centralité, cliques, small-world networks.",
+      "question_iris": "Quels liens te structurent en ce moment — et lesquels sont absents ?",
+      "stele": "`⊛` NOEUD — convergence de dynamiques, croisement, là où plusieurs flux se rencontrent.",
+      "distinctions": [
+        {
+          "autre": "communaute",
+          "autre_nom": "COMMUNAUTÉ",
+          "explication": "Le réseau décrit la topologie (qui est relié à qui) ; la communauté décrit la coopération autour d'un projet commun (ce qui tient ensemble). Un réseau peut exister sans projet commun",
+          "critere": "ce qui importe est-il la structure des liens (→ RÉSEAU) ou le projet commun qui unit (→ COMMUNAUTÉ) ?"
+        },
+        {
+          "autre": "hierarchie",
+          "autre_nom": "HIÉRARCHIE",
+          "explication": "Le réseau est une topologie de connexions ; la hiérarchie est une structure de positions relatives ordonnées",
+          "critere": "la structure définit-elle des connexions (→ RÉSEAU) ou des rangs (→ HIÉRARCHIE) ?"
+        },
+        {
+          "autre": "reciprocite",
+          "autre_nom": "RÉCIPROCITÉ",
+          "explication": "Le réseau décrit la topologie ; la réciprocité décrit la qualité symétrique de l'échange",
+          "critere": "ce qui importe est-il la structure des connexions (→ RÉSEAU) ou l'équilibre de ce qui circule (→ RÉCIPROCITÉ) ?"
+        }
+      ]
+    },
+    {
+      "id": "polarite",
+      "nom": "POLARITÉ",
+      "glyphe": "⥀",
+      "mot": "INVERSER",
+      "registre_rationnel": "organisation autour de deux pôles opposés — dualité structurant la perception et l'espace des possibles.",
+      "registre_symbolique": "oppositions binaires dans la pensée et le langage — toutes les cultures pensent en paires (sacré/profane, nature/culture, dedans/dehors).",
+      "branche_math": "Algèbre / topologie différentielle — espaces bipolaires, symétrie, groupes de transformation Z₂.",
+      "question_iris": "Quels sont les deux pôles en tension — et lequel est invisibilisé ?",
+      "stele": "`⥀` INVERSER — retourner, faire pivoter, basculer le point de vue.",
+      "distinctions": [
+        {
+          "autre": "contrainte",
+          "autre_nom": "CONTRAINTE",
+          "explication": "La polarité structure la perception en deux pôles opposés ; la contrainte réduit l'espace des possibles sans nécessairement le polariser",
+          "critere": "y a-t-il deux pôles en tension (→ POLARITÉ) ou une règle qui bloque certains mouvements (→ CONTRAINTE) ?"
+        },
+        {
+          "autre": "seuil",
+          "autre_nom": "SEUIL",
+          "explication": "La polarité est une dualité structurale stable ; le seuil est un point de basculement irréversible entre deux états",
+          "critere": "la dualité est-elle un état structurel permanent (→ POLARITÉ) ou un moment de passage irréversible (→ SEUIL) ?"
+        }
+      ]
+    },
+    {
+      "id": "incertitude",
+      "nom": "INCERTITUDE",
+      "glyphe": "Ø",
+      "mot": "VIDE",
+      "registre_rationnel": "entropie, probabilité — l'espace de ce qui n'est pas encore déterminé, la structure de l'inconnu.",
+      "registre_symbolique": "divination, augure — toutes les cultures ont développé des pratiques de raisonnement face à l'inconnu et aux décisions sous incertitude.",
+      "branche_math": "Théorie des probabilités / entropie — entropie de Shannon, espaces d'états indéterminés, inférence bayésienne.",
+      "question_iris": "Qu'est-ce qui reste ouvert — et comment te comportes-tu face à ce vide ?",
+      "stele": "`Ø` VIDE — absence créatrice, non-encore-advenu, ce qui appelle sans se définir.",
+      "distinctions": [
+        {
+          "autre": "contrainte",
+          "autre_nom": "CONTRAINTE",
+          "explication": "L'incertitude décrit ce qui n'est pas encore déterminé ; la contrainte décrit ce qui est explicitement interdit. Le vide est ouvert, la contrainte est fermée",
+          "critere": "y a-t-il de l'inconnu structurel (→ INCERTITUDE) ou une règle d'interdiction (→ CONTRAINTE) ?"
+        },
+        {
+          "autre": "emergence",
+          "autre_nom": "ÉMERGENCE",
+          "explication": "L'incertitude est l'état d'indétermination avant qu'un pattern n'apparaisse ; l'émergence est l'apparition effective d'un ordre nouveau",
+          "critere": "est-on dans l'avant (→ INCERTITUDE) ou dans l'apparition elle-même (→ ÉMERGENCE) ?"
+        }
+      ]
+    },
+    {
+      "id": "contrainte",
+      "nom": "CONTRAINTE",
+      "glyphe": "⊘",
+      "mot": "NÉGATION",
+      "registre_rationnel": "règles réduisant l'espace des possibles — la forme est définie autant par ce qui ne peut pas se faire que par ce qui peut.",
+      "registre_symbolique": "lois, tabous, règles de jeux — toutes les cultures ont des systèmes formels d'interdiction qui structurent le comportement possible.",
+      "branche_math": "Théorie des systèmes / optimisation — espaces de contraintes, programmation linéaire, frontières de domaine.",
+      "question_iris": "Quelle contrainte est active ici — et vient-elle de l'extérieur ou de toi ?",
+      "stele": "`⊘` NÉGATION — refus, exclusion, ce qui est hors du possible.",
+      "distinctions": [
+        {
+          "autre": "seuil",
+          "autre_nom": "SEUIL",
+          "explication": "La contrainte limite l'espace des possibles sans changer l'état du système ; le seuil marque le basculement effectif vers un nouvel état",
+          "critere": "y a-t-il limitation sans changement d'état (→ CONTRAINTE) ou basculement irréversible (→ SEUIL) ?"
+        },
+        {
+          "autre": "hierarchie",
+          "autre_nom": "HIÉRARCHIE",
+          "explication": "La contrainte est une règle d'interdiction ; la hiérarchie est une structure de positions relatives",
+          "critere": "s'agit-il d'une règle qui bloque (→ CONTRAINTE) ou d'un ordre de rangs (→ HIÉRARCHIE) ?"
+        }
+      ]
+    },
+    {
+      "id": "proportion",
+      "nom": "PROPORTION",
+      "glyphe": "◯",
+      "mot": "FORME",
+      "registre_rationnel": "rapport entre parties — harmonie, ratio, équilibre des échelles dans un système.",
+      "registre_symbolique": "évaluation esthétique — toutes les cultures jugent ce qui est juste, beau, bien proportionné. Le sens de la mesure est universel.",
+      "branche_math": "Géométrie / algèbre — ratios, section dorée, homothéties, équilibres d'échelle.",
+      "question_iris": "Qu'est-ce qui est hors proportion ici — et qu'est-ce que ça dit de l'ensemble ?",
+      "stele": "`◯` FORME — ce qui est advenu, la manifestation, le contour stabilisé.",
+      "distinctions": [
+        {
+          "autre": "hierarchie",
+          "autre_nom": "HIÉRARCHIE",
+          "explication": "La proportion décrit les rapports d'échelle entre parties ; la hiérarchie décrit des positions relatives ordonnées",
+          "critere": "s'agit-il d'un équilibre de mesures (→ PROPORTION) ou d'un ordre de rangs (→ HIÉRARCHIE) ?"
+        },
+        {
+          "autre": "croissance",
+          "autre_nom": "CROISSANCE",
+          "explication": "La proportion décrit un état d'équilibre des rapports ; la croissance décrit une dynamique d'amplification",
+          "critere": "est-on dans un état de rapport (→ PROPORTION) ou dans un processus d'amplification (→ CROISSANCE) ?"
+        }
+      ]
+    },
+    {
+      "id": "transformation",
+      "nom": "TRANSFORMATION",
+      "glyphe": "∿",
+      "mot": "MOUVEMENT",
+      "registre_rationnel": "changement continu avec conservation d'un invariant — ce qui change de forme sans cesser d'être ce qu'il est fondamentalement.",
+      "registre_symbolique": "métamorphose — la chrysalide n'est pas un seuil, c'est un processus. Toutes les cultures ont des récits de transformation radicale avec persistance d'une essence.",
+      "branche_math": "Algèbre des transformations / topologie — homéomorphismes, groupes de Lie, invariants topologiques.",
+      "question_iris": "Qu'est-ce qui est en train de changer de forme — et qu'est-ce qui reste ?",
+      "stele": "`∿` MOUVEMENT — flux, transformation en cours, devenir actif.",
+      "distinctions": [
+        {
+          "autre": "seuil",
+          "autre_nom": "SEUIL",
+          "explication": "La transformation est un processus continu avec conservation d'une essence ; le seuil est un instant discret de basculement irréversible",
+          "critere": "s'agit-il d'un processus de mutation qui dure (→ TRANSFORMATION) ou d'un instant de non-retour (→ SEUIL) ?"
+        },
+        {
+          "autre": "emergence",
+          "autre_nom": "ÉMERGENCE",
+          "explication": "La transformation mute une entité existante ; l'émergence fait apparaître quelque chose de fondamentalement nouveau",
+          "critere": "y a-t-il mutation d'une entité existante (→ TRANSFORMATION) ou apparition d'une entité nouvelle (→ ÉMERGENCE) ?"
+        },
+        {
+          "autre": "croissance",
+          "autre_nom": "CROISSANCE",
+          "explication": "La croissance est une amplification quantitative d'une grandeur ; la transformation est un changement qualitatif de forme",
+          "critere": "s'agit-il d'un changement de degré (→ CROISSANCE) ou de nature (→ TRANSFORMATION) ?"
+        }
+      ]
+    },
+    {
+      "id": "trace-memoire",
+      "nom": "TRACE · MÉMOIRE",
+      "glyphe": "◊",
+      "mot": "TRACE",
+      "registre_rationnel": "invariant résiduel et persistence de l'information — ce qui demeure après une transformation, l'empreinte que le passé laisse dans le présent.",
+      "registre_symbolique": "mémoire ancestrale, commémoration, tradition orale — toutes les cultures préservent et transmettent les traces de ceux qui sont passés avant. La mémoire collective est un universel documenté.",
+      "branche_math": "Théorie de l'information — persistence de l'information, invariants résiduels, mémoire des systèmes dynamiques.",
+      "question_iris": "Qu'est-ce qui reste et se transmet — et qu'est-ce que cette persistence dit de ce qui a changé ?",
+      "stele": "`◊` TRACE — empreinte, mémoire résiduelle, ce qui reste après que la chose a passé.",
+      "distinctions": [
+        {
+          "autre": "periodicite",
+          "autre_nom": "PÉRIODICITÉ",
+          "explication": "La trace est ce qui reste après une transformation et ne revient pas ; la périodicité est ce qui revient régulièrement",
+          "critere": "le passé est-il présent comme empreinte résiduelle unique (→ TRACE) ou comme retour cyclique (→ PÉRIODICITÉ) ?"
+        },
+        {
+          "autre": "transformation",
+          "autre_nom": "TRANSFORMATION",
+          "explication": "La trace est le résidu stable après une transformation ; la transformation est le processus de changement lui-même",
+          "critere": "est-on dans le processus de mutation (→ TRANSFORMATION) ou dans ce qui en reste après (→ TRACE) ?"
+        }
+      ]
+    },
+    {
+      "id": "croissance",
+      "nom": "CROISSANCE",
+      "glyphe": "▲",
+      "mot": "INTENSITÉ",
+      "registre_rationnel": "fonctions de croissance — courbes logistiques, expansion exponentielle suivie de saturation. Ce qui s'amplifie jusqu'à sa limite structurelle.",
+      "registre_symbolique": "distinction croissance/déclin, jeunesse/âge, vitalité — toutes les cultures différencient les phases d'expansion et de déclin des êtres et des collectifs. Universel documenté par Brown.",
+      "branche_math": "Analyse mathématique / équations différentielles — fonctions logistiques, croissance exponentielle, saturation et points d'inflexion.",
+      "question_iris": "Qu'est-ce qui est en train de croître ici — et à quel stade de sa courbe se trouve-t-il ?",
+      "stele": "`▲` INTENSITÉ — amplification, accélération, augmentation de degré.",
+      "distinctions": [
+        {
+          "autre": "transformation",
+          "autre_nom": "TRANSFORMATION",
+          "explication": "La croissance est une amplification quantitative d'une grandeur existante ; la transformation est un changement qualitatif de forme",
+          "critere": "s'agit-il d'un changement de degré (→ CROISSANCE) ou de nature (→ TRANSFORMATION) ?"
+        },
+        {
+          "autre": "emergence",
+          "autre_nom": "ÉMERGENCE",
+          "explication": "La croissance amplifie quelque chose d'existant ; l'émergence fait apparaître quelque chose de fondamentalement nouveau",
+          "critere": "y a-t-il amplification d'une chose existante (→ CROISSANCE) ou apparition d'une chose nouvelle (→ ÉMERGENCE) ?"
+        }
+      ]
+    },
+    {
+      "id": "communaute",
+      "nom": "COMMUNAUTÉ",
+      "glyphe": "⟶",
+      "mot": "TRANSMETTRE",
+      "registre_rationnel": "coopération et équilibres collectifs — théorie des jeux coopératifs, coalitions stables, auto-organisation d'un groupe autour d'intérêts partagés.",
+      "registre_symbolique": "coalition, entraide, solidarité de groupe — parmi les universaux les plus robustes de Brown : formation de coalitions, réciprocité élargie, coopération collective au-delà de la parenté.",
+      "branche_math": "Théorie des jeux coopératifs / auto-organisation — coalitions stables, dilemmes du prisonnier répétés, équilibres collectifs.",
+      "question_iris": "Quelle communauté est active dans cette situation — et qu'est-ce qui tient ensemble ses membres ?",
+      "stele": "`⟶` TRANSMETTRE — faire circuler, passer à un autre, mettre en mouvement entre membres.",
+      "distinctions": [
+        {
+          "autre": "reseau",
+          "autre_nom": "RÉSEAU",
+          "explication": "La communauté décrit la coopération autour d'un projet commun ; le réseau décrit la topologie des connexions. Un réseau peut exister sans projet commun, une communauté peut exister sans topologie clairement définie",
+          "critere": "ce qui importe est-il le projet commun qui unit (→ COMMUNAUTÉ) ou la structure des liens (→ RÉSEAU) ?"
+        },
+        {
+          "autre": "reciprocite",
+          "autre_nom": "RÉCIPROCITÉ",
+          "explication": "La réciprocité est bilatérale ; la communauté est multi-acteurs",
+          "critere": "la relation est-elle entre deux parties (→ RÉCIPROCITÉ) ou entre un collectif et son bien commun (→ COMMUNAUTÉ) ?"
+        }
+      ]
+    },
+    {
+      "id": "resonance",
+      "nom": "RÉSONANCE",
+      "glyphe": "✶",
+      "mot": "RÉVÉLER",
+      "registre_rationnel": "couplage d'oscillateurs — synchronisation de fréquences, entraînement, alignement spontané de systèmes indépendants sur un rythme commun.",
+      "registre_symbolique": "musique collective, rituel synchronisé — toutes les cultures créent des états de synchronisation corporelle et émotionnelle (chant, danse, cérémonie). Ancrage complémentaire : synchronisation biologique documentée en éthologie évolutive.",
+      "branche_math": "Physique des oscillateurs couplés — modèle de Kuramoto, synchronisation, entraînement de fréquences.",
+      "question_iris": "Qu'est-ce qui s'aligne ici — et cette synchronisation est-elle choisie ou subie ?",
+      "stele": "`✶` RÉVÉLER — porter au visible ce qui était caché ; la résonance révèle l'alignement latent.",
+      "distinctions": [
+        {
+          "autre": "reciprocite",
+          "autre_nom": "RÉCIPROCITÉ",
+          "explication": "La résonance est un alignement spontané de rythmes entre systèmes ; la réciprocité est un échange conscient et symétrique",
+          "critere": "l'alignement est-il spontané et rythmique (→ RÉSONANCE) ou délibéré et réciproque (→ RÉCIPROCITÉ) ?"
+        },
+        {
+          "autre": "communaute",
+          "autre_nom": "COMMUNAUTÉ",
+          "explication": "La résonance est un phénomène de synchronisation de fréquences ; la communauté est une coopération organisée autour d'un projet",
+          "critere": "s'agit-il d'un alignement de rythmes (→ RÉSONANCE) ou d'une organisation coopérative (→ COMMUNAUTÉ) ?"
+        },
+        {
+          "autre": "periodicite",
+          "autre_nom": "PÉRIODICITÉ",
+          "explication": "La résonance implique le couplage entre deux systèmes ou plus ; la périodicité décrit le rythme interne d'un seul système",
+          "critere": "y a-t-il couplage entre systèmes distincts (→ RÉSONANCE) ou cycle interne d'un seul système (→ PÉRIODICITÉ) ?"
+        }
+      ]
+    }
+  ]
+}
