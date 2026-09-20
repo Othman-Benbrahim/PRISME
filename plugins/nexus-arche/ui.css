@@ -1,0 +1,33 @@
+/* NEXUS-ARCHÊ — écran Catalogue. Préfixe `arche-` sur tout sélecteur. */
+.arche-fenetre { width: 900px; max-width: 96vw; }
+.arche-entete { display: flex; align-items: center; gap: 12px; }
+.arche-entete h2 { flex: 1; margin: 0; }
+.arche-actions { display: flex; gap: 8px; align-items: center; margin: 10px 0; }
+
+/* `core.css` met `width:100%` sur les `button` et les `input` — c'est fait pour les
+   formulaires des fenêtres. Dans une rangée en flex, un bouton non bridé prend toute
+   la ligne et écrase le champ voisin. Troisième fois que ce motif mord dans ce dépôt :
+   toute rangée horizontale doit brider ses boutons explicitement. */
+.arche-entete .btn,
+.arche-actions .btn { width: auto; flex: none; padding: 6px 14px; }
+.arche-actions input { flex: 1; min-width: 0; width: auto; }
+
+#arche-cartes { max-height: 52vh; overflow: auto; border: 1px solid var(--bd); border-radius: 6px; }
+.arche-carte { padding: 10px 12px; border-bottom: 1px solid var(--bd); }
+.arche-carte:last-child { border-bottom: 0; }
+.arche-titre { display: flex; align-items: baseline; gap: 10px; cursor: pointer; }
+/* Le glyphe est l'identité de la carte : il se lit de loin. */
+.arche-glyphe { font-size: 26px; line-height: 1; width: 34px; text-align: center; flex: none; }
+.arche-nom { font-weight: 600; }
+.arche-mot { color: var(--tx2); font-size: 11px; letter-spacing: .05em; }
+.arche-branche { margin-left: auto; color: var(--tx2); font-size: 11px; }
+.arche-corps { margin: 8px 0 0 44px; font-size: 12px; line-height: 1.55; }
+.arche-corps dt { color: var(--tx2); font-size: 11px; margin-top: 6px; }
+.arche-corps dd { margin: 2px 0 0; }
+.arche-iris { font-style: italic; }
+.arche-distinction { margin-top: 4px; }
+.arche-critere { color: var(--acc); }
+
+.arche-sigma { margin-top: 12px; }
+#arche-verdict.ok { color: var(--acc); }
+#arche-verdict.refus { color: #d9534f; }

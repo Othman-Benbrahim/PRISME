@@ -1,0 +1,19 @@
+{
+  "id": "nexus-arche",
+  "name": "NEXUS-ARCHÊ",
+  "version": "0.1.0",
+  "api_version": 1,
+  "description": "Lecture structurelle d'une situation par 16 cartes invariantes, avec ancrage obligatoire et signature MÉMOIRE-Σ vérifiée. Le modèle propose, le code vérifie, l'auteur valide.",
+  "author": "PRISME",
+  "permissions": [
+    "vault_write"
+  ],
+  "buttons": [
+    {
+      "panel": "toolbar",
+      "label": "NEXUS-ARCHÊ",
+      "title": "Lire la structure d'une situation complexe",
+      "onclick": "archeOuvrir()"
+    }
+  ]
+}
