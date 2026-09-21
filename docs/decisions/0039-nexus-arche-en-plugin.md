@@ -1,6 +1,7 @@
 # 0039 · NEXUS-ARCHÊ en plugin — lecture assistée, garde-fous déterministes
 
-- **Statut** : acceptée, en cours (lot 1 livré)
+- **Statut** : acceptée, appliquée (lots 1 à 3 livrés)
+- **Prolongée par** : [0040](0040-antagonismes-et-configurations.md) — la relation d'antagonisme que le Mode 3 supposait sans la fournir
 - **Écrite** : 2026-09-21
 
 ## Problème

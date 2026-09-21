@@ -41,3 +41,5 @@ Chaque fiche indique : le **statut** (acceptée, appliquée, remplacée), la **d
 | 0034 | [Copies de référence de calibration](0034-copies-calibration.md) | implémentée, en revue |
 | 0036 | [Guides des plugins et périmètre E9](0036-guides-plugins-et-perimetre-e9.md) | acceptée ; guides livrés avant E9 |
 | 0038 | [Constat : passages exacts et pièces du pari](0038-constat-preuves-et-calibration.md) | implémentée sur `constat-suite`, en vérification |
+| 0039 | [NEXUS-ARCHÊ en plugin](0039-nexus-arche-en-plugin.md) | acceptée, appliquée (lots 1 à 3) |
+| 0040 | [Antagonismes structurels et configurations](0040-antagonismes-et-configurations.md) | acceptée, appliquée (lot 3) |

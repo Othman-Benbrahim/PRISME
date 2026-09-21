@@ -1,7 +1,7 @@
 /* NEXUS-ARCHÊ — écran Catalogue. Préfixe `arche-` sur tout sélecteur. */
 .arche-fenetre { width: 900px; max-width: 96vw; }
 .arche-entete { display: flex; align-items: center; gap: 12px; }
-.arche-entete h2 { flex: 1; margin: 0; }
+.arche-entete h2 { flex: none; margin: 0; }
 .arche-actions { display: flex; gap: 8px; align-items: center; margin: 10px 0; }
 
 /* `core.css` met `width:100%` sur les `button` et les `input` — c'est fait pour les
@@ -36,7 +36,18 @@
 #arche-situation { width: 100%; resize: vertical; font-family: inherit; }
 .arche-actions select { flex: none; }
 #arche-etat.erreur { color: #d9534f; }
-.arche-t-actif { background: var(--acc) !important; color: #fff !important; }
+
+/* Un onglet montre un panneau, il n'agit pas. Il ne doit donc pas ressembler à un
+   bouton d'action : pas de fond, pas de bordure, un simple soulignement pour l'actif.
+   Avec l'apparence d'un bouton, « Analyser » se lisait comme la commande d'analyse
+   alors que celle-ci est plus bas. */
+.arche-onglets { display: flex; gap: 2px; flex: 1; }
+.arche-onglet { width: auto; flex: none; background: none; border: 0;
+                border-bottom: 2px solid transparent; border-radius: 0;
+                padding: 6px 12px; color: var(--tx2); cursor: pointer;
+                font: inherit; }
+.arche-onglet:hover { color: var(--tx); }
+.arche-t-actif { color: var(--tx); border-bottom-color: var(--acc); font-weight: 600; }
 
 .arche-lue { border: 1px solid var(--bd); border-radius: 6px; padding: 10px 12px; margin-top: 8px; }
 .arche-lue.ecartee { opacity: .62; border-style: dashed; }
@@ -47,6 +58,19 @@
 /* L'ancrage est une citation : il doit se voir comme telle. */
 .arche-ancrage { border-left: 3px solid var(--acc); padding-left: 8px; font-style: italic; }
 .arche-motif { color: #d9534f; font-size: 12px; }
+/* Un signal de configuration n'est pas un verdict : il est encadré, pas alarmant. */
+.arche-config { border: 1px solid var(--acc); border-radius: 6px; padding: 10px 12px;
+                margin-top: 10px; font-size: 12px; line-height: 1.5; }
+.arche-config h4 { margin: 0 0 6px; }
+.arche-config p { margin: 4px 0; }
+.arche-fondement { color: var(--tx2); font-style: italic; }
+.arche-question { border-left: 3px solid var(--acc); padding-left: 8px; }
+
+.arche-archive { margin-top: 12px; }
+.arche-archive select { flex: none; }
+.arche-archive .btn { width: auto; flex: none; padding: 6px 14px; }
+.arche-archive input { flex: 1; min-width: 0; width: auto; }
+
 .arche-questions { margin-top: 10px; }
 .arche-questions li { margin: 4px 0; font-size: 12px; }
 .arche-avert { color: var(--tx2); font-size: 12px; margin-top: 8px; }

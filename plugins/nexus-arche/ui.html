@@ -1,8 +1,15 @@
 <div id="m-nexus-arche" class="ov"><div class="mb arche-fenetre">
   <div class="arche-entete">
     <h2>NEXUS-ARCHÊ</h2>
-    <button class="btn bs" type="button" onclick="archeOnglet('analyse')" id="arche-t-analyse">Analyser</button>
-    <button class="btn bs" type="button" onclick="archeOnglet('catalogue')" id="arche-t-catalogue">Catalogue</button>
+    <!-- Onglets : ils montrent un panneau, ils n'agissent pas. Leur apparence doit
+         donc différer des boutons d'action, et leur libellé être un nom, pas un verbe —
+         un onglet « Analyser » qui n'analyse rien envoie chercher ailleurs. -->
+    <div class="arche-onglets" role="tablist">
+      <button class="arche-onglet" type="button" role="tab" aria-controls="arche-p-analyse"
+              onclick="archeOnglet('analyse')" id="arche-t-analyse">Lecture</button>
+      <button class="arche-onglet" type="button" role="tab" aria-controls="arche-p-catalogue"
+              onclick="archeOnglet('catalogue')" id="arche-t-catalogue">Catalogue</button>
+    </div>
     <button class="btn bs" type="button" onclick="archeFermer()">Fermer</button>
   </div>
 
@@ -11,8 +18,8 @@
     disparaît pas, elle attend une situation qui lui corresponde. La coïncidence lexicale
     n'est pas un ancrage : un « réseau » nommé ne prouve pas RÉSEAU.</p>
 
-  <!-- ── Analyser ── -->
-  <div id="arche-p-analyse">
+  <!-- ── Lecture ── -->
+  <div id="arche-p-analyse" role="tabpanel" aria-labelledby="arche-t-analyse">
     <p id="arche-ia" class="eng-note"></p>
     <textarea id="arche-situation" rows="5" placeholder="Décrivez la situation, en quelques phrases, avec des faits."></textarea>
     <div class="arche-actions">
@@ -24,17 +31,48 @@
           <option value="3">Tirage — 3 cartes : tient / bouge / manque</option>
         </select>
       </label>
-      <button class="btn bp" type="button" onclick="archeLire()" id="arche-lire">Lire</button>
+      <button class="btn bp" type="button" onclick="archeLire()" id="arche-lire">Lancer la lecture</button>
     </div>
     <p class="eng-note">Au tirage, les cartes sortent <strong>avant</strong> l'analyse :
       le modèle ne choisit pas ce qu'il va justifier, il doit trouver un ancrage ou
       déclarer la carte inactive. C'est le mode le plus rigoureux.</p>
     <p id="arche-etat" role="status" aria-live="polite"></p>
     <div id="arche-lecture"></div>
+
+    <details id="arche-archive" class="arche-archive" hidden>
+      <summary>Archiver cette lecture dans le vault</summary>
+      <p class="eng-note">Les ancrages sont revérifiés au moment d'écrire, et les
+        configurations recalculées : une fiche ne peut pas contenir une citation qui n'en
+        est pas une.</p>
+      <div class="arche-actions">
+        <label>Format
+          <select id="arche-format">
+            <option value="longue">Fiche complète</option>
+            <option value="bloc">Bloc condensé</option>
+          </select>
+        </label>
+        <label>Statut épistémique
+          <select id="arche-statut">
+            <option value="">— non déclaré —</option>
+            <option value="descriptif">Descriptif</option>
+            <option value="speculatif">Spéculatif</option>
+            <option value="performatif">Performatif</option>
+          </select>
+        </label>
+      </div>
+      <div class="arche-actions">
+        <input id="arche-signature" type="text" placeholder="Signature MÉMOIRE-Σ de la séance (facultative) — ⟦⊙∿◯⊜⟧ Clos"
+               aria-label="Signature MÉMOIRE-Σ de la séance">
+        <button class="btn bp" type="button" onclick="archeArchiver()" id="arche-ecrire">Écrire la fiche</button>
+      </div>
+      <p class="eng-note">La signature décrit la <strong>séance</strong>, la chaîne NEXUS
+        décrit la <strong>situation</strong> : deux alphabets, jamais mêlés. Une signature
+        invalide bloque l'écriture plutôt que d'être archivée telle quelle.</p>
+    </details>
   </div>
 
   <!-- ── Catalogue ── -->
-  <div id="arche-p-catalogue" hidden>
+  <div id="arche-p-catalogue" role="tabpanel" aria-labelledby="arche-t-catalogue" hidden>
     <div class="arche-actions">
       <input id="arche-filtre" type="search" placeholder="Filtrer les cartes…"
              oninput="archeRendre()" aria-label="Filtrer les cartes">

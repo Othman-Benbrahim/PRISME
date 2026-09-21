@@ -112,7 +112,7 @@ def main():
         executer([sys.executable, ROOT / "packaging/verifier_processus.py", executable, travail], env=env, timeout=90)
         rapport = {"commit": commit, "plateforme": platform.platform(), "python": platform.python_version(),
                    "release_windows": sys.platform == "win32", "dependances_construction": versions,
-                   "controles": ["neuf plugins actifs", "sans dossier plugins", "inférence ONNX", "HTTP", "MCP"],
+                   "controles": ["dix plugins actifs", "sans dossier plugins", "inférence ONNX", "HTTP", "MCP"],
                    "limites": ["inspection visuelle manuelle requise", "services réseau non testés par ce build"]}
         (application / "construction.json").write_text(json.dumps(rapport, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         for nom in ("avec-plugins.json", "sans-plugins.json"):
