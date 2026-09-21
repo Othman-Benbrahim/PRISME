@@ -3,8 +3,12 @@ import json
 from pathlib import Path
 import sys
 
+# Inventaire des plugins de la distribution. Il double celui de `tests/test_e1_plugins.py`,
+# et lui seul est exerce par le binaire gele : un plugin ajoute sans etre inscrit ici passe
+# toute la suite de tests et fait echouer la construction. `test_e9_distribution.py` les lie
+# desormais au contenu reel de `plugins/`.
 ATTENDUS = {"arxiv", "calibration", "constat", "context", "duckduckgo",
-            "embeddings-locaux", "osint-cx", "prompts", "rss"}
+            "embeddings-locaux", "nexus-arche", "osint-cx", "prompts", "rss"}
 
 
 def exiger(condition, message):

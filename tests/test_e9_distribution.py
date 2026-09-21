@@ -19,6 +19,30 @@ spec.loader.exec_module(construction)
 
 
 class TestDistribution(unittest.TestCase):
+    def test_l_inventaire_de_la_distribution_suit_le_dossier_plugins(self):
+        """Le seul contrôle que la suite de tests ne voyait pas.
+
+        `diagnostic_distribution.ATTENDUS` est vérifié par le **binaire gelé**, pas ici :
+        un plugin livré sans y être inscrit passait toute la suite au vert et faisait
+        échouer la construction Windows. C'est arrivé — NEXUS-ARCHÊ a fait échouer la CI
+        à chacun de ses trois lots, dont deux déjà fusionnés dans `main`, sans qu'aucun
+        test ne bronche. Les deux inventaires sont désormais liés.
+        """
+        from prisme_core.diagnostic_distribution import ATTENDUS
+        livres = {d.name for d in (ROOT / "plugins").iterdir()
+                  if (d / "manifest.json").is_file()}
+        self.assertEqual(ATTENDUS, livres,
+                         "inscrivez le plugin dans diagnostic_distribution.ATTENDUS, "
+                         "sinon la construction du binaire le refusera")
+
+    def test_le_rapport_de_construction_annonce_le_bon_compte(self):
+        """Le rapport dit « dix plugins actifs » en clair : il doit suivre l'inventaire."""
+        from prisme_core.diagnostic_distribution import ATTENDUS
+        nombres = {9: "neuf", 10: "dix", 11: "onze", 12: "douze", 13: "treize"}
+        attendu = "%s plugins actifs" % nombres.get(len(ATTENDUS), len(ATTENDUS))
+        source = (ROOT / "packaging" / "construire.py").read_text(encoding="utf-8")
+        self.assertIn('"%s"' % attendu, source)
+
     def test_frontiere_des_fichiers_livres(self):
         for nom in ("plugins/constat/LICENSE", "plugins/constat/ui.js", "plugins/embeddings-locaux/moteur.py",
                     "guides-plugins/calibration.md", "mcp/prisme_mcp.py"):
