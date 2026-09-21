@@ -161,6 +161,33 @@ class Detection(unittest.TestCase):
         s = configurations.detecter({TIENT: 'seuil', BOUGE: 'reseau', MANQUE: 'transformation'})
         self.assertNotIn(4, [x['numero'] for x in s])
 
+    def test_un_antagonisme_ne_compte_pas_deux_fois_en_configuration_1(self):
+        """Le compte porte sur des paires distinctes de cartes, pas de positions.
+
+        En configuration 1, la même carte occupe « tient » et « manque ». L'énumérer
+        comme deux cartes faisait compter deux fois l'unique antagonisme qui la lie à
+        « bouge » : la configuration 4 se déclarait sur un seul antagonisme et affichait
+        la même paire deux fois. C'est le seul endroit du plugin où un faux diagnostic
+        pouvait sortir d'un calcul déterministe.
+        """
+        s = configurations.detecter({TIENT: 'seuil', BOUGE: 'transformation', MANQUE: 'seuil'})
+        numeros = [x['numero'] for x in s]
+        self.assertIn(1, numeros)
+        self.assertNotIn(4, numeros, 'un seul antagonisme ne fait pas une tension maximale')
+
+    def test_configuration_4_ne_repete_jamais_une_paire(self):
+        for a in (c['id'] for c in catalogue.toutes()):
+            for b in (c['id'] for c in catalogue.toutes()):
+                s = configurations.detecter({TIENT: a, BOUGE: b, MANQUE: a})
+                for signal in s:
+                    paires = [tuple(sorted(p['cartes'])) for p in signal.get('paires', [])]
+                    self.assertEqual(len(paires), len(set(paires)), (a, b))
+
+    def test_configuration_4_ne_liste_chaque_carte_qu_une_fois(self):
+        s = configurations.detecter({TIENT: 'emergence', BOUGE: 'croissance', MANQUE: 'emergence'})
+        for signal in s:
+            self.assertEqual(len(signal['cartes']), len(set(signal['cartes'])))
+
     def test_carte_inactive_n_entre_dans_aucune_configuration(self):
         """Une carte tirée sans ancrage est déclarée inactive : sa position est vide, et
         rien ne peut être prononcé dessus."""

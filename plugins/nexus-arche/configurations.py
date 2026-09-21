@@ -122,11 +122,27 @@ def detecter(positions):
             "question": MEME_OBJET, "fondement": a["fondement"], "statut": a["statut"],
             "axe": a["axe"]})
 
-    actives = [c for c in (tient, bouge, manque) if c]
-    couples = [(actives[i], actives[j])
-               for i in range(len(actives)) for j in range(i + 1, len(actives))]
-    incompatibles = [antagonisme(x, y) for x, y in couples]
-    incompatibles = [p for p in incompatibles if p]
+    # Les trois paires de positions, et non les paires de la liste des cartes : en
+    # configuration 1, la même carte occupe « tient » et « manque », et l'énumérer
+    # comme deux cartes fait compter DEUX FOIS l'unique antagonisme qui la lie à
+    # « bouge ». La configuration 4 se déclarait alors sur un seul antagonisme, et
+    # affichait la même paire deux fois — le compte doit porter sur des paires
+    # distinctes de cartes.
+    vus, incompatibles = set(), []
+    for x, y in ((tient, bouge), (bouge, manque), (tient, manque)):
+        p = antagonisme(x, y)
+        if p is None:
+            continue
+        cle = frozenset((p["a"], p["b"]))
+        if cle in vus:
+            continue
+        vus.add(cle)
+        incompatibles.append(p)
+
+    actives = []
+    for c in (tient, bouge, manque):
+        if c and c not in actives:
+            actives.append(c)
     if len(incompatibles) >= 2:
         signaux.append({
             "numero": 4, "nom": "Tension maximale", "cartes": actives,
