@@ -389,13 +389,12 @@ Rappel des invariants, parce qu'ils survivent aux étapes :
 
 PRISME est développé par **Othman Ben Brahim**. Il est issu d'une refonte de Second Brain V1, dont la base historique est conservée sous l'étiquette Git `base-v1`.
 
+Le fichier [`LICENSE`](LICENSE) à la racine indique la **licence MIT**. Le plugin Constat reprend des composants du [projet Constat](https://github.com/Othman-Benbrahim/constat) et conserve sa **licence AGPL-3.0**, disponible dans [`plugins/constat/LICENSE`](plugins/constat/LICENSE). Les dépendances et les modèles conservent leurs licences respectives.
+
 ## Badges GitHub
 
 ![Tests](https://github.com/Othman-Benbrahim/PRISME/actions/workflows/ci.yml/badge.svg)
 ![Version](https://img.shields.io/github/v/release/Othman-Benbrahim/PRISME)
 ![License](https://img.shields.io/github/license/Othman-Benbrahim/PRISME)
 ![Python](https://img.shields.io/badge/python-3.12+-blue)
-
-Le fichier [`LICENSE`](LICENSE) à la racine indique la **licence MIT**. Le plugin Constat reprend des composants du [projet Constat](https://github.com/Othman-Benbrahim/constat) et conserve sa **licence AGPL-3.0**, disponible dans [`plugins/constat/LICENSE`](plugins/constat/LICENSE). Les dépendances et les modèles conservent leurs licences respectives.
-
-[Deepwiki](https://deepwiki.com/Othman-Benbrahim/PRISME)
+![Deepwiki](https://deepwiki.com/Othman-Benbrahim/PRISME)
