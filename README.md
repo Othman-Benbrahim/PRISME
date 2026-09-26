@@ -393,7 +393,6 @@ Le fichier [`LICENSE`](LICENSE) à la racine indique la **licence MIT**. Le plug
 
 ## Badges GitHub
 
-![Tests](https://github.com/Othman-Benbrahim/PRISME/actions/workflows/ci.yml/badge.svg)
 ![Version](https://img.shields.io/github/v/release/Othman-Benbrahim/PRISME)
 ![License](https://img.shields.io/github/license/Othman-Benbrahim/PRISME)
 ![Python](https://img.shields.io/badge/python-3.12+-blue)
